@@ -1,0 +1,25 @@
+# FortiGate Configuration File
+# 
+# Format: IP_ADDRESS, API_KEY, NAME (optional)
+# Lines starting with # are ignored
+#
+# To use this file:
+# 1. Copy this file to fortigate_config.txt
+# 2. Replace the example values with your FortiGate details
+# 3. Run the script and select option 2 (Load from config file)
+#
+# ⚠️  SECURITY WARNING: Keep this file secure - it contains API tokens!
+# Add fortigate_config.txt to .gitignore to prevent accidental commits.
+
+# Example single FortiGate:
+# 192.168.1.100, fmtXXXXXXXXXXXXXXXXXXXXXXXXXXXX, HQ-FortiGate
+
+# Example A/A HA Cluster:
+# 192.168.1.100, fmtXXXXXXXXXXXXXXXXXXXXXXXXXXXX, FW-Primary
+# 192.168.1.101, fmtYYYYYYYYYYYYYYYYYYYYYYYYYYYY, FW-Secondary
+
+# Example multi-site deployment:
+# 10.10.1.1, fmtAAAAAAAAAAAAAAAAAAAAAAAAAAAA, Site-A-Primary
+# 10.10.1.2, fmtBBBBBBBBBBBBBBBBBBBBBBBBBBBB, Site-A-Secondary
+# 10.20.1.1, fmtCCCCCCCCCCCCCCCCCCCCCCCCCCCC, Site-B-Primary
+# 10.20.1.2, fmtDDDDDDDDDDDDDDDDDDDDDDDDDDDD, Site-B-Secondary
