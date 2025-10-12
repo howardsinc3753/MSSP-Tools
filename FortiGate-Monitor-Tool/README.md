@@ -1,6 +1,6 @@
 # FortiGate Conserve Mode Monitor
 
-A production-ready monitoring script for detecting and preventing conserve mode on FortiGate firewalls. Designed for MSSP and enterprise environments managing FortiGate 1800F A/A clusters.
+A production-ready monitoring script for detecting and preventing conserve mode on FortiGate firewalls. Designed for MSSP and enterprise environments managing FortiGate.
 
 ## ⚠️ Disclaimer
 
