@@ -73,7 +73,7 @@ Copy the generated token into `fortigate_config.txt`.
 
 ### 4. Run the Monitor
 ```bash
-python3 fortigate_prod_v22.py
+python3 FortiOS-Monitor-Script.py
 ```
 
 When prompted:
