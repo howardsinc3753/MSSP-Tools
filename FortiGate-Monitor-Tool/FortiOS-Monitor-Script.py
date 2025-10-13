@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 FortiGate Conserve Mode Monitor v2.2
-Production-ready monitoring script for FortiGate 1800F A/A clusters
+Production-ready monitoring script for FortiOS Firewalls
 Author: Daniel Howard, MSSP Solutions Engineer
 Last Updated: 2025-10-11
 
