@@ -157,8 +157,8 @@ diagnose sys top
 ## Tested Platforms
 
 - **FortiOS:** 7.4.x
-- **Models:** FortiGate 1800F (primary target), other models supported
-- **Deployment:** A/A HA clusters, standalone units
+- **Models:** 71F FortiGate
+- **Deployment:**  HA clusters, standalone units
 
 ## Support
 
