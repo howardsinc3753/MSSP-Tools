@@ -12,6 +12,38 @@ These tools are designed to help MSSPs, partners, and network engineers:
 
 ## 🛠️ Available Tools
 
+### [FortiFlex MSSP Automation Toolkit](FortiFlex-Dev-Package/fortiflex-mssp-toolkit/)
+**Status:** ✅ Production Ready - November 2025
+
+Complete Python automation toolkit for Fortinet FortiFlex MSSP operations. Manage customer lifecycle from onboarding to offboarding with production-ready scripts covering all 7 critical use cases.
+
+**Key Features:**
+- Customer onboarding with cost estimation
+- Service expansion and modification
+- Daily consumption reporting for billing
+- Entitlement suspension/reactivation
+- Multi-tenant operations dashboard
+- MSSP commitment tracking (50K points/year)
+- Complete FortiFlex 25.1.0 product catalog
+
+**What's Included:**
+- 7 production-ready use case scripts
+- Complete API integration guide (Parts 1 & 2)
+- Full product type reference
+- Automated testing utilities
+- November 2025 compatibility patches
+
+**Use Cases:**
+- Automated customer onboarding workflows
+- Monthly billing and invoicing
+- Service lifecycle management
+- MSSP program balance monitoring
+- Multi-customer operations at scale
+
+[📖 View Documentation →](FortiFlex-Dev-Package/fortiflex-mssp-toolkit/)
+
+---
+
 ### [FortiGate Conserve Mode Monitor](FortiGate-Monitor-Tool/)
 **Status:** ✅ Production Ready v2.2
 
@@ -37,8 +69,8 @@ Monitor FortiGate memory usage in real-time to prevent conserve mode before it i
 ## 🚀 Coming Soon
 
 More MSSP tools are in development:
-- FortiAnalyzer log analysis utilities
 - FortiManager automation scripts
+- FortiAnalyzer log analysis utilities
 - Multi-vendor health check tools
 - SIEM integration helpers
 
@@ -71,12 +103,25 @@ By using any tool in this repository, you agree to:
 2. Assume full responsibility for deployment and outcomes
 3. Validate all outputs independently before taking action
 
-## 📞 Support
+## 📞 Support & Bug Reports
 
 These are community-maintained tools. For issues or questions:
 
-- **Tool-specific bugs:** Open an issue in this repository
-- **Feature requests:** Submit via GitHub Issues
+### Reporting Bugs
+Found a bug? Help us improve! Please open a GitHub Issue with:
+
+1. **Go to:** https://github.com/howardsinc3753/MSSP-Tools/issues
+2. **Click:** "New Issue"
+3. **Include:**
+   - Tool name (e.g., "FortiFlex MSSP Toolkit" or "FortiGate Monitor")
+   - Description of the issue
+   - Steps to reproduce
+   - Expected vs actual behavior
+   - Your environment (OS, Python version, etc.)
+   - Error messages or logs (remove any credentials!)
+
+### Other Support
+- **Feature requests:** Submit via [GitHub Issues](https://github.com/howardsinc3753/MSSP-Tools/issues)
 - **Fortinet product support:** Contact [Fortinet TAC](https://support.fortinet.com) (not responsible for these tools)
 - **General MSSP questions:** Engage with the Fortinet community forums
 

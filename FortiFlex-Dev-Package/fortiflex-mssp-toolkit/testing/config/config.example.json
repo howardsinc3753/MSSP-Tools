@@ -1,0 +1,50 @@
+{
+  "api": {
+    "username": "YOUR_API_USERNAME",
+    "password": "YOUR_API_PASSWORD",
+    "client_id": "flexvm",
+    "program_serial_number": "ELAVMSXXXXXXXX"
+  },
+  "database": {
+    "enabled": true,
+    "dbname": "fortiflex",
+    "user": "app",
+    "password": "YOUR_DB_PASSWORD",
+    "host": "localhost",
+    "port": 5432
+  },
+  "rate_limiting": {
+    "max_per_minute": 90,
+    "max_per_hour": 900
+  },
+  "alerts": {
+    "enabled": true,
+    "email": {
+      "enabled": false,
+      "smtp_host": "smtp.example.com",
+      "smtp_port": 587,
+      "from_address": "fortiflex-alerts@example.com",
+      "to_addresses": ["ops@example.com"]
+    },
+    "slack": {
+      "enabled": false,
+      "webhook_url": "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+    }
+  },
+  "thresholds": {
+    "prepaid_balance": {
+      "critical_days": 7,
+      "warning_days": 15,
+      "info_days": 30
+    },
+    "mssp_commitment": {
+      "minimum_annual_points": 50000
+    }
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "/var/log/fortiflex/fortiflex.log",
+    "max_size_mb": 100,
+    "backup_count": 5
+  }
+}
