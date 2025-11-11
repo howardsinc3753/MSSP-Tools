@@ -38,9 +38,9 @@ FortiFlex MSSP is Fortinet's flexible licensing program for Managed Security Ser
 
 ### **👉 New User? START HERE!**
 
-**[START_HERE.md](START_HERE.md)** - Complete onboarding guide for non-technical users
+**[Getting Started Guide](documentation/GETTING_STARTED.md)** - Complete onboarding guide
 
-The START_HERE guide walks you through:
+The Getting Started guide walks you through:
 1. ✅ Getting your FortiFlex API credentials
 2. ✅ Configuring the toolkit (most important step!)
 3. ✅ Discovering your program serial number automatically
@@ -60,7 +60,7 @@ notepad testing\config\credentials.json
 **All scripts load credentials from this ONE file:**
 - Location: `testing/config/credentials.json`
 - Required fields: `api_username`, `api_password`, `program_serial_number`
-- **See [CREDENTIALS_SETUP.md](CREDENTIALS_SETUP.md) for detailed setup instructions**
+- **See [CREDENTIALS_SETUP.md](documentation/CREDENTIALS_SETUP.md) for detailed setup instructions**
 
 **Step 2: Discover Your Program**
 ```bash
