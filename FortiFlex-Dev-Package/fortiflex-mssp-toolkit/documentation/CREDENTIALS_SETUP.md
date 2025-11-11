@@ -15,6 +15,21 @@ C:\Users\howar\Documents\Projects\MSSP-SE-Tools\FortiFlex-Dev-Package\fortiflex-
 
 ---
 
+## 📋 Understanding the Config Files
+
+**You'll see TWO example files in `testing/config/`. Here's what they're for:**
+
+| File | What It's For | Action Needed |
+|------|---------------|---------------|
+| **credentials.example.json** | ✅ Simple credentials template | **Copy this to `credentials.json` and edit** |
+| **config.example.json** | 🔧 Advanced production config (database, SMTP, alerts) | **Ignore this - it's for advanced users** |
+
+**Important:** You ONLY need `credentials.example.json` for basic usage!
+
+The `config.example.json` file is for advanced production deployments with PostgreSQL databases, email alerts, and Slack notifications. Unless you're setting up enterprise infrastructure, you can completely ignore it.
+
+---
+
 ## 📁 How It Works
 
 ```

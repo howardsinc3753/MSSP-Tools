@@ -4,16 +4,31 @@
 
 ---
 
+## 📋 Before You Start - Understanding Config Files
+
+**You'll see TWO example files in `testing/config/`. Here's what they're for:**
+
+| File | Purpose | Do You Need It? |
+|------|---------|-----------------|
+| **credentials.example.json** | ✅ Simple template for API credentials | **YES - Use this one!** |
+| **config.example.json** | 🔧 Advanced config (database, alerts, SMTP) | **NO - Ignore for now** |
+
+**For this guide, you ONLY need `credentials.example.json`!**
+
+The advanced `config.example.json` is for future production deployments with databases and alerting. You can ignore it completely for now.
+
+---
+
 ## What You're About to Do
 
 You're going to:
-1. Configure your API credentials
-2. Install Python dependencies
-3. Discover your FortiFlex programs automatically
-4. Test API connectivity
-5. Run your first automation
+1. Configure your API credentials **(5 minutes)**
+2. Install Python dependencies **(optional - 2 minutes)**
+3. Discover your FortiFlex programs automatically **(2 minutes)**
+4. Test API connectivity **(1 minute)**
+5. Run your first automation **(1 minute)**
 
-**Time Required:** 10-15 minutes
+**Total Time:** 10-15 minutes
 
 ---
 
@@ -62,7 +77,15 @@ C:\Users\howar\Documents\Projects\MSSP-SE-Tools\FortiFlex-Dev-Package\fortiflex-
 
 ---
 
-## Step 2: Install Dependencies
+## Step 2: Install Dependencies (Optional)
+
+**Do I need this step?**
+
+✅ **Probably NO** - If you already have Python and pip installed, you likely already have the required `requests` library.
+
+❓ **Try skipping to Step 3.** If you get a `ModuleNotFoundError`, come back and run this step.
+
+**To install dependencies:**
 
 Open Command Prompt or PowerShell and run:
 
@@ -76,6 +99,14 @@ pip install -r requirements.txt
 ```
 Successfully installed requests-2.31.0 urllib3-2.0.0
 ```
+
+**What this installs:**
+- `requests` - For making API calls (required)
+- `urllib3` - HTTP library (usually already installed)
+- `psycopg2-binary` - PostgreSQL database support (optional)
+- Testing tools (optional)
+
+**Most users already have `requests` installed**, so this step often isn't necessary!
 
 ---
 

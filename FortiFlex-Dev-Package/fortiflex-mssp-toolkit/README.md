@@ -51,9 +51,14 @@ The Getting Started guide walks you through:
 
 ### **⚡ Quick Setup (3 Steps)**
 
+> **📋 Note:** You'll see two example files in `testing/config/`:
+> - `credentials.example.json` ✅ **Use this one** - Simple API credentials template
+> - `config.example.json` 🔧 **Ignore this** - Advanced config for enterprise deployments (database, alerts, etc.)
+
 **Step 1: Configure Credentials** (REQUIRED - Do this first!)
 ```bash
-# Edit this file with YOUR API credentials:
+# Copy the example file and edit with YOUR API credentials:
+copy testing\config\credentials.example.json testing\config\credentials.json
 notepad testing\config\credentials.json
 ```
 
@@ -84,10 +89,11 @@ python examples\use_case_6_multi_tenant_operations.py
 All scripts automatically load credentials from `testing/config/credentials.json`. No need to edit individual scripts!
 
 ```bash
-# Install dependencies
+# Install dependencies (optional - try skipping this first)
 pip install -r requirements.txt
 
-# Configure credentials (ONCE)
+# Copy and configure credentials (ONCE)
+copy testing\config\credentials.example.json testing\config\credentials.json
 notepad testing\config\credentials.json
 
 # Discover your program (auto-updates credentials.json)
@@ -100,6 +106,8 @@ python testing\test_authentication.py
 python examples\use_case_6_multi_tenant_operations.py
 python examples\use_case_4_daily_consumption.py
 ```
+
+**Note:** Most Python installations already include the `requests` library, so you can usually skip the `pip install` step unless you get a `ModuleNotFoundError`.
 
 ---
 
