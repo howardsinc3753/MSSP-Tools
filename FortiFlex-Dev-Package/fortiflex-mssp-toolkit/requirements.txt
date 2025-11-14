@@ -1,10 +1,14 @@
 # FortiFlex MSSP Toolkit - Python Dependencies
 
-# Core dependencies
+# Core dependencies (required)
 requests>=2.31.0
 urllib3>=2.0.0
 
-# Optional database support
+# Excel/CSV export (optional - for consumption reports)
+openpyxl>=3.1.0        # Excel .xlsx file creation
+pandas>=2.0.0          # Data manipulation and CSV export
+
+# PostgreSQL database support (optional - for enterprise deployments)
 psycopg2-binary>=2.9.0  # PostgreSQL adapter
 
 # Development dependencies (optional)
