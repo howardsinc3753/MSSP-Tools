@@ -8,9 +8,9 @@
 testing/config/credentials.json
 ```
 
-**Full Path:**
+**Relative Path:**
 ```
-C:\Users\howar\Documents\Projects\MSSP-SE-Tools\FortiFlex-Dev-Package\fortiflex-mssp-toolkit\testing\config\credentials.json
+fortiflex-mssp-toolkit/testing/config/credentials.json
 ```
 
 ---
@@ -104,7 +104,8 @@ Press `Ctrl + S` to save and close Notepad.
 Run the discovery script to verify credentials and auto-fill your program serial number:
 
 ```bash
-cd C:\Users\howar\Documents\Projects\MSSP-SE-Tools\FortiFlex-Dev-Package\fortiflex-mssp-toolkit
+# Navigate to the toolkit directory
+cd path/to/fortiflex-mssp-toolkit
 python testing\discover_program.py
 ```
 

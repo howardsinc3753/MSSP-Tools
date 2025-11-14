@@ -124,6 +124,53 @@ Configure credentials ONCE in that file, and all scripts will automatically use 
 
 ---
 
+## 🔧 Library Structure
+
+### Core Library: `src/fortiflex_client.py`
+
+**All example scripts import from this single library file.** You don't need to redefine functions - they're all in the `FortiFlexClient` class.
+
+**Available Methods:**
+
+| Method | Purpose | Use Case |
+|--------|---------|----------|
+| `create_config()` | Create product configuration | Use Cases 1, 3 |
+| `update_config()` | Modify existing configuration | Use Case 3 |
+| `list_configs()` | List all configurations | Use Cases 2, 5, 6 |
+| `create_hardware_entitlements()` | Provision hardware devices | Use Case 1 |
+| `create_cloud_entitlements()` | Provision cloud services | Use Case 1 |
+| `update_entitlement()` | Change device configuration | Use Case 2 |
+| `stop_entitlement()` | Suspend device (reversible) | Use Case 5 |
+| `reactivate_entitlement()` | Reactivate suspended device | Use Case 5 |
+| `get_entitlement_points()` | Get consumption data | Use Cases 4, 5, 6 |
+| `get_program_points()` | Check program balance | Use Case 7 |
+| `calculate_points()` | Estimate costs | Use Cases 1, 3 |
+| `get_multi_tenant_view()` | View all customers | Use Case 6 |
+
+**Usage Example:**
+```python
+from src.fortiflex_client import FortiFlexClient, get_oauth_token
+
+# Authenticate
+token = get_oauth_token(username, password, client_id="flexvm")
+
+# Initialize client
+client = FortiFlexClient(token, program_serial_number)
+
+# Use any method
+configs = client.list_configs(account_id=12345)
+consumption = client.get_entitlement_points(account_id=12345, start_date="2025-11-01")
+```
+
+**Why this structure?**
+- ✅ **Single source of truth** - All logic in one library file
+- ✅ **No code duplication** - Examples import, don't redefine
+- ✅ **Easy updates** - Fix bugs in one place
+- ✅ **Type hints included** - Better IDE autocomplete
+- ✅ **Built-in rate limiting** - Automatic compliance with API limits
+
+---
+
 ## 📚 Documentation
 
 **New Partners - Start Here**:

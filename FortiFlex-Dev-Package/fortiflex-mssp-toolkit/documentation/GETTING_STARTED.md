@@ -41,9 +41,9 @@ You're going to:
 testing/config/credentials.json
 ```
 
-**Full Path:**
+**Relative Path:**
 ```
-C:\Users\howar\Documents\Projects\MSSP-SE-Tools\FortiFlex-Dev-Package\fortiflex-mssp-toolkit\testing\config\credentials.json
+fortiflex-mssp-toolkit/testing/config/credentials.json
 ```
 
 ### **How to Configure:**
@@ -90,7 +90,8 @@ C:\Users\howar\Documents\Projects\MSSP-SE-Tools\FortiFlex-Dev-Package\fortiflex-
 Open Command Prompt or PowerShell and run:
 
 ```bash
-cd C:\Users\howar\Documents\Projects\MSSP-SE-Tools\FortiFlex-Dev-Package\fortiflex-mssp-toolkit
+# Navigate to the toolkit directory
+cd path/to/fortiflex-mssp-toolkit
 
 pip install -r requirements.txt
 ```

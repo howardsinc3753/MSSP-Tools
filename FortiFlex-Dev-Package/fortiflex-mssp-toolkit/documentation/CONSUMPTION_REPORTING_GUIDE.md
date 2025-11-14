@@ -47,7 +47,8 @@ python testing\discover_program.py
 ### 2. Navigate to Toolkit Directory
 
 ```bash
-cd C:\Users\howar\Documents\Projects\MSSP-SE-Tools\FortiFlex-Dev-Package\fortiflex-mssp-toolkit
+# Navigate to your toolkit installation
+cd path/to/fortiflex-mssp-toolkit
 ```
 
 ---
@@ -465,7 +466,7 @@ You can schedule the script to run automatically:
 **Windows Task Scheduler**:
 ```bash
 # Create a batch file: daily_report.bat
-cd C:\Users\howar\Documents\Projects\MSSP-SE-Tools\FortiFlex-Dev-Package\fortiflex-mssp-toolkit
+cd path\to\fortiflex-mssp-toolkit
 python examples\consumption_report_v2.py --days 1 > logs\daily_%date%.log
 ```
 
