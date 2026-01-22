@@ -28,8 +28,8 @@ Before running any examples:
    ```json
    {
      "fortiflex": {
-       "api_username": "your_username@company.com",
-       "api_password": "your_password",
+       "api_username": "YOUR-API-UUID-FROM-FORTICLOUD-IAM",
+       "api_password": "your_api_password",
        "program_serial_number": "ELAVMS0000XXXXXX",
        "account_id": 12345
      }
