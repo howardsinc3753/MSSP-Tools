@@ -257,7 +257,7 @@ consumption = client.get_entitlement_points(
 store_daily_consumption(db_conn, consumption, "2025-11-08")
 ```
 
-### [Use Case 5: Customer Suspension/Offboarding](examples/use_case_5_customer_suspension.py)
+### [Use Case 5: Customer Suspension/Offboarding](examples/use_case_5_entitlement_suspension.py)
 
 Manage customer lifecycle:
 - **Scenario A:** Temporary suspension (payment late, reversible)
@@ -409,7 +409,7 @@ parameters = [
 - `FGHWFAMS` - FortiGate Cloud Management
 - `FGHWFAIS` - AI-Based Sandbox
 - `FGHWSWNM` - SD-WAN Underlay
-- And more (see [Part 1 Guide](docs/FortiFlex-MSSP_Use-Case_Guide_Part1.md))
+- And more (see [Product Type Reference](examples/PRODUCT_TYPE_REFERENCE.md))
 
 #### FortiSwitch Hardware (productTypeId: 103)
 
@@ -540,17 +540,27 @@ fortiflex-mssp-toolkit/
 │   ├── use_case_2_service_expansion.py
 │   ├── use_case_3_service_modification.py
 │   ├── use_case_4_daily_consumption.py
-│   ├── use_case_5_customer_suspension.py
+│   ├── use_case_5_entitlement_suspension.py
 │   ├── use_case_6_multi_tenant_operations.py
-│   └── use_case_7_program_balance_monitoring.py
+│   ├── use_case_7_program_balance_monitoring.py
+│   ├── consumption_report_v2.py # Billing reports with Excel export
+│   ├── EXAMPLES_SUMMARY.md
+│   └── PRODUCT_TYPE_REFERENCE.md
+├── testing/
+│   ├── config/
+│   │   ├── credentials.example.json  # Template - copy and configure
+│   │   └── credentials.json          # Your API credentials (gitignored)
+│   ├── discover_program.py      # Auto-discover program serial number
+│   └── test_authentication.py   # Verify API connectivity
 ├── database/
 │   └── schema.sql               # PostgreSQL database schema
-├── config/
-│   ├── config.example.json      # Example configuration
-│   └── credentials.example.json # Example credentials
+├── documentation/
+│   ├── GETTING_STARTED.md
+│   ├── CREDENTIALS_SETUP.md
+│   ├── USE_CASES_GUIDE.md
+│   └── CONSUMPTION_REPORTING_GUIDE.md
 ├── docs/
-│   ├── FortiFlex-MSSP_Use-Case_Guide_Part1.md
-│   └── FortiFlex-MSSP_Use-Case_Guide_Part2.md
+│   └── MSSP_Integration_Guide_*.md  # API integration guides
 ├── requirements.txt
 ├── setup.py
 ├── LICENSE
@@ -563,7 +573,7 @@ fortiflex-mssp-toolkit/
 
 This is a community toolkit for partner use:
 
-1. **Toolkit issues:** Open a [GitHub issue](https://github.com/yourusername/fortiflex-mssp-toolkit/issues)
+1. **Toolkit issues:** Open a [GitHub issue](https://github.com/howardsinc3753/MSSP-Tools/issues)
 2. **FortiFlex API:** See [FortiFlex Documentation](https://docs.fortinet.com/document/flex-vm/)
 3. **Fortinet product support:** Contact [Fortinet TAC](https://support.fortinet.com)
 
@@ -629,12 +639,13 @@ Have an idea for improvement? Submit it via [GitHub Issues](https://github.com/h
 
 ## Additional Documentation
 
-- [CHANGELOG](documentation/CHANGELOG.md) - Version history and updates
-- [Bug Fixes & Improvements](documentation/BUGFIXES.md) - Known issues and fixes
-- [Project Summary](documentation/PROJECT_SUMMARY.md) - Complete project overview
-- [Testing Guide](documentation/TESTING_GUIDE.md) - Step-by-step testing instructions
-- [API Guide Part 1](documentation/FortiFlex-MSSP_Use-Case_Guide_Part1.md) - Detailed API documentation
-- [API Guide Part 2](documentation/FortiFlex-MSSP_Use-Case_Guide_Part2.md) - Advanced use cases
+- [Getting Started Guide](documentation/GETTING_STARTED.md) - Complete onboarding instructions
+- [Credentials Setup](documentation/CREDENTIALS_SETUP.md) - API credential configuration
+- [Use Cases Guide](documentation/USE_CASES_GUIDE.md) - Detailed use case documentation
+- [Consumption Reporting Guide](documentation/CONSUMPTION_REPORTING_GUIDE.md) - Billing data collection
+- [Bug Fixes (Nov 2025)](BUGFIX_USE_CASES.md) - API compatibility patches
+- [API Integration Guide Part 1](docs/MSSP_Integration_Guide_Part1%20(2).md) - API basics and authentication
+- [API Integration Guide Part 2](docs/MSSP_Integration_Guide_Part2%20(1).md) - Advanced use cases
 
 ---
 

@@ -52,6 +52,11 @@ logs/
 consumption_data/
 *.jsonl
 
+# Export files
+*.xlsx
+*.csv
+~$*
+
 # OS
 .DS_Store
 Thumbs.db
