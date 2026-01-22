@@ -164,7 +164,7 @@ Update credentials.json? (y/n):
 
 ---
 
-## Step 3: Test Authentication
+## Step 4: Test Authentication
 
 Now verify everything works:
 
@@ -236,7 +236,7 @@ You can now proceed to test the use case examples!
 
 ---
 
-## Step 4: Run Your First Automation
+## Step 5: Run Your First Automation
 
 Let's try a **safe** read-only operation - viewing all your customers:
 
@@ -292,7 +292,7 @@ These change existing resources:
 python examples\use_case_3_service_modification.py
 
 # Suspend customer
-python examples\use_case_5_customer_suspension.py
+python examples\use_case_5_entitlement_suspension.py
 ```
 
 ---
@@ -329,9 +329,9 @@ python examples\use_case_5_customer_suspension.py
 
 ## Need Help?
 
-1. **API Reference:** See `documentation/FortiFlex-MSSP_Use-Case_Guide_Part1.md`
-2. **Testing Guide:** See `documentation/TESTING_GUIDE.md`
-3. **Project Structure:** See `STRUCTURE.md`
+1. **API Reference:** See `docs/MSSP_Integration_Guide_Part1 (2).md`
+2. **Use Cases Guide:** See `documentation/USE_CASES_GUIDE.md`
+3. **Product Reference:** See `examples/PRODUCT_TYPE_REFERENCE.md`
 
 ---
 
