@@ -1,0 +1,4 @@
+# Dev/test dependencies only - use pyproject.toml for installation
+# These versions match pyproject.toml dependencies
+requests>=2.25.0
+pyyaml>=5.4.0
