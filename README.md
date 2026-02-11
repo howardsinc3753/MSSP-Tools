@@ -66,13 +66,51 @@ Monitor FortiGate memory usage in real-time to prevent conserve mode before it i
 
 ---
 
+### [SOCaaS Python SDK](SOCaaS-SDK/)
+**Status:** ✅ Production Ready - February 2026
+
+Python SDK for Fortinet SOCaaS (Security Operations Center as a Service) API. Enables MSSP partners to automate alert triage, add investigation notes, monitor for new alerts, and integrate with third-party platforms.
+
+**Key Features:**
+- Alert management: list, get details (IOCs/events/endpoints), update status
+- Investigation comments: add analyst notes to alerts
+- Service requests: list, create, track support tickets
+- Alert polling: background monitoring with webhook delivery
+- MSSP client management: multi-tenant operations
+- Webhook integrations: ServiceNow, Slack, Teams, PagerDuty
+
+**What's Included:**
+- 6 partner-facing example scripts
+- Webhook integration guide with setup for 5 platforms
+- Credential file template and 3 auth methods
+- Full API reference documentation
+
+**Use Cases:**
+- Automated alert triage and enrichment workflows
+- SOAR/SIEM integration via webhooks
+- Investigation note automation during incident response
+- Multi-tenant alert monitoring across MSSP clients
+- ServiceNow incident creation from SOCaaS alerts
+
+[📖 View Documentation →](SOCaaS-SDK/)
+
+---
+
+### [FortiZTP Python SDK](FortiZTP/)
+**Status:** ✅ Production Ready - January 2026
+
+Python SDK for Fortinet FortiZTP (Zero Touch Provisioning) API. Automate device provisioning, script management, and firmware deployment for MSSP environments.
+
+[📖 View Documentation →](FortiZTP/)
+
+---
+
 ## 🚀 Coming Soon
 
 More MSSP tools are in development:
 - FortiManager automation scripts
 - FortiAnalyzer log analysis utilities
 - Multi-vendor health check tools
-- SIEM integration helpers
 
 ## 💡 Contributing
 
@@ -113,7 +151,7 @@ Found a bug? Help us improve! Please open a GitHub Issue with:
 1. **Go to:** https://github.com/howardsinc3753/MSSP-Tools/issues
 2. **Click:** "New Issue"
 3. **Include:**
-   - Tool name (e.g., "FortiFlex MSSP Toolkit" or "FortiGate Monitor")
+   - Tool name (e.g., "SOCaaS SDK", "FortiFlex MSSP Toolkit", "FortiGate Monitor", "FortiZTP SDK")
    - Description of the issue
    - Steps to reproduce
    - Expected vs actual behavior
