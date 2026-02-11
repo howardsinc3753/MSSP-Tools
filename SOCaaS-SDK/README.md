@@ -7,6 +7,15 @@ Python SDK for Fortinet SOCaaS (Security Operations Center as a Service) API.
 
 > **For Fortinet MSSP Partners**: This SDK provides programmatic access to the SOCaaS platform for automation, integration, and custom tooling.
 
+## Disclaimer
+This script is provided for partner troubleshooting and diagnostic purposes only.
+
+NOT an official Fortinet product - Not endorsed, tested, or maintained by Fortinet, Inc.
+Use at your own risk - Test in lab environments before production deployment
+No warranties - Provided "AS IS" without warranties of any kind
+No liability - Neither the author nor Fortinet, Inc. shall be held liable for any damages, outages, or issues resulting from use of this code
+By using this script, you agree to validate all outputs independently and assume full responsibility for its operation.
+
 ## Features
 
 - **Alerts**: List, get details, update status, IOCs, events, endpoints
