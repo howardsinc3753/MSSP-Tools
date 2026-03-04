@@ -73,11 +73,11 @@ Push blocks 020-029 individually in dependency order
 | Parameter | Type | Example | Description |
 |-----------|------|---------|-------------|
 | `HUB_HOSTNAME` | string | `howard-sdwan-hub-2` | Hub device hostname |
-| `WAN_IP_CIDR` | cidr | `192.168.215.20/24` | Hub WAN IP with subnet |
+| `WAN_IP_CIDR` | cidr | `10.0.1.20/24` | Hub WAN IP with subnet |
 | `LAN_IP_CIDR` | cidr | `10.250.250.1/24` | Hub LAN IP with subnet |
 | `HUB_LOOPBACK_IP` | ip_address | `172.16.255.253` | Hub services loopback |
 | `BGP_LOOPBACK_IP` | ip_address | `172.16.255.252` | BGP operations loopback |
-| `HUB_WAN_IP` | ip_address | `192.168.215.20` | Hub WAN IP (no CIDR, for IPsec local-gw) |
+| `HUB_WAN_IP` | ip_address | `10.0.1.20` | Hub WAN IP (no CIDR, for IPsec local-gw) |
 | `PSK` | string (sensitive) | `YourSecurePassword123` | IPsec pre-shared key |
 | `BGP_AS` | integer | `65000` | Hub BGP AS (iBGP with spokes) |
 | `ROUTER_ID` | ip_address | `172.16.255.252` | BGP router-ID (same as BGP_LOOPBACK_IP) |
@@ -121,8 +121,8 @@ Push blocks 020-029 individually in dependency order
 ### Critical Parameter Notes
 
 1. **HUB_WAN_IP vs WAN_IP_CIDR**:
-   - `WAN_IP_CIDR` = `192.168.215.20/24` (for interface config)
-   - `HUB_WAN_IP` = `192.168.215.20` (for IPsec local-gw, no CIDR)
+   - `WAN_IP_CIDR` = `10.0.1.20/24` (for interface config)
+   - `HUB_WAN_IP` = `10.0.1.20` (for IPsec local-gw, no CIDR)
 
 2. **BGP_LOOPBACK_IP = ROUTER_ID = HEALTH_CHECK_TARGET**:
    - All three should be the same IP (e.g., 172.16.255.252)
@@ -185,7 +185,7 @@ get vpn ipsec phase1-interface SPOKE_VPN2
 ```
 type: dynamic
 peertype: any
-local-gw: 192.168.215.20
+local-gw: 10.0.1.20
 mode-cfg: disable
 exchange-ip-addr4: 172.16.255.252
 auto-discovery-sender: enable
@@ -310,16 +310,16 @@ set name "SDWAN-to-INET"
 
 ### Example 1: Complete Hub Deployment
 
-**Scenario**: Deploy a new hub at 192.168.215.20 for site aggregation
+**Scenario**: Deploy a new hub at 10.0.1.20 for site aggregation
 
 **Parameters**:
 ```yaml
 HUB_HOSTNAME: howard-sdwan-hub-2
-WAN_IP_CIDR: 192.168.215.20/24
+WAN_IP_CIDR: 10.0.1.20/24
 LAN_IP_CIDR: 10.250.250.1/24
 HUB_LOOPBACK_IP: 172.16.255.253
 BGP_LOOPBACK_IP: 172.16.255.252
-HUB_WAN_IP: 192.168.215.20
+HUB_WAN_IP: 10.0.1.20
 PSK: SecurePassword123
 BGP_AS: 65000
 ROUTER_ID: 172.16.255.252
@@ -339,7 +339,7 @@ cp C:/ProgramData/Ulysses/config/blueprints/ATOMIC_HUB_TEMPLATE.conf hub-2-confi
 2. **Push Config**:
 ```
 execute_certified_tool("org.ulysses.noc.fortigate-config-push/2.0.0", {
-    "target_ip": "192.168.215.20",
+    "target_ip": "10.0.1.20",
     "config_path": "C:/ProgramData/Ulysses/config/deployments/hub-2/hub-2-config.conf"
 })
 ```
@@ -348,37 +348,37 @@ execute_certified_tool("org.ulysses.noc.fortigate-config-push/2.0.0", {
 ```javascript
 // System
 execute_certified_tool("org.ulysses.noc.fortigate-ssh/1.0.9", {
-    "target_ip": "192.168.215.20",
+    "target_ip": "10.0.1.20",
     "command": "get system global | grep hostname"
 })
 
 // Interfaces
 execute_certified_tool("org.ulysses.noc.fortigate-ssh/1.0.9", {
-    "target_ip": "192.168.215.20",
+    "target_ip": "10.0.1.20",
     "command": "get system interface Hub_Lo"
 })
 
 // IPsec
 execute_certified_tool("org.ulysses.noc.fortigate-ssh/1.0.9", {
-    "target_ip": "192.168.215.20",
+    "target_ip": "10.0.1.20",
     "command": "diagnose vpn ike gateway list"
 })
 
 // BGP
 execute_certified_tool("org.ulysses.noc.fortigate-ssh/1.0.9", {
-    "target_ip": "192.168.215.20",
+    "target_ip": "10.0.1.20",
     "command": "get router info bgp summary"
 })
 
 // SD-WAN
 execute_certified_tool("org.ulysses.noc.fortigate-ssh/1.0.9", {
-    "target_ip": "192.168.215.20",
+    "target_ip": "10.0.1.20",
     "command": "diagnose sys sdwan health-check"
 })
 
 // Firewall
 execute_certified_tool("org.ulysses.noc.fortigate-ssh/1.0.9", {
-    "target_ip": "192.168.215.20",
+    "target_ip": "10.0.1.20",
     "command": "show firewall policy | grep 'set name'"
 })
 ```
@@ -387,7 +387,7 @@ execute_certified_tool("org.ulysses.noc.fortigate-ssh/1.0.9", {
 ```
 ✅ Hub deployment complete!
    - Hostname: howard-sdwan-hub-2
-   - WAN: 192.168.215.20
+   - WAN: 10.0.1.20
    - Hub_Lo: 172.16.255.253
    - BGP_Lo: 172.16.255.252
    - BGP AS: 65000
@@ -412,7 +412,7 @@ get vpn ipsec phase1-interface SPOKE_VPN1 | grep local-gw
 3. Re-push Block 023 only:
 ```
 execute_certified_tool("org.ulysses.noc.fortigate-config-push/2.0.0", {
-    "target_ip": "192.168.215.20",
+    "target_ip": "10.0.1.20",
     "config_path": "C:/ProgramData/Ulysses/config/blocks/fortigate/core/023-hub-ipsec-phase1-template.block"
 })
 ```
@@ -421,7 +421,7 @@ execute_certified_tool("org.ulysses.noc.fortigate-config-push/2.0.0", {
 ```bash
 get vpn ipsec phase1-interface SPOKE_VPN1 | grep local-gw
 ```
-**Expected**: `local-gw: 192.168.215.20` ✅
+**Expected**: `local-gw: 10.0.1.20` ✅
 
 ### Example 3: Connecting First Spoke
 
@@ -445,7 +445,7 @@ get system sdwan
 **Connect Spoke-07**:
 ```
 # Deploy spoke-07 with:
-HUB1_IP: 192.168.215.20
+HUB1_IP: 10.0.1.20
 HUB1_PSK: SecurePassword123
 LOOPBACK_IP: 172.16.7.1 (in range 172.16.0.0/16)
 BGP_AS: 65007 (65000 + 7)
@@ -502,7 +502,7 @@ get vpn ipsec phase1-interface SPOKE_VPN1 | grep peertype
 ```bash
 get vpn ipsec phase1-interface SPOKE_VPN1 | grep local-gw
 ```
-**Expected**: `local-gw: 192.168.215.20` (not 0.0.0.0)
+**Expected**: `local-gw: 10.0.1.20` (not 0.0.0.0)
 
 3. Check PSK matches spokes:
 ```bash
@@ -646,7 +646,7 @@ diagnose vpn tunnel list
 Add hub to fortigate_credentials.yaml:
 ```yaml
 devices:
-  - device_ip: "192.168.215.20"
+  - device_ip: "10.0.1.20"
     device_name: "howard-sdwan-hub-2"
     username: "admin"
     password: "YourAdminPassword"
@@ -689,11 +689,11 @@ devices:
   # Hub 1 (Production)
   hub_192_168_215_15:
     device_name: "howard-sdwan-hub-1"
-    management_ip: "192.168.215.15"
+    management_ip: "10.0.1.1"
     role: "hub"
     hub_id: 1
     firmware: "v7.6.5"
-    wan_ip: "192.168.215.15"
+    wan_ip: "10.0.1.1"
     hub_loopback: "172.16.255.253"
     bgp_loopback: "172.16.255.252"
     bgp_as: 65000
@@ -719,11 +719,11 @@ devices:
   # Hub 2 (DR/Test)
   hub_192_168_215_20:
     device_name: "howard-sdwan-hub-2"
-    management_ip: "192.168.215.20"
+    management_ip: "10.0.1.20"
     role: "hub"
     hub_id: 2
     firmware: "v7.6.5"
-    wan_ip: "192.168.215.20"
+    wan_ip: "10.0.1.20"
     hub_loopback: "172.16.255.251"
     bgp_loopback: "172.16.255.250"
     bgp_as: 65000
@@ -833,7 +833,7 @@ Generate report after hub deployment:
 ```
 Hub Deployment Report
 =====================
-Hub: howard-sdwan-hub-2 (192.168.215.20)
+Hub: howard-sdwan-hub-2 (10.0.1.20)
 Hub ID: 2
 Timestamp: 2026-02-05T15:30:00
 
@@ -941,7 +941,7 @@ Individual block files for incremental push:
 🎯 Hub deployment starting!
 
 Let me verify prerequisites:
-✅ FortiGate reachable at 192.168.215.20
+✅ FortiGate reachable at 10.0.1.20
 ✅ Credentials loaded
 ✅ ATOMIC_HUB_TEMPLATE.conf prepared
 ✅ All parameters validated
@@ -993,7 +993,7 @@ All checks passed! Hub is ready for spoke connections! 🎉
 Root cause: HUB_WAN_IP parameter not substituted
 
 Fix required:
-1. Update parameter file with HUB_WAN_IP=192.168.215.20
+1. Update parameter file with HUB_WAN_IP=10.0.1.20
 2. Re-push Block 023
 
 Escalating to user for parameter file update.
@@ -1006,7 +1006,7 @@ Would you like me to show you the exact parameter format needed? 🛠️
 🎉 Hub deployment SUCCESS!
 
 Summary:
-- Hub: howard-sdwan-hub-2 (192.168.215.20)
+- Hub: howard-sdwan-hub-2 (10.0.1.20)
 - Dual loopbacks configured (Hub_Lo + BGP_Lo)
 - IPsec templates ready for dynamic spokes
 - BGP accepting 172.16.0.0/16 range
@@ -1014,7 +1014,7 @@ Summary:
 - Ready for production spoke connections!
 
 Next steps:
-- Deploy spoke-07 with HUB1_IP=192.168.215.20
+- Deploy spoke-07 with HUB1_IP=10.0.1.20
 - PSK must match: SecurePassword123
 - Spoke loopback must be in 172.16.0.0/16 range
 
@@ -1043,7 +1043,7 @@ This workflow incorporates fixes from GAP analysis:
   - All 10 hub blocks (020-029) complete
   - ATOMIC_HUB_TEMPLATE.conf ready
   - SecBot persona integrated
-  - Production-based on howard-sdwan-hub-1 (192.168.215.15)
+  - Production-based on howard-sdwan-hub-1 (10.0.1.1)
 
 ---
 

@@ -20,16 +20,16 @@ from typing import Dict, Any, List, Optional
 # =============================================================================
 # CONFIGURATION
 # =============================================================================
-TRUST_ANCHOR_URL = "http://192.168.209.115:8000"
+TRUST_ANCHOR_URL = "http://10.0.0.100:8000"
 PACK_NAME = "fortigate-ops"
 RESULTS_DIR = Path(__file__).parent / "results"
 
 # Lab devices for testing
 TEST_DEVICES = {
-    "lab-71f": "192.168.209.62",
-    "fw-50g": "192.168.209.30"
+    "lab-71f": "10.0.0.62",
+    "fw-50g": "10.0.0.30"
 }
-DEFAULT_DEVICE = "192.168.209.62"
+DEFAULT_DEVICE = "10.0.0.62"
 
 # Tools to test
 FORTIGATE_TOOLS = [

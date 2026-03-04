@@ -46,8 +46,8 @@
 
 ## Current Network
 
-- **Hub**: 192.168.215.15 (loopbacks: 172.16.255.253, 172.16.255.252)
-- **Spoke1**: 192.168.209.30 (loopback: 172.16.0.2)
+- **Hub**: 10.0.1.1 (loopbacks: 172.16.255.253, 172.16.255.252)
+- **Spoke1**: 10.0.0.30 (loopback: 172.16.0.2)
 - **Manifest**: `C:\ProgramData\Ulysses\config\sdwan-manifest.yaml`
 
 ## Full Docs

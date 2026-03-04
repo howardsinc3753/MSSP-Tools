@@ -31,7 +31,7 @@ ai_instructions:
     - Atomic CLI pushes (use fortigate-cli-execute with ordered blocks)
 
     CORRECT: execute_certified_tool org.ulysses.noc.fortigate-sdwan-member/1.0.3 {...}
-    WRONG: Bash("curl -X POST https://192.168.209.40/api/v2/...")
+    WRONG: Bash("curl -X POST https://10.0.0.40/api/v2/...")
 
   tool_discovery: |
     Use route_query to find tools:
@@ -110,7 +110,7 @@ inputs:
 
     - name: hub_wan_ip
       type: string
-      default: "192.168.215.15"
+      default: "10.0.1.1"
 
     - name: hub_loopback
       type: string
@@ -376,7 +376,7 @@ critical_settings:
   # System Global Settings
   system_global:
     - setting: management-ip
-      example: "192.168.209.35"
+      example: "10.0.0.35"
       purpose: "Required for proper device identification"
       tool: "org.ulysses.noc.fortigate-system-global/1.0.0"
 
@@ -421,7 +421,7 @@ critical_settings:
 # -----------------------------------------------------------------------------
 tool_gaps:
   - tool: "org.ulysses.provisioning.fortigate-sdwan-spoke-template"
-    issue: "Hardcoded target_ip in __main__ block - always targets 192.168.209.30"
+    issue: "Hardcoded target_ip in __main__ block - always targets 10.0.0.30"
     workaround: |
       Option 1: Use blueprint file directly and push via SSH
       Option 2: Call tool programmatically with correct parameters (not CLI)
@@ -546,7 +546,7 @@ error_handling:
   - condition: "template_args_failed"
     description: "spoke-template ignores CLI arguments"
     detection:
-      - "Config applied to wrong device (192.168.209.30)"
+      - "Config applied to wrong device (10.0.0.30)"
     remediation:
       - action: "Use blueprint file directly"
       - action: "Call tool via MCP framework (not CLI)"

@@ -34,7 +34,7 @@
 ## Environment Details
 
 ### KVM Hypervisor
-- **Host:** 192.168.209.115
+- **Host:** 10.0.0.100
 - **OS:** Rocky Linux 9
 - **libvirt:** v10.10.0
 - **SSH:** root / `{{REDACTED}}`
@@ -50,8 +50,8 @@
 ### Existing SD-WAN Network
 - **AS Number:** 65000
 - **Loopback Range:** 172.16.0.0/16
-- **Hub:** 192.168.215.15 (FGVMMLTM26000192) - FortiFlex licensed
-- **Spoke:** 192.168.209.30 (FW50G5TK25000404) - Standard HW license
+- **Hub:** 10.0.1.1 (FGVMMLTMXXXXXXXXX) - FortiFlex licensed
+- **Spoke:** 10.0.0.30 (FW50G5TKXXXXXXXXX) - Standard HW license
 - **Hub Loopbacks:** 172.16.255.252 (BGP), 172.16.255.253 (Health)
 - **Spoke Loopback:** 172.16.0.2
 
@@ -101,7 +101,7 @@
 ```yaml
 hypervisors:
   rocky-kvm-lab:
-    host: 192.168.209.115
+    host: 10.0.0.100
     port: 22
     username: root
     auth_method: password
@@ -180,14 +180,14 @@ virt-install \
 - Created agentic workflow scaffold (`add-sdwan-site`)
 
 ### 2026-01-19 (Session 2) - BLOCK 1 TEST
-**VM Provisioned:** `sdwan-spoke-02` → `192.168.209.35`
+**VM Provisioned:** `sdwan-spoke-02` → `10.0.0.35`
 
 **What Worked:**
 - ✅ virt-install with SCSI disk bus
 - ✅ VM-Net-2 (10.254.2.0/24) created and attached for BGP
 - ✅ VM boots to FortiOS 7.6.5
-- ✅ DHCP assigned 192.168.209.35
-- ✅ Manual password set: `FG@dm1n2026!`
+- ✅ DHCP assigned 10.0.0.35
+- ✅ Manual password set: `{{ADMIN_PASSWORD}}`
 - ✅ SSH/HTTPS/PING enabled on port1
 - ✅ Connectivity verified from Windows
 
@@ -200,20 +200,20 @@ virt-install \
 
 **VM Details:**
 - **Name:** FortiGate-sdwan-spoke-02
-- **IP:** 192.168.209.35 (DHCP)
-- **VNC:** 192.168.209.115:5902
-- **Credentials:** admin / FG@dm1n2026!
+- **IP:** 10.0.0.35 (DHCP)
+- **VNC:** 10.0.0.100:5902
+- **Credentials:** admin / {{ADMIN_PASSWORD}}
 - **BGP Network:** VM-Net-2 (port3 → 10.254.2.0/24)
 
 **Next:** Block 2 - Apply FortiFlex license, register API credentials
 
 ### 2026-01-19 (Session 3) - BLOCK 2 TEST
-**Device Licensed & Onboarded:** `sdwan-spoke-02` → `FGVMMLTM26000304`
+**Device Licensed & Onboarded:** `sdwan-spoke-02` → `FGVMMLTMYYYYYYYYY`
 
 **What Worked:**
-- ✅ FortiFlex token generated: `C9C4AF7CB197B4B1BE40` (config: sdwan-spoke-2cpu-utp / 53713)
-- ✅ License applied via SSH: `execute vm-license C9C4AF7CB197B4B1BE40`
-- ✅ Serial changed from FGVM64-KVM → FGVMMLTM26000304
+- ✅ FortiFlex token generated: `{{FORTIFLEX_TOKEN_EXAMPLE}}` (config: sdwan-spoke-2cpu-utp / 53713)
+- ✅ License applied via SSH: `execute vm-license {{FORTIFLEX_TOKEN_EXAMPLE}}`
+- ✅ Serial changed from FGVM64-KVM → FGVMMLTMYYYYYYYYY
 - ✅ Device rebooted and came back online at same IP
 - ✅ `fortigate-onboard` tool created API user and token
 - ✅ Device registered as `sdwan-spoke-02` in credentials file
@@ -237,10 +237,10 @@ virt-install \
 
 **Updated Device Details:**
 - **Name:** FortiGate-sdwan-spoke-02
-- **IP:** 192.168.209.35 (DHCP)
-- **Serial:** FGVMMLTM26000304 (FortiFlex licensed)
-- **Credentials:** admin / FG@dm!n2026!
-- **API Token:** r4t4gn131n7QGcq633fmkyqkHx7s33
+- **IP:** 10.0.0.35 (DHCP)
+- **Serial:** FGVMMLTMYYYYYYYYY (FortiFlex licensed)
+- **Credentials:** admin / {{ADMIN_PASSWORD}}
+- **API Token:** {{API_TOKEN_EXAMPLE}}
 - **Device ID:** sdwan-spoke-02 (in fortigate_credentials.yaml)
 
 **Next:** Block 3 - Deploy SD-WAN Blueprint (IPsec/BGP/SD-WAN config)
@@ -333,7 +333,7 @@ config_paths = [
 ```python
 if __name__ == "__main__":
     result = main({
-        "target_ip": "192.168.209.30",  # HARDCODED - WRONG!
+        "target_ip": "10.0.0.30",  # HARDCODED - WRONG!
         "hub_wan_ip": "66.110.253.68",
         # ... more hardcoded values
     })
@@ -485,7 +485,7 @@ Before continuing Block 3, audit and fix tool gaps:
    - [ ] Complete config push to sdwan-spoke-02
 
 ### Priority 2: Complete Block 3
-- Push generated config to 192.168.209.35
+- Push generated config to 10.0.0.35
 - Verify IPsec tunnel negotiates with hub
 - Verify BGP peering establishes
 
@@ -518,7 +518,7 @@ Before continuing Block 3, audit and fix tool gaps:
 
 ### Hypervisor SSH
 ```bash
-ssh root@192.168.209.115
+ssh root@10.0.0.100
 # Password: {{REDACTED}}
 ```
 

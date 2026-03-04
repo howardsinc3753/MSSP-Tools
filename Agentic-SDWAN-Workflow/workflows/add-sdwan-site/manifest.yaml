@@ -110,7 +110,7 @@ critical_settings:
       required: true
       purpose: "Identifies device in management plane"
       tool: "org.ulysses.noc.fortigate-system-global"
-      example: "192.168.209.35"
+      example: "10.0.0.35"
 
     # IMPORTANT: Allow API key in URL query for some tools
     rest_api_key_url_query:
@@ -361,7 +361,7 @@ site_id_derivation:
   example:
     input:
       site_id: 4
-      management_ip: "192.168.209.40"  # Still required
+      management_ip: "10.0.0.40"  # Still required
     derived:
       spoke_loopback: "172.16.0.4"
       location_id: "172.16.0.4"
@@ -521,7 +521,7 @@ entry_point:
     - spoke_loopback   # Phase 3-4: derived from site_id
     - deployment_type  # Phase 1: vm/hardware decision
     - license_type     # Phase 2: fortiflex/standard decision
-    - wan_ip           # Phase 1: VM provisioning (CIDR format: 192.168.209.45/24)
+    - wan_ip           # Phase 1: VM provisioning (CIDR format: 10.0.0.45/24)
     - wan_gateway      # Phase 1: VM provisioning
     - lan_subnets      # Tracked for collision detection
     - lan_interface    # Phase 3: firewall policies
@@ -2065,7 +2065,7 @@ parameters:
     # SD-WAN Hub Configuration
     - name: hub_wan_ip
       type: string
-      default: "192.168.215.15"
+      default: "10.0.1.1"
       description: "Hub WAN IP for IPsec"
 
     - name: hub_loopback

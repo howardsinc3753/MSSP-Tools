@@ -118,7 +118,7 @@ Tools check credentials in priority order (first match wins):
 |-----------------|-------------|-------------|
 | FortiGate devices (API + SSH) | `~/.config/mcp/fortigate_credentials.yaml` | `C:/ProgramData/mcp/fortigate_credentials.yaml` |
 | FortiCloud / FortiFlex API | `C:/ProgramData/mcp/forticloud_credentials.yaml` | — |
-| Hypervisor SSH | Key-based auth to `root@192.168.209.115` (ed25519, autonomous) | — |
+| Hypervisor SSH | Key-based auth to `root@10.0.0.100` (ed25519, autonomous) | — |
 
 **IMPORTANT:** Keep the PRIMARY file up to date. Tools use it first and never check backups if it exists.
 

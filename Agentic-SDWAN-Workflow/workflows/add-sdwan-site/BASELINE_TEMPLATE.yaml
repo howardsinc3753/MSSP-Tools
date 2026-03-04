@@ -1,14 +1,14 @@
 # SD-WAN Working Baseline Template
 # Extracted from production spokes on 2026-01-21
-# Source: Spoke-1 (192.168.209.30), Spoke-2 (192.168.209.35)
+# Source: Spoke-1 (10.0.0.30), Spoke-2 (10.0.0.35)
 # Updated: 2026-01-22 - Added system_global section, transport: udp
 # Updated: 2026-01-24 - Added NAMING_CONSTANTS section as single source of truth
 
 version: "1.2.0"
 extracted_from:
-  spoke_1: "192.168.209.30"
-  spoke_2: "192.168.209.35"
-  hub: "192.168.215.15"
+  spoke_1: "10.0.0.30"
+  spoke_2: "10.0.0.35"
+  hub: "10.0.1.1"
   extraction_date: "2026-01-21"
 
 # ============================================================================
@@ -96,7 +96,7 @@ site_id_formula:
 hub_registry:
   HUB1:
     name: "HUB1"
-    management_ip: "192.168.215.15"
+    management_ip: "10.0.1.1"
     loopbacks:
       - "172.16.255.252"  # BGP router-id / primary
       - "172.16.255.253"  # Secondary / health-check target
@@ -113,7 +113,7 @@ hub_registry:
       as_number: 65000
       advertised_networks:
         - "10.250.250.0/24"
-        - "192.168.215.0/24"
+        - "10.0.1.0/24"
 
 # ============================================================================
 # SPOKE BASELINE TEMPLATE
@@ -166,7 +166,7 @@ spoke_template:
       exchange-ip-addr4: "{derived.spoke_loopback}"
       tunnel-search: "selectors"
       # PSK: Retrieved from credential store
-      # Remote gateway: Hub WAN IP (192.168.215.15)
+      # Remote gateway: Hub WAN IP (10.0.1.1)
 
     HUB1-VPN2:
       # Same structure, network-id: 2
@@ -369,7 +369,7 @@ validation:
 
     - check: "hub_reachable"
       description: "Ping hub from spoke WAN"
-      command: "execute ping 192.168.215.15"
+      command: "execute ping 10.0.1.1"
 
     - check: "loopback_not_in_use"
       description: "Verify derived loopback is unique"

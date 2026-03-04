@@ -111,13 +111,13 @@ persona:
 # Test environment
 test_devices:
   - name: "sdwan-spoke-07"
-    ip: "192.168.209.45"
+    ip: "10.0.0.45"
     role: "primary test"
   - name: "sdwan-spoke-08"
-    ip: "192.168.209.31"
+    ip: "10.0.0.31"
     role: "secondary test"
   - name: "sdwan-spoke-09"
-    ip: "192.168.209.41"
+    ip: "10.0.0.41"
     role: "backup"
 
 # Related documents

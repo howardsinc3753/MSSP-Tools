@@ -178,7 +178,7 @@ process_log:
     - config_push_skills: "2026-01-24T12:04:00Z"  # or "via MCP get_tool_skills"
   mcp_checks:
     - list_certified_tools: "found 15 fortinet tools"
-    - list_accessible_devices: ["<discovered_spoke_ip>", "192.168.209.62"]
+    - list_accessible_devices: ["<discovered_spoke_ip>", "10.0.0.62"]
     - get_tool_skills_config_push: "v2.0.0 - SSH CLI push"  # ACCEPTABLE if file read fails
   preflight_confirmed:
     loopback_name: "Spoke-Lo"
@@ -213,7 +213,7 @@ Before executing ANY tools, confirm you know:
 | Health check | `HUB_Health` | BASELINE_TEMPLATE.yaml |
 | ike-tcp-port | `11443` | critical_settings |
 | transport | `udp` | critical_settings |
-| **hub_wan_ip** | **`192.168.215.15`** | **sdwan-hub in credentials** |
+| **hub_wan_ip** | **`10.0.1.1`** | **sdwan-hub in credentials** |
 | **hub_loopback (health)** | **`172.16.255.253`** | **Hub health-check loopback** |
 | **hub_bgp_loopback** | **`172.16.255.252`** | **Hub BGP router-id** |
 | Min kvm-provision version | `1.0.11` | Trust Anchor certified version |
@@ -249,7 +249,7 @@ If your network requires static IPs, modify the bootstrap config accordingly.
 
 | Field | Correct Value | Wrong Value |
 |-------|---------------|-------------|
-| hypervisor (name) | `rocky-kvm-lab` | 192.168.209.115 |
+| hypervisor (name) | `rocky-kvm-lab` | 10.0.0.100 |
 
 The `kvm-fortios-provision` tool expects the **hypervisor name** (as registered in hypervisor-credential-manager), not the IP address.
 
@@ -259,15 +259,15 @@ The `kvm-fortios-provision` tool expects the **hypervisor name** (as registered 
 │                    DO NOT CONFUSE THESE IPs!                                 │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                              │
-│  192.168.209.62 = Lab default GATEWAY (routes traffic, NOT the hub!)        │
-│  192.168.215.15 = SD-WAN HUB (IPsec remote-gw for spoke tunnels)            │
+│  10.0.0.62 = Lab default GATEWAY (routes traffic, NOT the hub!)        │
+│  10.0.1.1 = SD-WAN HUB (IPsec remote-gw for spoke tunnels)            │
 │                                                                              │
 │  When calling fortigate-sdwan-spoke-template:                               │
-│    hub_wan_ip = 192.168.215.15  ← ALWAYS use this for IPsec remote-gw      │
-│    wan_gateway = 192.168.209.62 ← This is for the spoke's default route    │
+│    hub_wan_ip = 10.0.1.1  ← ALWAYS use this for IPsec remote-gw      │
+│    wan_gateway = 10.0.0.62 ← This is for the spoke's default route    │
 │                                                                              │
-│  WRONG: hub_wan_ip = 192.168.209.62 (causes tunnel to never establish!)    │
-│  RIGHT: hub_wan_ip = 192.168.215.15 (actual SD-WAN hub)                    │
+│  WRONG: hub_wan_ip = 10.0.0.62 (causes tunnel to never establish!)    │
+│  RIGHT: hub_wan_ip = 10.0.1.1 (actual SD-WAN hub)                    │
 │                                                                              │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -309,11 +309,11 @@ Site X Parameters (derivation from site_id = X):
 
 Fixed Infrastructure (SAME for all sites - DO NOT CHANGE):
 ┌─────────────────────┬──────────────────────────────────────────────────────────┐
-│ hub_wan_ip          │ 192.168.215.15      ← IPsec remote-gw (THE HUB!)        │
+│ hub_wan_ip          │ 10.0.1.1      ← IPsec remote-gw (THE HUB!)        │
 │ hub_bgp_loopback    │ 172.16.255.252      ← BGP neighbor (route-reflector)   │
 │ hub_loopback        │ 172.16.255.253      ← Health check target              │
-│ wan_gateway         │ 192.168.209.62      ← Spoke's default route (NOT hub!) │
-│ hypervisor          │ rocky-kvm-lab       ← NAME not IP! (IP: 192.168.209.115)│
+│ wan_gateway         │ 10.0.0.62      ← Spoke's default route (NOT hub!) │
+│ hypervisor          │ rocky-kvm-lab       ← NAME not IP! (IP: 10.0.0.100)│
 └─────────────────────┴──────────────────────────────────────────────────────────┘
 
 ⚠️ COLLISION CHECKS - YOU MUST VERIFY BEFORE PROCEEDING:
@@ -344,10 +344,10 @@ Site 9 Parameters:
 - management_ip: DHCP (discovered after boot)
 - lan_subnet: 10.9.1.0/24
 - lan_gateway: 10.9.1.1
-- hub_wan_ip: 192.168.215.15
+- hub_wan_ip: 10.0.1.1
 - hub_bgp_loopback: 172.16.255.252
 - hub_loopback: 172.16.255.253
-- wan_gateway: 192.168.209.62
+- wan_gateway: 10.0.0.62
 - hypervisor: rocky-kvm-lab         ← NAME not IP!
 
 Mode: DRY-RUN first, generate CLI config and validate against contract.
@@ -389,11 +389,11 @@ Common Bash backup scenarios:
   ```
   ```bash
   # FALLBACK: Bash SSH if tool unavailable
-  Bash("ssh root@192.168.209.115 'virsh start FortiGate-sdwan-spoke-07'")
+  Bash("ssh root@10.0.0.100 'virsh start FortiGate-sdwan-spoke-07'")
   ```
 - **Linux host operations**: File checks, network diagnostics on non-FortiGate hosts
   ```bash
-  Bash("ssh root@192.168.209.115 'virsh dominfo FortiGate-sdwan-spoke-07'")
+  Bash("ssh root@10.0.0.100 'virsh dominfo FortiGate-sdwan-spoke-07'")
   ```
 - **Any gap where no certified tool covers the action**: Figure it out, make it work
 
@@ -407,7 +407,7 @@ curl -s -X POST http://localhost:8002/tasks/send \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":"task-1","params":{
     "skill":"run-command",
-    "message":{"role":"user","parts":[{"type":"text","text":"ssh root@192.168.209.115 virsh start FortiGate-sdwan-spoke-11"}]}
+    "message":{"role":"user","parts":[{"type":"text","text":"ssh root@10.0.0.100 virsh start FortiGate-sdwan-spoke-11"}]}
   }}'
 
 # Poll for result
@@ -436,7 +436,7 @@ execute_certified_tool("org.ulysses.noc.fortigate-health-check/1.0.4", {"target_
 
 **ACCEPTABLE (Bash backup when certified tool unavailable):**
 ```bash
-Bash("ssh root@192.168.209.115 'virsh start FortiGate-sdwan-spoke-07'")  # Fallback if kvm-fortios-provision/1.0.11 unavailable
+Bash("ssh root@10.0.0.100 'virsh start FortiGate-sdwan-spoke-07'")  # Fallback if kvm-fortios-provision/1.0.11 unavailable
 ```
 
 **WRONG (Bash when a certified tool exists):**
@@ -667,7 +667,7 @@ Execute every step in that document for site {SITE_ID}.
 Return a JSON object with: vm_name, management_ip, mac_address, admin_password, ssh_ready, credentials_registered.
 
 You have access to MCP certified tools via execute_certified_tool AND Bash for SSH to the hypervisor.
-The hypervisor is rocky-kvm-lab (IP: 192.168.209.115, SSH user: root).
+The hypervisor is rocky-kvm-lab (IP: 10.0.0.100, SSH user: root).
 Admin password: FG@dm!n2026!
 """,
     run_in_background=True
@@ -707,7 +707,7 @@ Config ID for SD-WAN spokes: 54380
 # Step 1: Generate config
 # NOTE: In DHCP mode, wan_ip is NOT passed — port1 uses "set mode dhcp" in the template.
 # The blueprint planner generates the SD-WAN/BGP/IPsec config which doesn't depend on WAN IP.
-# wan_ip is ONLY needed for static mode (must be CIDR format: "192.168.209.XX/24").
+# wan_ip is ONLY needed for static mode (must be CIDR format: "10.0.0.XX/24").
 # NOTE: plan-site requires csv_path (NOT inline params). Generate CSV first.
 # Step 1a: Generate CSV template
 execute_certified_tool("org.ulysses.noc.fortigate-sdwan-blueprint-planner/1.0.8", {
@@ -780,10 +780,10 @@ execute_certified_tool("org.ulysses.noc.fortigate-bgp-troubleshoot/1.0.2", {
 
 ```yaml
 # These values are FIXED for this SD-WAN topology
-hub_wan_ip: "192.168.215.15"        # IPsec remote-gw (the actual hub)
+hub_wan_ip: "10.0.1.1"        # IPsec remote-gw (the actual hub)
 hub_loopback: "172.16.255.253"      # Health check target
 hub_bgp_loopback: "172.16.255.252"  # BGP peer address
-wan_gateway: "192.168.209.62"       # Spoke's default route (lab gateway)
+wan_gateway: "10.0.0.62"       # Spoke's default route (lab gateway)
 vpn_psk: "<ask_user>"               # Must match hub config
 
 # These values are DERIVED from site_id
@@ -1175,8 +1175,8 @@ BLOCK_0 → BLOCK_1 (Bootstrap ISO) → BLOCK_2 → BLOCK_3 → BLOCK_4
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                              │
 │  STATIC IP MODE (RECOMMENDED):                                               │
-│    - wan_ip: REQUIRED (e.g., "192.168.209.43/24")                          │
-│    - wan_gateway: REQUIRED (e.g., "192.168.209.62")                          │
+│    - wan_ip: REQUIRED (e.g., "10.0.0.43/24")                          │
+│    - wan_gateway: REQUIRED (e.g., "10.0.0.62")                          │
 │    - Creates default gateway route in bootstrap config                       │
 │    - VM is immediately reachable at known IP                                 │
 │                                                                              │
@@ -1210,7 +1210,7 @@ end
 config system interface
     edit "port1"
         set mode static
-        set ip 192.168.209.43 255.255.255.0
+        set ip 10.0.0.43 255.255.255.0
         set allowaccess ping https ssh http fgfm
         set role wan
     next
@@ -1223,7 +1223,7 @@ config system interface
 end
 config router static
     edit 1
-        set gateway 192.168.209.62
+        set gateway 10.0.0.62
         set device port1
     next
 end
@@ -1235,8 +1235,8 @@ execute_certified_tool("org.ulysses.sdwan.kvm-fortios-provision/1.0.11", {
     "action": "provision",
     "site_name": "sdwan-spoke-05",
     "subnet_id": 5,
-    "wan_ip": "192.168.209.43/24",     # REQUIRED for static
-    "wan_gateway": "192.168.209.62",      # REQUIRED for static
+    "wan_ip": "10.0.0.43/24",     # REQUIRED for static
+    "wan_gateway": "10.0.0.62",      # REQUIRED for static
     "use_dhcp": false,                   # Explicit static mode
     "admin_password": "FG@dm!n2026!",
     "hypervisor": "rocky-kvm-lab"
@@ -1298,14 +1298,14 @@ end
 config system interface
     edit "port1"
         set mode static
-        set ip 192.168.209.43 255.255.255.0
+        set ip 10.0.0.43 255.255.255.0
         set allowaccess ping https ssh http fgfm
         set role wan
     next
 end
 config router static
     edit 1
-        set gateway 192.168.209.62
+        set gateway 10.0.0.62
         set device port1
     next
 end
@@ -1365,9 +1365,9 @@ exit 1
 
 **Notes:**
 - KVM VMs use MAC prefix `52:54:00` by default
-- `br0` is bridged to physical network `192.168.209.0/24`
+- `br0` is bridged to physical network `10.0.0.0/24`
 - VM needs ~10-30 seconds after boot to get DHCP lease
-- If ARP table empty, broadcast ping first: `ping -c 2 -b 192.168.209.255`
+- If ARP table empty, broadcast ping first: `ping -c 2 -b 10.0.0.255`
 
 ### CRITICAL: Register Device Credentials (MANDATORY STEP)
 
@@ -1489,8 +1489,8 @@ execute_certified_tool("org.ulysses.sdwan.kvm-fortios-provision/1.0.11", {
     "action": "provision",
     "site_name": "sdwan-spoke-05",
     "subnet_id": 5,
-    "wan_ip": "192.168.209.43/24",        # REQUIRED for static mode
-    "wan_gateway": "192.168.209.62",      # Spoke's default route — NOT the hub WAN IP (GAP-11)
+    "wan_ip": "10.0.0.43/24",        # REQUIRED for static mode
+    "wan_gateway": "10.0.0.62",      # Spoke's default route — NOT the hub WAN IP (GAP-11)
     "use_dhcp": False,
     "admin_password": "FG@dm!n2026!",
     "hypervisor": "rocky-kvm-lab"
@@ -1541,8 +1541,8 @@ After `execute vm-license <token>` (NOTE: no "install" keyword!), the FortiGate 
 ```python
 # Apply license via certified tool
 execute_certified_tool("org.ulysses.provisioning.fortigate-license-apply/1.0.5", {
-    "target_ip": "192.168.209.45",
-    "fortiflex_token": "5D5E5E730575627733C7",
+    "target_ip": "10.0.0.45",
+    "fortiflex_token": "{{FORTIFLEX_TOKEN_EXAMPLE}}",
     "vm_name": "FortiGate-sdwan-spoke-07"
 })
 ```
@@ -1566,14 +1566,14 @@ execute_certified_tool("org.ulysses.sdwan.kvm-fortios-provision/1.0.11", {
 
 **FALLBACK: Bash SSH (if tool unavailable):**
 ```bash
-Bash("ssh root@192.168.209.115 'virsh start FortiGate-sdwan-spoke-XX'")
+Bash("ssh root@10.0.0.100 'virsh start FortiGate-sdwan-spoke-XX'")
 # Wait ~60 seconds, then re-discover IP via MAC-to-ARP correlation
 ```
 
 **LAST RESORT: Ask user:**
 ```
 The VM needs to be restarted on the hypervisor. Please run:
-  ssh root@192.168.209.115
+  ssh root@10.0.0.100
   virsh start FortiGate-sdwan-spoke-XX
 ```
 
@@ -1739,7 +1739,7 @@ This workflow orchestrates these certified tools.
 - **Base Image**: `/home/libvirt/images/fortios-7.6.5-base.qcow2`
 - **Network**: br0 bridge for WAN connectivity
 - **Manifest**: `C:/ProgramData/Ulysses/config/sdwan-manifest.yaml`
-- **Hub**: Existing hub at 192.168.215.15 with BGP loopback 172.16.255.252, health-check loopback 172.16.255.253
+- **Hub**: Existing hub at 10.0.1.1 with BGP loopback 172.16.255.252, health-check loopback 172.16.255.253
 
 ---
 
@@ -1837,11 +1837,11 @@ execute_certified_tool("org.ulysses.noc.fortigate-config-push/2.0.0", {
 })
 ```
 
-**Hypervisor SSH:** Key-based SSH to `root@192.168.209.115` (ed25519 key deployed 2026-01-26).
+**Hypervisor SSH:** Key-based SSH to `root@10.0.0.100` (ed25519 key deployed 2026-01-26).
 The `kvm-fortios-provision` tool handles credentials internally. For Bash SSH fallback,
 the agent can SSH directly — no password prompt, fully autonomous:
 ```bash
-ssh -o BatchMode=yes root@192.168.209.115 "virsh list --all"
+ssh -o BatchMode=yes root@10.0.0.100 "virsh list --all"
 ```
 
 ---
@@ -1856,7 +1856,7 @@ ssh -o BatchMode=yes root@192.168.209.115 "virsh list --all"
 - **FortiGate credentials (config-push):** `C:/ProgramData/Ulysses/config/fortigate_credentials.yaml`
 - **FortiGate credentials (onboard writes here — BUG):** `~/config/fortigate_credentials.yaml`
 - **FortiCloud credentials:** `C:/ProgramData/mcp/forticloud_credentials.yaml`
-- **Hypervisor SSH:** Key-based auth to `root@192.168.209.115` (autonomous, no password prompt)
+- **Hypervisor SSH:** Key-based auth to `root@10.0.0.100` (autonomous, no password prompt)
 - **NFR Reference:** `NFR-023-SDWAN-FORTIGATE-VM-PROVISIONING.md`
 
 ---
@@ -1871,8 +1871,8 @@ This section documents discovered issues that caused workflow failures and their
 
 | Parameter | Correct Value | Wrong Value | What It's For |
 |-----------|---------------|-------------|---------------|
-| `hub_wan_ip` | 192.168.215.15 | 192.168.209.62 | IPsec remote-gw (Hub's WAN IP) |
-| `wan_gateway` | 192.168.209.62 | - | Spoke's default route gateway |
+| `hub_wan_ip` | 10.0.1.1 | 10.0.0.62 | IPsec remote-gw (Hub's WAN IP) |
+| `wan_gateway` | 10.0.0.62 | - | Spoke's default route gateway |
 
 The spoke-template and blueprint tools confused these values, causing tunnels to point at the lab gateway instead of the hub.
 

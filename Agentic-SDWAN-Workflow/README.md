@@ -239,7 +239,7 @@ Agentic-SDWAN-Workflow/
 
 | Device | IP | Role |
 |--------|-----|------|
-| sdwan-hub-1 | 192.168.215.15 | SD-WAN Hub (ADVPN + BGP) |
+| sdwan-hub-1 | 10.0.1.1 | SD-WAN Hub (ADVPN + BGP) |
 | sdwan-spoke-07 | DHCP | Spoke (site_id=7) |
 | sdwan-spoke-08 | DHCP | Spoke (site_id=8) |
 | sdwan-spoke-09 | DHCP | Spoke (site_id=9) |

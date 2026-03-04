@@ -38,15 +38,15 @@ This Skills.md provides AI agents with the knowledge needed to:
 
 | Device ID | Model | IP | Role |
 |-----------|-------|-----|------|
-| `lab-71f` | FortiGate 71F | 192.168.209.62 | Lab Primary |
-| `fw-50g` | FortiGate 50G | 192.168.209.30 | Lab Secondary |
+| `lab-71f` | FortiGate 71F | 10.0.0.62 | Lab Primary |
+| `fw-50g` | FortiGate 50G | 10.0.0.30 | Lab Secondary |
 
 ### Credential Lookup
 
 Credentials stored in: `config/fortigate_credentials.yaml`
 
-When user says "the 71F" or "lab firewall" → use `192.168.209.62`
-When user says "the 50G" or "backup firewall" → use `192.168.209.30`
+When user says "the 71F" or "lab firewall" → use `10.0.0.62`
+When user says "the 50G" or "backup firewall" → use `10.0.0.30`
 
 ---
 
@@ -60,7 +60,7 @@ When user says "the 50G" or "backup firewall" → use `192.168.209.30`
 **Example intents:**
 - "Check the health of the 71F"
 - "Is the FortiGate healthy?"
-- "What's the CPU usage on 192.168.209.62?"
+- "What's the CPU usage on 10.0.0.62?"
 - "FortiGate status"
 
 **Tool:** `org.ulysses.noc.fortigate-health-check/1.0.0`
@@ -68,9 +68,9 @@ When user says "the 50G" or "backup firewall" → use `192.168.209.30`
 **Parameter extraction:**
 ```yaml
 target_ip:
-  - Direct IP: "192.168.209.62" → use as-is
-  - Device alias: "71F" → lookup 192.168.209.62
-  - Default: use 192.168.209.62 (lab-71f)
+  - Direct IP: "10.0.0.62" → use as-is
+  - Device alias: "71F" → lookup 10.0.0.62
+  - Default: use 10.0.0.62 (lab-71f)
 ```
 
 ---
@@ -158,7 +158,7 @@ target_ip:
 
 | Parameter | Default | Notes |
 |-----------|---------|-------|
-| `target_ip` | 192.168.209.62 | Lab 71F |
+| `target_ip` | 10.0.0.62 | Lab 71F |
 | `timeout` | 30 | Seconds |
 | `verify_ssl` | false | Lab certs self-signed |
 

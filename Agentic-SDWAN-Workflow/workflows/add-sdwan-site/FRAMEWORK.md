@@ -164,7 +164,7 @@ status: SUCCESS
 execution_time_seconds: 245
 
 outputs:
-  management_ip: "192.168.209.36"
+  management_ip: "10.0.0.36"
   vm_name: "FortiGate-sdwan-spoke-03"
   vnc_port: 5903
   admin_password: "FG@dm!n2026!"
@@ -259,7 +259,7 @@ blocks:
     status: SUCCESS
     completed_at: 2026-01-20T14:34:15Z
     outputs:
-      management_ip: "192.168.209.36"
+      management_ip: "10.0.0.36"
       vm_name: "FortiGate-sdwan-spoke-03"
 
   BLOCK_2_LICENSE:

@@ -132,7 +132,7 @@ device_registry:
   devices:
     - device_id: "lab-71f"
       model: "FortiGate 71F"
-      ip: "192.168.209.62"
+      ip: "10.0.0.62"
       role: "lab-primary"
       features:
         - sdwan
@@ -140,7 +140,7 @@ device_registry:
 
     - device_id: "fw-50g"
       model: "FortiGate 50G"
-      ip: "192.168.209.30"
+      ip: "10.0.0.30"
       role: "lab-secondary"
       features:
         - sdwan
@@ -216,9 +216,9 @@ tool_domains:
 installation:
   pre_install:
     - description: "Verify Trust Anchor running"
-      check: "curl -s http://192.168.209.115:8000/health"
+      check: "curl -s http://10.0.0.100:8000/health"
     - description: "Verify FortiGate reachable"
-      check: "curl -sk https://192.168.209.62/api/v2/monitor/system/status"
+      check: "curl -sk https://10.0.0.62/api/v2/monitor/system/status"
 
   install:
     - description: "Register tools with Trust Anchor"
@@ -228,7 +228,7 @@ installation:
 
   post_install:
     - description: "Verify tools registered"
-      command: "curl http://192.168.209.115:8000/tools | grep fortigate"
+      command: "curl http://10.0.0.100:8000/tools | grep fortigate"
     - description: "Run QA tests"
       command: "python solution_packs/fortigate-ops/tests/qa_fortigate_ops_tests.py"
 

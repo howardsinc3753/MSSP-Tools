@@ -35,7 +35,7 @@ Add SD-WAN steering rules to **already-deployed** spoke sites. This is a **post-
 execute_certified_tool(
     canonical_id="org.ulysses.noc.fortigate-ssh/1.0.9",
     parameters={
-        "target_ip": "192.168.209.45",
+        "target_ip": "10.0.0.45",
         "command": "get router sdwan service"  # SINGULAR - one command per call
     }
 )
@@ -58,7 +58,7 @@ Write(config_path, config_content)
 execute_certified_tool(
     canonical_id="org.ulysses.noc.fortigate-config-push/2.0.0",
     parameters={
-        "target_ip": "192.168.209.45",
+        "target_ip": "10.0.0.45",
         "config_file": config_path
     }
 )
@@ -82,7 +82,7 @@ for key, device in manifest.devices.items():
     if device.role == "spoke" and device.sdwan.status == "enable":
         candidates.append({
             "key": key,                           # spoke_192_168_209_45
-            "ip": device.management_ip,           # 192.168.209.45
+            "ip": device.management_ip,           # 10.0.0.45
             "name": device.device_name,           # sdwan-spoke-07
             "members": device.sdwan.members,      # For GAP-51 seq extraction
             "deployed_rules": device.deployed_rules or []
@@ -159,7 +159,7 @@ for device in candidates:
 # In sdwan-manifest.yaml, find the device entry and extract:
 # sdwan.members[].seq_num
 
-# Example for spoke-08 (192.168.209.31):
+# Example for spoke-08 (10.0.0.31):
 #   seq_num: 3 → HUB1-VPN1
 #   seq_num: 4 → HUB1-VPN2
 # Use: priority-members 3 4 (NOT 1 2)
@@ -279,7 +279,7 @@ Write("C:/ProgramData/Ulysses/config/sdwan-manifest.yaml", yaml.dump(manifest))
 ### Per-Device Result Schema
 
 ```yaml
-device_ip: 192.168.209.45
+device_ip: 10.0.0.45
 device_name: sdwan-spoke-07
 status: deployed | skip_manifest | skip_exists | error_query | error_push
 rule_id: 2                    # Only if deployed
@@ -310,13 +310,13 @@ Block: 10101 (O365-Steering)
 Timestamp: 2026-02-05T15:30:00
 
 DEPLOYED (3):
-  ✓ spoke-09 (192.168.209.41) - Rule ID 1, members 3 4
-  ✓ spoke-10 (192.168.209.42) - Rule ID 1, members 3 4
-  ✓ spoke-11 (192.168.209.33) - Rule ID 1, members 3 4
+  ✓ spoke-09 (10.0.0.41) - Rule ID 1, members 3 4
+  ✓ spoke-10 (10.0.0.42) - Rule ID 1, members 3 4
+  ✓ spoke-11 (10.0.0.33) - Rule ID 1, members 3 4
 
 SKIPPED - Already Deployed (2):
-  - spoke-07 (192.168.209.45) - Rule ID 2 exists
-  - spoke-08 (192.168.209.31) - Rule ID 1 exists
+  - spoke-07 (10.0.0.45) - Rule ID 2 exists
+  - spoke-08 (10.0.0.31) - Rule ID 1 exists
 
 ERRORS (0):
   (none)
@@ -445,11 +445,11 @@ end
 
 | Device | IP | Status |
 |--------|-----|--------|
-| sdwan-spoke-07 | 192.168.209.45 | Has O365 rule (ID 2) |
-| sdwan-spoke-08 | 192.168.209.31 | Has O365 rule (ID 1) |
-| sdwan-spoke-09 | 192.168.209.32 | Needs O365 rule |
-| sdwan-spoke-10 | 192.168.209.42 | Needs O365 rule |
-| sdwan-spoke-11 | 192.168.209.33 | Needs O365 rule |
+| sdwan-spoke-07 | 10.0.0.45 | Has O365 rule (ID 2) |
+| sdwan-spoke-08 | 10.0.0.31 | Has O365 rule (ID 1) |
+| sdwan-spoke-09 | 10.0.0.32 | Needs O365 rule |
+| sdwan-spoke-10 | 10.0.0.42 | Needs O365 rule |
+| sdwan-spoke-11 | 10.0.0.33 | Needs O365 rule |
 
 ---
 
@@ -458,7 +458,7 @@ end
 ```
 User: "Add O365 steering rule to spoke-09"
 
-SecBot: "Spoke-09 (192.168.209.41) — let me check the baseline first."
+SecBot: "Spoke-09 (10.0.0.41) — let me check the baseline first."
 
 [Queries manifest for member seq numbers: 3, 4]
 [Queries device for existing rules: none]
@@ -494,9 +494,9 @@ SecBot: "Found 5 spokes:
 [Pushes in batch of 3 (under MAX_PARALLEL=5)]
 
 SecBot: "Deployment complete:
-         ✓ spoke-09 (192.168.209.41) — Rule ID 1
-         ✓ spoke-10 (192.168.209.42) — Rule ID 1
-         ✓ spoke-11 (192.168.209.33) — Rule ID 1
+         ✓ spoke-09 (10.0.0.41) — Rule ID 1
+         ✓ spoke-10 (10.0.0.42) — Rule ID 1
+         ✓ spoke-11 (10.0.0.33) — Rule ID 1
 
          Manifest updated. O365 steering now active on 5/5 spokes."
 ```

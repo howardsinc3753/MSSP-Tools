@@ -188,7 +188,7 @@ AI: "Branch3 deployed. Tunnels UP. Added to manifest."
 ```
                     ┌─────────────────────┐
                     │       HUB           │
-                    │  192.168.215.15     │
+                    │  10.0.1.1     │
                     │                     │
                     │  Loopbacks:         │
                     │  • Hub_Lo: 172.16.255.253 (health-check)
@@ -207,7 +207,7 @@ AI: "Branch3 deployed. Tunnels UP. Added to manifest."
               ▼                ▼                ▼
     ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
     │    SPOKE 1      │ │    SPOKE 2      │ │    SPOKE 3      │
-    │  192.168.209.30 │ │  (future)       │ │  (planned)      │
+    │  10.0.0.30 │ │  (future)       │ │  (planned)      │
     │                 │ │                 │ │                 │
     │  Loopback:      │ │  Loopback:      │ │  Loopback:      │
     │  172.16.0.2     │ │  172.16.0.X     │ │  172.16.0.3     │

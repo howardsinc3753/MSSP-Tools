@@ -81,7 +81,7 @@ parameters:
     description: "Hub WAN IP address for local-gw binding"
     type: ip_address
     required: true
-    example: "192.168.215.15"
+    example: "10.0.1.1"
     note: "Must match WAN interface IP for proper tunnel binding"
 
 verification:

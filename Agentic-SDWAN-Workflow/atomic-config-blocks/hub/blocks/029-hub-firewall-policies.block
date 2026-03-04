@@ -103,7 +103,7 @@ notes: |
   - ADDED BGP loopback policies for spoke BGP sessions
   - ADDED Hub_Lo in overlay traffic policy for hub services
   - Verification now uses policy names, not IDs
-  - Based on production hub howard-sdwan-hub-1 (192.168.215.15)
+  - Based on production hub howard-sdwan-hub-1 (10.0.1.1)
 
 ---
 

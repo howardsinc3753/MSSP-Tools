@@ -106,7 +106,7 @@ unique_values:
   - field: management_ip
     source: "user input"
     used_for: "Device management, WAN IP"
-    example: "192.168.209.40"
+    example: "10.0.0.40"
 
   # LAN subnet tracking (critical for IP overlap prevention)
   - field: lan_subnets
@@ -320,7 +320,7 @@ wizard:
       validation:
         unique_in: "existing_sites[].management_ip"
         reachable_from_hub: true
-      hint: "Must be unique and reachable from hub at 192.168.215.15"
+      hint: "Must be unique and reachable from hub at 10.0.1.1"
 
     - id: wan_netmask
       sequence: 7
@@ -344,7 +344,7 @@ wizard:
       question: "WAN IP with CIDR (required for static bootstrap)?"
       type: cidr
       required_if: "wan_mode == 'static'"
-      hint: "Example: 192.168.209.46/24 (must match management_ip + wan_netmask)"
+      hint: "Example: 10.0.0.46/24 (must match management_ip + wan_netmask)"
 
     # =========================================================================
     # SECTION 3: LAN NETWORKS
@@ -611,7 +611,7 @@ wizard:
       required_if: "deployment_type == 'vm'"
       options:
         - value: "rocky-kvm-lab"
-          label: "Rocky KVM Lab (192.168.209.115)"
+          label: "Rocky KVM Lab (10.0.0.100)"
       default: "rocky-kvm-lab"
 
     - id: device_serial
@@ -676,14 +676,14 @@ derivations:
     # In DHCP mode (default), wan_ip is NOT set — port1 uses "set mode dhcp"
     wan_ip:
       formula: "{management_ip}/24"
-      example: "management_ip=192.168.209.45 → wan_ip=192.168.209.45/24"
+      example: "management_ip=10.0.0.45 → wan_ip=10.0.0.45/24"
       used_in: "BLOCK_1 kvm-fortios-provision static IP mode ONLY"
       note: |
-        STATIC MODE ONLY: wan_ip must be CIDR format (e.g., 192.168.209.45/24).
+        STATIC MODE ONLY: wan_ip must be CIDR format (e.g., 10.0.0.45/24).
         DHCP MODE (default): wan_ip is NOT set. Port1 uses DHCP. Management IP
         is discovered after boot via MAC-to-ARP correlation — not pre-calculated.
         If wan_netmask is provided, compute CIDR from it.
-        Default /24 mask matches lab network (192.168.209.0/24).
+        Default /24 mask matches lab network (10.0.0.0/24).
       tracked: true
 
     lan_ip:
@@ -711,7 +711,7 @@ derivations:
       used_in: "IPsec phase1 interface names"
 
   constants:
-    hub_ip: "192.168.215.15"
+    hub_ip: "10.0.1.1"
     hub_loopback_primary: "172.16.255.252"     # BGP router-id
     hub_loopback_secondary: "172.16.255.253"   # Health-check target, BGP peer
     bgp_as: 65000
@@ -744,9 +744,9 @@ outputs:
         # Network - WAN
         wan_mode: string       # "dhcp" (default) or "static"
         management_ip: string  # DHCP: "discovered_after_boot" | Static: pre-assigned IP
-        wan_ip: string         # Static only: IP with CIDR (e.g., "192.168.209.45/24") | DHCP: null
+        wan_ip: string         # Static only: IP with CIDR (e.g., "10.0.0.45/24") | DHCP: null
         wan_netmask: string    # Static only: "255.255.255.0" | DHCP: null
-        wan_gateway: string    # Static only: "192.168.209.62" | DHCP: provided by DHCP server
+        wan_gateway: string    # Static only: "10.0.0.62" | DHCP: provided by DHCP server
         wan_interface: string
 
         # Network - LAN (tracked for overlap prevention)
@@ -855,8 +855,8 @@ success_criteria:
     verification:
       check: "wan_gateway in same_subnet_as(management_ip)"
       example: |
-        management_ip: 192.168.209.45/24 → subnet 192.168.209.0/24
-        wan_gateway: 192.168.209.62 → VALID (same subnet)
+        management_ip: 10.0.0.45/24 → subnet 10.0.0.0/24
+        wan_gateway: 10.0.0.62 → VALID (same subnet)
         wan_gateway: 10.0.0.1 → INVALID (different subnet)
     critical: true
     required_if: "wan_mode == 'static'"
@@ -905,8 +905,8 @@ error_handling:
     remediation:
       - action: "Use gateway on same /24 subnet"
         example: |
-          management_ip: 192.168.209.45/24
-          wan_gateway: 192.168.209.62 (CORRECT)
+          management_ip: 10.0.0.45/24
+          wan_gateway: 10.0.0.62 (CORRECT)
           wan_gateway: 10.0.0.1 (WRONG - different subnet)
 
   - condition: "rest_api_disabled"
@@ -950,8 +950,8 @@ express_mode:
     wan_mode: "dhcp"                             # Default — DHCP provides IP + gateway automatically
     management_ip: "discovered_after_boot"       # NOT pre-calculated — DHCP assigns it
     # For static mode (optional): operator provides wan_ip and wan_gateway
-    # wan_ip: "192.168.209.XX/24"
-    # wan_gateway: "192.168.209.62"
+    # wan_ip: "10.0.0.XX/24"
+    # wan_gateway: "10.0.0.62"
     rest_api_key_url_query: "enable"             # Required for REST API config push
     admin_password: "FG@dm!n2026!"               # CRITICAL - flows to BLOCK_1 bootstrap and BLOCK_2 SSH
     lan_interface: "port2"
@@ -1046,7 +1046,7 @@ manifest_update:
       - site_id: 4
         site_name: "branch-chicago"
         hostname: "FG-branch-chicago"
-        management_ip: "192.168.209.40"
+        management_ip: "10.0.0.40"
         spoke_loopback: "172.16.0.4"
         lan_subnets:
           - "10.4.1.0/24"

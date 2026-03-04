@@ -176,10 +176,10 @@ dhcp_ip_discovery:
 
   notes:
     - "KVM VMs use MAC prefix 52:54:00 by default"
-    - "br0 is bridged to physical network 192.168.209.0/24"
+    - "br0 is bridged to physical network 10.0.0.0/24"
     - "DHCP server is on the physical network, not libvirt"
     - "VM needs ~10-30 seconds after boot to get DHCP lease"
-    - "If ARP table empty, ping broadcast: ping -c 2 -b 192.168.209.255"
+    - "If ARP table empty, ping broadcast: ping -c 2 -b 10.0.0.255"
 
 # -----------------------------------------------------------------------------
 # SUB-AGENT GOAL
@@ -237,8 +237,8 @@ inputs:
   # DHCP mode is only for lab/testing where IP is discovered post-boot.
   #
   # STATIC IP REQUIREMENTS:
-  #   - wan_ip: REQUIRED (e.g., "192.168.209.43/24")
-  #   - wan_gateway: REQUIRED (e.g., "192.168.209.62")
+  #   - wan_ip: REQUIRED (e.g., "10.0.0.43/24")
+  #   - wan_gateway: REQUIRED (e.g., "10.0.0.62")
   #   - use_dhcp: MUST be false (or omitted)
   #
   # If wan_ip is NOT provided, tool defaults to DHCP mode!
@@ -249,13 +249,13 @@ inputs:
       type: string
       required_for_static: true
       description: |
-        Static WAN IP with CIDR notation (e.g., "192.168.209.43/24")
+        Static WAN IP with CIDR notation (e.g., "10.0.0.43/24")
         REQUIRED for static mode. If omitted, defaults to DHCP.
 
     - name: wan_gateway
       type: string
       required_for_static: true
-      default: "192.168.209.62"
+      default: "10.0.0.62"
       description: |
         Default gateway IP for WAN interface.
         REQUIRED for static mode - without this, no default route is created.
@@ -298,7 +298,7 @@ success_criteria:
       command: |
         MAC=$(virsh domiflist {{ vm_name }} | grep br0 | awk '{print $5}')
         arp -an | grep -i "$MAC" | awk -F'[()]' '{print $2}'
-      expected: "192.168.209.X"
+      expected: "10.0.0.X"
       # Fallback: virsh domifaddr (works with libvirt DHCP/virbr0)
       fallback_command: "virsh domifaddr {{ vm_name }}"
 
@@ -370,8 +370,8 @@ tools:
           "action": "provision",
           "site_name": "sdwan-spoke-05",
           "subnet_id": 5,
-          "wan_ip": "192.168.209.43/24",     # REQUIRED for static
-          "wan_gateway": "192.168.209.62",      # REQUIRED for static
+          "wan_ip": "10.0.0.43/24",     # REQUIRED for static
+          "wan_gateway": "10.0.0.62",      # REQUIRED for static
           "use_dhcp": false,                   # Explicit static mode
           "admin_password": "FG@dm!n2026!",
           "hypervisor": "rocky-kvm-lab"
@@ -413,9 +413,9 @@ hypervisor_config:
   credentials_source: "MCP server context (Trust Anchor manages hypervisor SSH credentials)"
   current_hypervisor:
     name: "rocky-kvm-lab"
-    host: "192.168.209.115"
+    host: "10.0.0.100"
     auth_method: "key"
-    ssh_key_path: "Managed via MCP server — agent uses Bash SSH to root@192.168.209.115"
+    ssh_key_path: "Managed via MCP server — agent uses Bash SSH to root@10.0.0.100"
     base_image_path: "/home/libvirt/images/fortios-7.6.5-base.qcow2"
     vm_image_path: "/home/libvirt/images/"
     wan_bridge: "br0"
@@ -425,7 +425,7 @@ hypervisor_config:
 # -----------------------------------------------------------------------------
 preflight_checks:
   - name: "SSH to hypervisor"
-    command: "ssh -i {{ ssh_key_path }} -o StrictHostKeyChecking=no root@192.168.209.6215 'echo connected'"
+    command: "ssh -i {{ ssh_key_path }} -o StrictHostKeyChecking=no root@10.0.0.6215 'echo connected'"
     on_failure: "Check RSA key exists and is deployed to hypervisor"
 
   - name: "libvirtd running"
@@ -555,11 +555,11 @@ error_handling:
       - "Permission denied (publickey)"
     remediation:
       - action: "Verify SSH access to hypervisor"
-        command: "ssh root@192.168.209.115 'hostname'"
+        command: "ssh root@10.0.0.100 'hostname'"
       - action: "If key auth fails, check agent's SSH key is in hypervisor authorized_keys"
         steps:
           - "Verify ~/.ssh/id_rsa exists on this endpoint"
-          - "Copy public key to hypervisor: ssh-copy-id root@192.168.209.115"
+          - "Copy public key to hypervisor: ssh-copy-id root@10.0.0.100"
       - action: "Test with verbose output"
         command: "ssh -v -i {{ ssh_key_path }} root@{{ hypervisor_host }}"
     escalation: "Cannot reach hypervisor - check network and credentials"

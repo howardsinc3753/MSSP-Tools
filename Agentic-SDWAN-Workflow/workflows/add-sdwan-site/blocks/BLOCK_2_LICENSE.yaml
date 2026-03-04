@@ -173,7 +173,7 @@ outputs:
 
     - name: serial_number
       type: string
-      description: "FortiFlex serial (e.g., FGVMMLTM26000304)"
+      description: "FortiFlex serial (e.g., FGVMMLTMYYYYYYYYY)"
 
     - name: api_token
       type: string
@@ -407,7 +407,7 @@ execution_steps:
 
     fallback: |
       If kvm-fortios-provision/1.0.11 is not available, use Bash SSH (key-based, autonomous):
-        Bash("ssh -o BatchMode=yes root@192.168.209.115 'virsh start {{ vm_name }}'")
+        Bash("ssh -o BatchMode=yes root@10.0.0.100 'virsh start {{ vm_name }}'")
         Wait ~60 seconds, then re-discover IP via MAC-to-ARP correlation.
         Note: SSH key auth configured — no password prompt, fully autonomous.
 
@@ -548,8 +548,8 @@ error_handling:
     fallback:
       - action: "If tool unavailable, use Bash SSH to restart"
         commands:
-          - 'Bash("ssh root@192.168.209.115 ''virsh start {{ vm_name }}''")'
-          - 'Bash("ssh root@192.168.209.115 ''virsh domstate {{ vm_name }}''")'
+          - 'Bash("ssh root@10.0.0.100 ''virsh start {{ vm_name }}''")'
+          - 'Bash("ssh root@10.0.0.100 ''virsh domstate {{ vm_name }}''")'
         expected: "running"
     notes:
       - "GAP-35 is CLOSED — kvm-fortios-provision/1.0.11 has native start action"
@@ -595,7 +595,7 @@ error_handling:
       - "Original management_ip not responding"
     remediation:
       - action: "Use virsh domifaddr to find new IP"
-        command: "ssh root@192.168.209.115 'virsh domifaddr {{ vm_name }}'"
+        command: "ssh root@10.0.0.100 'virsh domifaddr {{ vm_name }}'"
       - action: "Update management_ip for remaining steps"
     escalation: "Device relocated - workflow needs IP update"
 
