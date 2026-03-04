@@ -1,0 +1,229 @@
+canonical_id: org.ulysses.sdwan.kvm-fortios-provision/1.0.12
+oid: 1.2.3.2.1.1
+name: KVM FortiOS Provisioning
+version: 1.0.12
+description: "AI-driven tool to provision FortiGate VMs on KVM/Rocky Linux hypervisors.\n\
+  \nComplete lifecycle management:\n- Pre-flight validation (SSH, libvirt, base image,\
+  \ disk space)\n- Virtual network creation for BGP/SD-WAN peering\n- VM creation\
+  \ with proper SCSI disk configuration\n- Bootstrap ISO configuration (OpenStack cloud-init config-drive format)\n- DHCP IP discovery via MAC-to-ARP correlation\n- FortiFlex license\
+  \ application\n- Post-reboot validation\n- VM start/stop (lifecycle management)\n\n\
+  v1.0.12: Added start and stop actions for VM lifecycle management.\n\
+  \        - start: Start a stopped VM (e.g., after FortiFlex license shutdown)\n\
+  \        - stop: Gracefully or forcefully stop a running VM\n\
+  \        - start includes automatic DHCP IP discovery after boot\n\
+  \        - Closes GAP-35: agents no longer need Bash SSH to restart VMs\n\n\
+  v1.0.11: CRITICAL FIXES for SD-WAN workflow:\n\
+  \        - Added rest-api-key-url-query enable to config system global\n\
+  \        - Added admintimeout 480 to config system global\n\
+  \        - Added lan_ip parameter for explicit LAN interface IP\n\
+  \        - Added site_id parameter to derive LAN IP as 10.{site_id}.1.1/24\n\
+  \        - Fixed port2 allowaccess to include https ssh (not just ping)\n\n\
+  v1.0.10: BUGFIX - admin_password now defaults to DEFAULT_ADMIN_PASSWORD constant (FG@dm!n2026!).\n\
+  \        - Previous versions incorrectly defaulted to 'admin'\n\n\
+  v1.0.9: VERIFIED WORKING - Applied Rocky Linux tested ISO procedure:\n\
+  \        - ISO structure: /openstack/content/0000 + /openstack/latest/user_data\n\
+  \        - mkisofs -R -r (no volume label needed)\n\
+  \        - password-policy disable + force-password-change disable\n\n\
+  v1.0.8: Changed to OpenStack cloud-init config-drive format.\n\n\
+  v1.0.7: Fixed ISO creation - remove existing ISO before creating new one.\n\n\
+  v1.0.6: Fixed fresh disk requirement - removes existing disk before copy.\n\n\
+  Enables autonomous FortiGate deployment from Windows Claude Code session.\n"
+metadata:
+  org_namespace: ulysses
+  domain: noc
+  intent: provision
+  vendor: fortinet
+  shelf: sdwan/provisioning
+  author: Trust-Bot Tool Maker
+  created: '2026-01-18'
+  updated: '2026-01-26'
+  tags:
+  - fortigate
+  - kvm
+  - libvirt
+  - vm
+  - provisioning
+  - sdwan
+  - fortiflex
+  - automation
+runtime:
+  language: python
+  entry_point: main
+  source_file: org.ulysses.sdwan.kvm-fortios-provision.py
+  python_packages:
+  - pyyaml>=6.0
+  - paramiko>=3.0
+parameters:
+  type: object
+  required:
+  - action
+  properties: null
+  action:
+    type: string
+    required: true
+    enum:
+    - provision
+    - start
+    - stop
+    - status
+    - destroy
+    - list
+    description: 'Action to perform:
+
+      - provision: Create and configure new FortiGate VM
+
+      - start: Start a stopped VM (e.g., after license shutdown)
+
+      - stop: Gracefully stop a running VM
+
+      - status: Get status of existing VM
+
+      - destroy: Remove VM and optionally its resources
+
+      - list: List all FortiGate VMs on hypervisor
+
+      '
+  site_name:
+    type: string
+    required: false
+    description: Site identifier (e.g., "NYC-01", "Branch1")
+  site_role:
+    type: string
+    required: false
+    enum:
+    - spoke
+    - hub
+    default: spoke
+    description: SD-WAN role for this site
+  subnet_id:
+    type: integer
+    required: false
+    description: Third octet for 10.254.X.0/24 BGP network (e.g., 30)
+  wan_ip:
+    type: string
+    required: false
+    description: WAN interface IP with mask (e.g., "192.168.1.100/24")
+  wan_gateway:
+    type: string
+    required: false
+    description: WAN default gateway IP
+  lan_ip:
+    type: string
+    required: false
+    description: LAN interface IP with mask (e.g., "10.7.1.1/24") - FortiGate's gateway on LAN
+  site_id:
+    type: integer
+    required: false
+    description: Site ID number - if provided, derives lan_ip as 10.{site_id}.1.1/24
+  memory_mb:
+    type: integer
+    required: false
+    default: 4096
+    description: VM memory in MB
+  vcpus:
+    type: integer
+    required: false
+    default: 2
+    description: Number of vCPUs
+  admin_password:
+    type: string
+    required: false
+    sensitive: true
+    description: Admin password (generated if not provided)
+  fortiflex_token:
+    type: string
+    required: false
+    description: FortiFlex license token to apply
+  hypervisor:
+    type: string
+    required: false
+    description: Hypervisor key from credentials (uses default if not specified)
+  wait_for_boot:
+    type: boolean
+    required: false
+    default: true
+    description: "For action=start: Wait for FortiOS to boot and discover DHCP IP"
+  boot_timeout:
+    type: integer
+    required: false
+    default: 120
+    description: "For action=start: Seconds to wait for DHCP IP discovery after boot"
+  force:
+    type: boolean
+    required: false
+    default: false
+    description: "For action=stop: Use virsh destroy (hard stop) instead of virsh shutdown"
+  remove_disk:
+    type: boolean
+    required: false
+    default: true
+    description: Remove disk image when destroying VM
+  remove_network:
+    type: boolean
+    required: false
+    default: false
+    description: Remove BGP network when destroying VM
+output:
+  success:
+    type: boolean
+    description: Whether the operation succeeded
+  site_name:
+    type: string
+    description: Site identifier
+  vm:
+    type: object
+    description: VM information (name, state, VNC port)
+  network:
+    type: object
+    description: BGP network information
+  interfaces:
+    type: array
+    description: VM network interfaces
+  credentials:
+    type: object
+    description: Generated admin credentials
+    sensitive: true
+  license:
+    type: object
+    description: FortiFlex license information
+  phases:
+    type: object
+    description: Results from each provisioning phase
+  next_steps:
+    type: array
+    description: Recommended next actions
+  error:
+    type: string
+    description: Error message if failed
+dependencies:
+- pyyaml
+- paramiko
+related_tools:
+- org.ulysses.provisioning.hypervisor-credential-manager
+- org.ulysses.cloud.fortiflex-token-create
+- org.ulysses.noc.fortigate-sdwan-onboard
+- org.ulysses.noc.fortigate-sdwan-blueprint-planner
+- org.ulysses.noc.fortigate-sdwan-manifest-tracker
+- org.ulysses.provisioning.credential-manager
+- org.ulysses.noc.fortigate-ssh
+capabilities:
+  network:
+    outbound:
+    - ssh:22
+    inbound: []
+  filesystem:
+    read:
+    - ~/.config/mcp/*.yaml
+    write: []
+  process:
+    spawn: false
+    elevated: false
+  max_execution_time_ms: 600000
+status: certified
+skills_ref: Skills.md
+security:
+  certified: true
+  certified_at: '2026-01-24T16:39:21.732609Z'
+  certified_by: trust-anchor
+  algorithm: RSA-2048-PKCS1v15-SHA256
+  verified_via: trust-anchor-lookup

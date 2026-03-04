@@ -1,0 +1,131 @@
+canonical_id: org.ulysses.provisioning.fortigate-license-apply/1.0.5
+oid: 1.2.3.2.1.5
+name: FortiGate License Apply
+version: 1.0.5
+description: |
+  Apply FortiFlex license token to a FortiGate VM via SSH.
+
+  v1.0.5: TESTED AND WORKING!
+          - Fixed command: 'execute vm-license <token>' (no 'install' keyword!)
+          - Full hypervisor integration for VM restart
+          - VM shuts down after license (does NOT reboot)
+          - Tool now SSHs to hypervisor and runs 'virsh start'
+          - Loads hypervisor credentials from ~/.config/mcp/hypervisor_credentials.yaml
+          - Waits for FortiGate to come back online
+          - Verifies license status
+
+  WORKFLOW:
+  1. SSH to FortiGate, apply license with 'execute vm-license install'
+  2. Wait for VM to shut down (SSH goes down)
+  3. SSH to hypervisor, run 'virsh start <vm_name>'
+  4. Wait for FortiGate SSH to come back up
+  5. Verify license is valid
+
+  Use after provisioning a new FortiGate VM with kvm-fortios-provision.
+
+  IMPORTANT: Requires network connectivity from FortiGate to Fortinet servers
+  (forticare.fortinet.com) for license validation.
+metadata:
+  org_namespace: ulysses
+  domain: noc
+  intent: configure
+  vendor: fortinet
+  shelf: provisioning/fortigate
+  author: Trust-Bot Tool Maker
+  created: '2026-01-25'
+  tags:
+  - fortigate
+  - license
+  - fortiflex
+  - provisioning
+  - ssh
+runtime:
+  language: python
+  entry_point: main
+  source_file: org.ulysses.provisioning.fortigate-license-apply.py
+  python_packages:
+  - paramiko>=3.0
+parameters:
+  type: object
+  required:
+  - target_ip
+  - fortiflex_token
+  properties:
+    target_ip:
+      type: string
+      description: FortiGate management IP address
+    admin_password:
+      type: string
+      sensitive: true
+      default: "FG@dm!n2026!"
+      description: Admin password for SSH (default is lab standard)
+    admin_user:
+      type: string
+      default: "admin"
+      description: Admin username (default is admin)
+    fortiflex_token:
+      type: string
+      description: FortiFlex license token (20-char hex string)
+    wait_for_reboot:
+      type: boolean
+      default: true
+      description: Wait for FortiGate to reboot after license apply
+    reboot_timeout:
+      type: integer
+      default: 180
+      description: Seconds to wait for VM to come back online
+    vm_name:
+      type: string
+      description: |
+        VM name in libvirt/virsh (e.g., 'FortiGate-sdwan-spoke-07').
+        REQUIRED for automatic VM restart after license.
+        If not provided, tool returns success with manual restart instructions.
+    hypervisor_host:
+      type: string
+      description: |
+        Hypervisor IP/hostname (default: loads from ~/.config/mcp/hypervisor_credentials.yaml)
+    hypervisor_user:
+      type: string
+      default: "root"
+      description: Hypervisor SSH username
+    hypervisor_password:
+      type: string
+      sensitive: true
+      description: |
+        Hypervisor SSH password (default: loads from ~/.config/mcp/hypervisor_credentials.yaml)
+output:
+  success:
+    type: boolean
+    description: Whether license was applied successfully
+  license_status:
+    type: string
+    description: License status after application (Valid, Invalid, etc.)
+  serial_number:
+    type: string
+    description: FortiGate serial number
+  license_output:
+    type: string
+    description: Raw output from license install command
+  vm_started:
+    type: boolean
+    description: Whether VM was started via hypervisor after license
+  note:
+    type: string
+    description: Additional information about the operation
+  error:
+    type: string
+    description: Error message if failed
+capabilities:
+  network:
+    outbound:
+    - ssh:22
+    inbound: []
+  filesystem:
+    read: []
+    write: []
+  process:
+    spawn: false
+    elevated: false
+  max_execution_time_ms: 300000
+status: draft
+skills_ref: Skills.md

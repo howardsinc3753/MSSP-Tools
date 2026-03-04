@@ -1,0 +1,118 @@
+canonical_id: org.ulysses.noc.fortigate-config-push/2.0.0
+name: FortiGate Config Push
+version: 2.0.0
+description: 'Pushes FortiOS CLI configuration to a FortiGate device via SSH.
+
+
+  Sends CLI commands directly - no API translation required.
+
+  Supports all major config sections:
+
+  - System interfaces and global settings
+
+  - IPsec Phase1/Phase2 tunnels
+
+  - SD-WAN zones, members, health-checks, neighbors
+
+  - BGP neighbors, neighbor-groups, neighbor-ranges
+
+  - Firewall addresses and policies
+
+  - Static routes
+
+
+  This tool closes the automation gap - AI can now fully deploy
+
+  new SD-WAN sites without human intervention.
+
+
+  Use with:
+
+  1. fortigate-sdwan-blueprint-planner (generate config)
+
+  2. fortigate-config-push (this tool - push config)
+
+  3. fortigate-sdwan-status (verify tunnels)
+
+  4. fortigate-sdwan-manifest-tracker (track device)
+
+  '
+metadata:
+  org_namespace: ulysses
+  domain: noc
+  intent: provision
+  vendor: fortinet
+  shelf: noc/fortigate
+  tags:
+  - fortigate
+  - config
+  - push
+  - deploy
+  - automation
+  - sdwan
+runtime:
+  language: python
+  entry_point: main
+  source_file: org.ulysses.noc.fortigate-config-push.py
+  python_packages:
+  - pyyaml>=6.0
+  - paramiko>=2.0
+  files:
+  - config/fortigate_credentials.yaml
+parameters:
+  type: object
+  required:
+  - target_ip
+  properties:
+    target_ip:
+      type: string
+      format: ipv4
+      description: FortiGate management IP address
+    config_path:
+      type: string
+      description: Path to FortiOS CLI config file
+    config_text:
+      type: string
+      description: FortiOS CLI config as string (alternative to config_path)
+    dry_run:
+      type: boolean
+      default: false
+      description: Parse config only, don't push to device
+output_schema:
+  type: object
+  properties:
+    success:
+      type: boolean
+    target:
+      type: string
+    blocks_total:
+      type: integer
+    blocks_success:
+      type: integer
+    blocks_failed:
+      type: integer
+    results:
+      type: array
+    pushed_at:
+      type: string
+credentials:
+- ref: local://config/fortigate_credentials.yaml
+  type: config_file
+  required: true
+capabilities:
+  network:
+    outbound:
+    - ssh:22
+  filesystem:
+    read:
+    - config/*.yaml
+    - config/blueprints/*.txt
+  max_execution_time_ms: 300000
+status: certified
+skills_ref: Skills.md
+security:
+  certified: true
+  certified_at: '2026-01-26T20:53:12.130830Z'
+  certified_by: admin
+  algorithm: RSA-2048-PKCS1v15-SHA256
+  notes: Version 2.0.0 - GAP-26 FIX - SSH CLI push instead of API translation

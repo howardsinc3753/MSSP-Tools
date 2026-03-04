@@ -1,0 +1,155 @@
+canonical_id: org.ulysses.noc.fortigate-ssh/1.0.9
+name: FortiGate SSH
+version: 1.0.9
+description: 'Execute CLI commands on FortiGate via SSH with public key authentication.
+
+  Automatically provisions tron-cli admin user and manages RSA-4096 keypair.
+
+  Gracefully handles API permission errors (401/403) and tries SSH anyway.
+
+  Allows any show, get, or diagnose command. Blocks config/shutdown/reboot.
+
+  '
+metadata:
+  org_namespace: ulysses
+  domain: noc
+  intent: troubleshoot
+  vendor: fortinet
+  shelf: noc/fortigate
+  tags:
+  - fortigate
+  - ssh
+  - cli
+  - network
+  - firewall
+  - diagnostics
+runtime:
+  language: python
+  entry_point: main
+  source_file: org.ulysses.noc.fortigate-ssh.py
+  python_packages:
+  - paramiko>=3.0.0
+  - cryptography>=41.0.0
+  - pyyaml>=6.0
+  dotnet_packages: []
+  files:
+  - config/fortigate_credentials.yaml
+  services: []
+parameters:
+  type: object
+  required:
+  - target_ip
+  - command
+  properties:
+    target_ip:
+      type: string
+      description: FortiGate management IP address
+      format: ipv4
+    command:
+      type: string
+      description: CLI command to execute (must be in allowlist)
+    provision_user:
+      type: boolean
+      default: true
+      description: Auto-provision tron-cli user on FortiGate if not exists
+    trusthost:
+      type: string
+      default: 0.0.0.0 0.0.0.0
+      description: Allowed source network for SSH (format - IP NETMASK)
+    ssh_port:
+      type: integer
+      default: 22
+      description: SSH port on FortiGate
+    timeout:
+      type: integer
+      default: 30
+      description: Connection and command timeout in seconds
+    verify_ssl:
+      type: boolean
+      default: false
+      description: Verify SSL certificate for REST API calls
+output_schema:
+  type: object
+  properties:
+    success:
+      type: boolean
+      description: Whether the command executed successfully
+    target_ip:
+      type: string
+      description: Target FortiGate IP address
+    command:
+      type: string
+      description: Command that was executed
+    output:
+      type: string
+      description: Command stdout output
+    stderr:
+      type: string
+      description: Command stderr output (if any)
+    exit_status:
+      type: integer
+      description: Command exit status code
+    ssh_user:
+      type: string
+      description: SSH username used (tron-cli)
+    user_provisioned:
+      type: boolean
+      description: Whether user was newly provisioned
+    key_path:
+      type: string
+      description: Path to SSH private key
+    error:
+      type: string
+      description: Error message if success is false
+    command_blocked:
+      type: boolean
+      description: True if command was blocked by allowlist
+    api_permission_skipped:
+      type: boolean
+      description: True if API check was skipped due to 401/403 permission error
+    hint:
+      type: string
+      description: Additional context about execution
+credentials:
+- ref: vault://fortigate/admin
+  type: api_key
+  required: false
+  scope:
+  - read
+  - write
+  description: FortiGate API key with admin write access (for user provisioning)
+- ref: local://config/fortigate_credentials.yaml
+  type: config_file
+  required: false
+  description: Local credential file (fallback when vault unavailable)
+capabilities:
+  network:
+    outbound:
+    - https:443
+    - ssh:22
+    inbound: []
+  filesystem:
+    read:
+    - config/*.yaml
+    - ~/.config/mcp/keys/*
+    write:
+    - ~/.config/mcp/keys/*
+  process:
+    spawn: false
+    elevated: false
+  max_execution_time_ms: 60000
+telemetry:
+  metrics_enabled: true
+  log_level: INFO
+  trace_enabled: false
+versioning:
+  breaking_change: false
+  supersedes: null
+security:
+  certified: true
+  certified_at: "2026-02-05T20:34:41.592036Z"
+  certified_by: trust-anchor
+  algorithm: RSA-2048-PKCS1v15-SHA256
+  verified_via: trust-anchor-lookup
+status: certified
+skills_ref: Skills.md

@@ -1,0 +1,107 @@
+canonical_id: org.ulysses.noc.fortigate-sdwan-status/1.1.0
+name: FortiGate SD-WAN Status
+version: 1.1.0
+description: 'Diagnostic tool for SD-WAN operational status on FortiGate devices.
+
+
+  Retrieves real-time status of:
+
+  - SD-WAN health check probes (latency, jitter, packet loss)
+
+  - SD-WAN members and their states
+
+  - BGP neighbor sessions
+
+  - IPsec VPN tunnel status
+
+
+  v1.1.0: Re-signed with MCP standard credential paths.
+
+  '
+metadata:
+  org_namespace: ulysses
+  domain: noc
+  intent: monitor
+  vendor: fortinet
+  shelf: noc/fortigate
+  tags:
+  - fortigate
+  - sdwan
+  - health-check
+  - bgp
+  - ipsec
+  - diagnostics
+  - monitoring
+runtime:
+  language: python
+  entry_point: main
+  source_file: org.ulysses.noc.fortigate-sdwan-status.py
+  python_packages:
+  - pyyaml>=6.0
+  files:
+  - config/fortigate_credentials.yaml
+parameters:
+  type: object
+  required:
+  - target_ip
+  properties:
+    target_ip:
+      type: string
+      description: FortiGate management IP
+      format: ipv4
+    include_health_checks:
+      type: boolean
+      default: true
+      description: Include SD-WAN health check probe status
+    include_members:
+      type: boolean
+      default: true
+      description: Include SD-WAN member status
+    include_bgp:
+      type: boolean
+      default: true
+      description: Include BGP neighbor status
+    include_ipsec:
+      type: boolean
+      default: true
+      description: Include IPsec tunnel status
+    health_check_name:
+      type: string
+      description: Filter to specific health check by name
+output_schema:
+  type: object
+  properties:
+    success:
+      type: boolean
+    target_ip:
+      type: string
+    health_checks:
+      type: array
+    members:
+      type: array
+    bgp_neighbors:
+      type: array
+    ipsec_tunnels:
+      type: array
+    summary:
+      type: object
+credentials:
+- ref: local://config/fortigate_credentials.yaml
+  type: config_file
+  required: true
+capabilities:
+  network:
+    outbound:
+    - https:443
+  filesystem:
+    read:
+    - config/*.yaml
+  max_execution_time_ms: 60000
+status: certified
+skills_ref: Skills.md
+security:
+  certified: true
+  certified_at: '2026-01-21T14:45:13.606500+00:00'
+  certified_by: trust-anchor
+  algorithm: RSA-2048-PKCS1v15-SHA256
+  verified_via: trust-anchor-lookup

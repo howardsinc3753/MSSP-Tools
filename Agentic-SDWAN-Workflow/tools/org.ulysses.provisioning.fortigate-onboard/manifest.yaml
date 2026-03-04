@@ -1,0 +1,186 @@
+canonical_id: org.ulysses.noc.fortigate-onboard/1.0.1
+name: FortiGate Onboard
+version: 1.0.1
+# v1.0.1: Enable rest-api-key-url-query before API user creation (fixes 401 errors)
+description: 'Complete onboarding workflow for new FortiGate devices.
+
+  Handles SSH connection, API user creation, key generation,
+
+  API testing, and credential storage in a single operation.
+
+
+  Workflow steps:
+
+  1. SSH into device with admin credentials
+
+  2. Create REST API admin user via CLI
+
+  3. Generate API key (handles password prompts)
+
+  4. Test API connectivity with Bearer auth
+
+  5. Register device in local credentials file
+
+  '
+metadata:
+  org_namespace: ulysses
+  domain: noc
+  intent: configure
+  vendor: fortinet
+  shelf: noc/fortigate
+  tags:
+  - fortigate
+  - onboarding
+  - provisioning
+  - automation
+  - api-token
+  - ssh
+runtime:
+  language: python
+  entry_point: main
+  source_file: org.ulysses.provisioning.fortigate-onboard.py
+  python_packages:
+  - paramiko>=3.0.0
+  - pyyaml>=6.0
+  dotnet_packages: []
+  files:
+  - config/fortigate_credentials.yaml
+  services: []
+parameters:
+  type: object
+  required:
+  - target_ip
+  - admin_password
+  - device_id
+  properties:
+    target_ip:
+      type: string
+      description: FortiGate management IP address
+      format: ipv4
+    admin_user:
+      type: string
+      default: admin
+      description: Admin username for SSH authentication
+    admin_password:
+      type: string
+      description: Admin password (sensitive)
+      sensitive: true
+    device_id:
+      type: string
+      description: Unique device identifier (e.g., "lab-vm02", "fw-branch01")
+    api_username:
+      type: string
+      default: ulysses-api
+      description: Name for the REST API admin user
+    accprofile:
+      type: string
+      default: super_admin
+      description: Admin profile to assign
+    trusthosts:
+      type: array
+      description: List of allowed source networks [["ip", "mask"], ...]
+      items:
+        type: array
+    ssh_port:
+      type: integer
+      default: 22
+      description: SSH port on FortiGate
+    timeout:
+      type: integer
+      default: 60
+      description: Operation timeout in seconds
+    verify_ssl:
+      type: boolean
+      default: false
+      description: Verify SSL certificates
+output_schema:
+  type: object
+  properties:
+    success:
+      type: boolean
+      description: Whether onboarding completed successfully
+    target_ip:
+      type: string
+      description: Target FortiGate IP address
+    device_id:
+      type: string
+      description: Registered device identifier
+    api_token:
+      type: string
+      description: Generated API token (sensitive)
+      sensitive: true
+    device_info:
+      type: object
+      description: Device information from API
+      properties:
+        hostname:
+          type: string
+        serial:
+          type: string
+        version:
+          type: string
+        model:
+          type: string
+    steps_completed:
+      type: array
+      description: List of completed workflow steps
+    credentials_file:
+      type: string
+      description: Path to credentials file
+    message:
+      type: string
+      description: Success message
+    error:
+      type: string
+      description: Error message if failed
+credentials:
+- ref: runtime://admin_password
+  type: password
+  required: true
+  scope:
+  - write
+  description: Admin password provided at runtime
+capabilities:
+  network:
+    outbound:
+    - ssh:22
+    - https:443
+    inbound: []
+  filesystem:
+    read:
+    - config/*.yaml
+    write:
+    - config/fortigate_credentials.yaml
+  process:
+    spawn: false
+    elevated: false
+  max_execution_time_ms: 120000
+telemetry:
+  metrics_enabled: true
+  log_level: INFO
+  trace_enabled: false
+versioning:
+  breaking_change: false
+  supersedes: null
+security:
+  checksum_sha256: null
+  signature: null
+  cert_chain: null
+  certified: true
+  certified_at: '2026-01-24T21:30:56.098988Z'
+  certified_by: trust-anchor
+  notes: 'This tool handles sensitive credentials:
+
+    - Admin password passed at runtime (not stored)
+
+    - Generated API token stored in local credentials file
+
+    - SSH connection uses password authentication
+
+    - API tested with Bearer token (FortiOS 7.6+ compatible)
+
+    '
+  algorithm: RSA-2048-PKCS1v15-SHA256
+  verified_via: trust-anchor-lookup
+status: certified
+skills_ref: Skills.md

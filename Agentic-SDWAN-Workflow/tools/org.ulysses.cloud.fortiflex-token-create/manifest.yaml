@@ -1,0 +1,151 @@
+canonical_id: org.ulysses.cloud.fortiflex-token-create/1.0.3
+name: FortiFlex Token Create
+version: 1.0.3
+description: 'Create FortiFlex license tokens for VM provisioning.
+
+  Generates VM entitlements for FortiGate-VM, FortiManager-VM, FortiAnalyzer-VM.
+
+
+  IMPORTANT: Uses entitlements/vm/create endpoint for virtual appliances.
+
+  - Hardware products use entitlements/hardware/create (requires serial numbers)
+
+  - Cloud services (FortiEDR) use entitlements/cloud/create
+
+  - VMs (FortiGate-VM, FMG-VM, FAZ-VM) use entitlements/vm/create
+
+
+  API Base: https://support.fortinet.com/ES/api/fortiflex/v2/
+
+  Client ID: flexvm
+
+  '
+metadata:
+  org_namespace: ulysses
+  domain: cloud
+  intent: configure
+  vendor: fortinet
+  shelf: cloud/fortiflex
+  tags:
+  - fortiflex
+  - flexvm
+  - licensing
+  - token
+  - vm
+  - provisioning
+  - mssp
+runtime:
+  language: python
+  entry_point: main
+  source_file: org.ulysses.cloud.fortiflex-token-create.py
+  python_packages:
+  - requests>=2.28.0
+  - pyyaml>=6.0
+  dotnet_packages: []
+  files:
+  - config/forticloud_credentials.yaml
+  services: []
+parameters:
+  type: object
+  required:
+  - config_id
+  properties:
+    config_id:
+      type: integer
+      description: FortiFlex configuration ID (use fortiflex-config-list to find)
+    count:
+      type: integer
+      default: 1
+      description: Number of tokens to create (1-10)
+    end_date:
+      type: string
+      description: Optional end date (YYYY-MM-DD format)
+    description:
+      type: string
+      description: Optional description for the token
+    program_serial_number:
+      type: string
+      description: FortiFlex program serial number (ELAVMSXXXXXXXX)
+    api_username:
+      type: string
+      description: FortiCloud API username (overrides credential file)
+    api_password:
+      type: string
+      description: FortiCloud API password (overrides credential file)
+output_schema:
+  type: object
+  properties:
+    success:
+      type: boolean
+      description: Whether tokens were created
+    tokens_created:
+      type: integer
+      description: Number of tokens created
+    tokens:
+      type: array
+      description: List of created tokens
+      items:
+        type: object
+        properties:
+          serial_number:
+            type: string
+            description: Token serial number (FGVMXXXXXX format)
+          token:
+            type: string
+            description: The license token string
+          config_id:
+            type: integer
+            description: Configuration ID
+          status:
+            type: string
+            description: Token status
+          end_date:
+            type: string
+            description: Token end date
+    error:
+      type: string
+      description: Error message if success is false
+credentials:
+- ref: vault://forticloud/flexvm
+  type: api_credentials
+  required: false
+  scope:
+  - read
+  - write
+  description: FortiCloud FortiFlex API credentials
+- ref: local://config/forticloud_credentials.yaml
+  type: config_file
+  required: false
+  description: Local credential file
+capabilities:
+  network:
+    outbound:
+    - https://customerapiauth.fortinet.com:443
+    - https://support.fortinet.com:443
+    inbound: []
+  filesystem:
+    read:
+    - config/*.yaml
+    write: []
+  process:
+    spawn: false
+    elevated: false
+  max_execution_time_ms: 60000
+telemetry:
+  metrics_enabled: true
+  log_level: INFO
+  trace_enabled: false
+versioning:
+  breaking_change: false
+  supersedes: null
+security:
+  checksum_sha256: null
+  signature: null
+  cert_chain: null
+  certified: true
+  certified_at: '2026-01-20T03:40:55.438424+00:00'
+  certified_by: trust-anchor
+  algorithm: RSA-2048-PKCS1v15-SHA256
+  verified_via: trust-anchor-lookup
+status: certified
+skills_ref: Skills.md

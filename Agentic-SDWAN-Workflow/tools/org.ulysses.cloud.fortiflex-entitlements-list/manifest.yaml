@@ -1,0 +1,149 @@
+# FortiFlex Entitlements List Tool Manifest
+# Version: 1.0.0
+
+canonical_id: org.ulysses.cloud.fortiflex-entitlements-list/1.0.0
+name: FortiFlex Entitlements List
+version: 1.0.0
+description: |
+  List all FortiFlex entitlements (VM licenses and hardware) under a program.
+  Returns serial numbers, config assignments, and status for all active entitlements.
+
+  Use this to see what licenses exist and their current state.
+
+metadata:
+  org_namespace: ulysses
+  domain: cloud
+  intent: query
+  vendor: fortinet
+  shelf: cloud/fortiflex
+  tags:
+    - fortiflex
+    - flexvm
+    - licensing
+    - entitlements
+    - vm
+    - inventory
+
+runtime:
+  language: python
+  entry_point: main
+  source_file: org.ulysses.cloud.fortiflex-entitlements-list.py
+  python_packages:
+    - requests>=2.28.0
+    - pyyaml>=6.0
+  dotnet_packages: []
+  files:
+    - config/forticloud_credentials.yaml
+  services: []
+
+parameters:
+  type: object
+  required: []
+  properties:
+    config_id:
+      type: integer
+      description: Optional filter by configuration ID
+    serial_number:
+      type: string
+      description: Optional filter by serial number
+    account_id:
+      type: integer
+      description: Optional filter by customer account ID
+    program_serial_number:
+      type: string
+      description: FortiFlex program serial number (ELAVMSXXXXXXXX)
+    api_username:
+      type: string
+      description: FortiCloud API username (overrides credential file)
+    api_password:
+      type: string
+      description: FortiCloud API password (overrides credential file)
+
+output_schema:
+  type: object
+  properties:
+    success:
+      type: boolean
+      description: Whether the query succeeded
+    entitlement_count:
+      type: integer
+      description: Number of entitlements found
+    entitlements:
+      type: array
+      description: List of entitlements
+      items:
+        type: object
+        properties:
+          serial_number:
+            type: string
+            description: Entitlement serial number
+          config_id:
+            type: integer
+            description: Configuration ID
+          config_name:
+            type: string
+            description: Configuration name
+          product_type:
+            type: string
+            description: Product type
+          status:
+            type: string
+            description: Entitlement status
+          start_date:
+            type: string
+            description: Start date
+          end_date:
+            type: string
+            description: End date
+          token:
+            type: string
+            description: License token (if available)
+    error:
+      type: string
+      description: Error message if success is false
+
+credentials:
+  - ref: vault://forticloud/flexvm
+    type: api_credentials
+    required: false
+    scope:
+      - read
+    description: FortiCloud FortiFlex API credentials
+  - ref: local://config/forticloud_credentials.yaml
+    type: config_file
+    required: false
+    description: Local credential file
+
+capabilities:
+  network:
+    outbound:
+      - https://customerapiauth.fortinet.com:443
+      - https://support.fortinet.com:443
+    inbound: []
+  filesystem:
+    read:
+      - config/*.yaml
+    write: []
+  process:
+    spawn: false
+    elevated: false
+  max_execution_time_ms: 60000
+
+telemetry:
+  metrics_enabled: true
+  log_level: INFO
+  trace_enabled: false
+
+versioning:
+  breaking_change: false
+  supersedes: null
+
+security:
+  certified: true
+  certified_at: '2026-01-22T17:50:55Z'
+  certified_by: trust-anchor
+  algorithm: RSA-2048-PKCS1v15-SHA256
+  verified_via: trust-anchor-lookup
+
+status: certified
+skills_ref: Skills.md

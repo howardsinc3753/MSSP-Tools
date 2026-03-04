@@ -1,0 +1,152 @@
+canonical_id: org.ulysses.noc.fortigate-cli-execute/1.0.1
+name: FortiGate CLI Execute
+version: 1.0.1
+# v1.0.1: Fix credential lookup - check ssh_username/ssh_password fields
+description: 'Execute CLI commands on FortiGate via SSH with password authentication.
+
+  Supports write commands (config, execute) for initial device setup.
+
+
+  Use this tool when:
+
+  - Device is newly provisioned (no API user yet)
+
+  - Need to apply FortiFlex license (execute vm-license)
+
+  - Need to configure interfaces, routes, or other settings via CLI
+
+  - fortigate-ssh is insufficient (read-only commands only)
+
+
+  WARNING: This tool executes write commands. Use with caution.
+
+  '
+metadata:
+  org_namespace: ulysses
+  domain: noc
+  intent: provision
+  vendor: fortinet
+  shelf: noc/fortigate
+  tags:
+  - fortigate
+  - ssh
+  - cli
+  - provisioning
+  - configuration
+  - execute
+runtime:
+  language: python
+  entry_point: main
+  source_file: org.ulysses.noc.fortigate-cli-execute.py
+  python_packages:
+  - paramiko>=3.0.0
+  - pyyaml>=6.0
+  dotnet_packages: []
+  files: []
+  services: []
+parameters:
+  type: object
+  required:
+  - target_ip
+  - commands
+  properties:
+    target_ip:
+      type: string
+      description: FortiGate management IP address
+    commands:
+      type: array
+      description: List of CLI commands to execute in sequence
+      items:
+        type: string
+    username:
+      type: string
+      default: admin
+      description: SSH username
+    password:
+      type: string
+      description: SSH password (required for password auth)
+    ssh_port:
+      type: integer
+      default: 22
+      description: SSH port
+    timeout:
+      type: integer
+      default: 30
+      description: Command timeout in seconds
+    interactive_responses:
+      type: object
+      description: 'Map of prompts to responses for interactive commands.
+
+        Example: {"(y/n)": "y", "New Password:": "newpass123"}
+
+        '
+      additionalProperties:
+        type: string
+    use_shell:
+      type: boolean
+      default: true
+      description: Use interactive shell (required for config blocks)
+output_schema:
+  type: object
+  properties:
+    success:
+      type: boolean
+      description: Whether all commands executed successfully
+    target_ip:
+      type: string
+      description: Target device IP
+    commands_executed:
+      type: integer
+      description: Number of commands executed
+    results:
+      type: array
+      description: Output from each command
+      items:
+        type: object
+        properties:
+          command:
+            type: string
+          output:
+            type: string
+          success:
+            type: boolean
+    error:
+      type: string
+      description: Error message if failed
+credentials:
+- ref: local://config/fortigate_credentials.yaml
+  type: config_file
+  required: false
+  description: Local credential file for device lookup
+- ref: parameter://password
+  type: inline
+  required: false
+  description: Password provided directly in parameters
+capabilities:
+  network:
+    outbound:
+    - tcp://0.0.0.0:22
+    inbound: []
+  filesystem:
+    read:
+    - config/*.yaml
+    write: []
+  process:
+    spawn: false
+    elevated: false
+  max_execution_time_ms: 120000
+telemetry:
+  metrics_enabled: true
+  log_level: INFO
+  trace_enabled: false
+versioning:
+  breaking_change: false
+  supersedes: null
+status: certified
+skills_ref: Skills.md
+security:
+  certified: true
+  certified_at: '2026-01-24T16:47:04.021383+00:00'
+  certified_by: trust-anchor
+  algorithm: RSA-2048-PKCS1v15-SHA256
+  verified_via: trust-anchor-lookup

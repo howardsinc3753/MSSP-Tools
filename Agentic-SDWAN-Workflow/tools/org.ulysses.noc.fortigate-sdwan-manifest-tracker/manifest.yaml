@@ -1,0 +1,186 @@
+canonical_id: org.ulysses.noc.fortigate-sdwan-manifest-tracker/1.0.0
+name: FortiGate SD-WAN Manifest Tracker
+version: 1.0.0
+description: 'Single source of truth for SD-WAN network inventory and configuration.
+
+
+  Absorbs FortiGate device configurations and tracks all unique per-site settings:
+
+  - Device identity (hostname, serial, firmware, model)
+
+  - Interfaces (physical, tunnel, loopback, VLAN)
+
+  - IPsec Phase1/Phase2 configurations
+
+  - SD-WAN (zones, members, health-checks, neighbors, services/rules)
+
+  - BGP (neighbors, neighbor-groups, neighbor-ranges, networks)
+
+  - Firewall policies and address objects
+
+  - Static routes
+
+
+  Use for:
+
+  - Onboarding new SD-WAN sites
+
+  - Tracking configuration drift
+
+  - Blueprint planning for new deployments
+
+  - Generating unique per-site variables
+
+  '
+metadata:
+  org_namespace: ulysses
+  domain: noc
+  intent: discover
+  vendor: fortinet
+  shelf: noc/fortigate
+  tags:
+  - fortigate
+  - sdwan
+  - inventory
+  - manifest
+  - cmdb
+  - blueprint
+  - template
+runtime:
+  language: python
+  entry_point: main
+  source_file: org.ulysses.noc.fortigate-sdwan-manifest-tracker.py
+  python_packages:
+  - pyyaml>=6.0
+  files:
+  - config/fortigate_credentials.yaml
+  - config/sdwan-manifest.yaml
+parameters:
+  type: object
+  required:
+  - action
+  properties:
+    action:
+      type: string
+      enum:
+      - absorb
+      - list
+      - get
+      - remove
+      - update-license
+      - export
+      description: 'Action to perform:
+
+        - absorb: Onboard a device (creates or updates entry)
+
+        - list: List all tracked devices
+
+        - get: Get full manifest entry for a device
+
+        - remove: Remove a device from tracking
+
+        - update-license: Assign license info (FortiFlex or Standard)
+
+        - export: Export the complete manifest
+
+        '
+    target_ip:
+      type: string
+      description: FortiGate management IP (required for absorb)
+      format: ipv4
+    device_key:
+      type: string
+      description: Device key in manifest (required for get/remove/update-license)
+    license_type:
+      type: string
+      enum:
+      - fortiflex
+      - standard
+      description: 'License type (required for update-license):
+
+        - fortiflex: VM token-based license (requires token application)
+
+        - standard: Hardware appliance license (pre-licensed)
+
+        '
+    fortiflex_serial:
+      type: string
+      description: FortiFlex serial number (FGVMXXXXXX) - for fortiflex type
+    fortiflex_token:
+      type: string
+      description: FortiFlex license token - REQUIRED for fortiflex type
+    fortiflex_config_id:
+      type: string
+      description: FortiFlex config ID used to generate token
+    fortiflex_config_name:
+      type: string
+      description: FortiFlex configuration name
+    fortiflex_status:
+      type: string
+      enum:
+      - ACTIVE
+      - PENDING
+      - STOPPED
+      description: FortiFlex license status
+    fortiflex_end_date:
+      type: string
+      description: FortiFlex license end date (YYYY-MM-DD)
+    device_serial:
+      type: string
+      description: Hardware device serial number - REQUIRED for standard type
+    device_model:
+      type: string
+      description: Device model (e.g., FortiWiFi-50G-5G, FortiGate-100F)
+    license_name:
+      type: string
+      description: License/contract name
+    license_start_date:
+      type: string
+      description: License start date (YYYY-MM-DD)
+    license_end_date:
+      type: string
+      description: License end date (YYYY-MM-DD)
+output_schema:
+  type: object
+  properties:
+    success:
+      type: boolean
+    action:
+      type: string
+    device_key:
+      type: string
+    role:
+      type: string
+      enum:
+      - hub
+      - spoke
+    device_name:
+      type: string
+    devices:
+      type: array
+    manifest:
+      type: object
+    summary:
+      type: object
+credentials:
+- ref: local://config/fortigate_credentials.yaml
+  type: config_file
+  required: true
+capabilities:
+  network:
+    outbound:
+    - https:443
+  filesystem:
+    read:
+    - config/*.yaml
+    write:
+    - config/sdwan-manifest.yaml
+  max_execution_time_ms: 120000
+status: certified
+skills_ref: Skills.md
+security:
+  certified: true
+  certified_at: '2026-01-20T03:41:02.232220+00:00'
+  certified_by: trust-anchor
+  algorithm: RSA-2048-PKCS1v15-SHA256
+  verified_via: trust-anchor-lookup

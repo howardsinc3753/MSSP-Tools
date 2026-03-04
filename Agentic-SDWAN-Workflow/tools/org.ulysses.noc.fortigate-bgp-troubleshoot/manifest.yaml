@@ -1,0 +1,179 @@
+canonical_id: org.ulysses.noc.fortigate-bgp-troubleshoot/1.0.2
+name: FortiGate BGP Troubleshoot
+version: 1.0.2
+description: 'Comprehensive BGP diagnostics for FortiGate SD-WAN deployments.
+
+
+  Provides:
+
+  - BGP summary (router ID, AS, neighbor states)
+
+  - Neighbor details (capabilities, timers, BFD status)
+
+  - Received routes from neighbors
+
+  - Advertised routes to neighbors
+
+  - Full troubleshooting report
+
+
+  Equivalent CLI commands:
+
+  - get router info bgp summary
+
+  - get router info bgp neighbors
+
+  - get router info bgp neighbors <ip> received-routes
+
+  - get router info bgp neighbors <ip> advertised-routes
+
+
+  v1.0.2: Re-signed with MCP standard credential paths.
+
+  '
+metadata:
+  org_namespace: ulysses
+  domain: noc
+  intent: troubleshoot
+  vendor: fortinet
+  shelf: noc/fortigate
+  tags:
+  - fortigate
+  - bgp
+  - sdwan
+  - routing
+  - troubleshoot
+  - diagnostics
+runtime:
+  language: python
+  entry_point: main
+  source_file: org.ulysses.noc.fortigate-bgp-troubleshoot.py
+  python_packages:
+  - pyyaml>=6.0
+  dotnet_packages: []
+  files:
+  - config/fortigate_credentials.yaml
+  services: []
+parameters:
+  type: object
+  required:
+  - target_ip
+  properties:
+    target_ip:
+      type: string
+      description: FortiGate management IP address
+      format: ipv4
+    action:
+      type: string
+      enum:
+      - summary
+      - neighbors
+      - paths
+      - received
+      - advertised
+      - report
+      default: summary
+      description: 'Diagnostic action to perform:
+
+        - summary: BGP overview (neighbors, states, prefix counts)
+
+        - neighbors: Detailed neighbor information
+
+        - paths: BGP RIB entries
+
+        - received: Routes received from a neighbor (requires neighbor_ip)
+
+        - advertised: Routes advertised to a neighbor (requires neighbor_ip)
+
+        - report: Full troubleshooting report with all data
+
+        '
+    neighbor_ip:
+      type: string
+      description: Neighbor IP for received/advertised route queries
+      format: ipv4
+    verify_ssl:
+      type: boolean
+      default: false
+      description: Verify SSL certificates
+output_schema:
+  type: object
+  properties:
+    success:
+      type: boolean
+    action:
+      type: string
+    target_ip:
+      type: string
+    router_id:
+      type: string
+    local_as:
+      type: string
+    neighbor_count:
+      type: integer
+    neighbors:
+      type: array
+      items:
+        type: object
+        properties:
+          ip:
+            type: string
+          remote_as:
+            type: string
+          state:
+            type: string
+          up_time:
+            type: string
+          prefixes_received:
+            type: integer
+    paths:
+      type: array
+      items:
+        type: object
+        properties:
+          network:
+            type: string
+          next_hop:
+            type: string
+          metric:
+            type: integer
+          local_pref:
+            type: integer
+          best:
+            type: boolean
+    routes:
+      type: array
+      description: Received routes from neighbor
+    advertised:
+      type: array
+      description: Routes advertised to neighbor
+    error:
+      type: string
+credentials:
+- ref: local://config/fortigate_credentials.yaml
+  type: config_file
+  required: true
+  scope:
+  - read
+  description: Local credential file with API tokens
+capabilities:
+  network:
+    outbound:
+    - https:443
+    inbound: []
+  filesystem:
+    read:
+    - config/*.yaml
+    write: []
+  process:
+    spawn: false
+    elevated: false
+  max_execution_time_ms: 60000
+status: certified
+skills_ref: Skills.md
+security:
+  certified: true
+  certified_at: '2026-01-21T14:46:11.476830+00:00'
+  certified_by: trust-anchor
+  algorithm: RSA-2048-PKCS1v15-SHA256
+  verified_via: trust-anchor-lookup

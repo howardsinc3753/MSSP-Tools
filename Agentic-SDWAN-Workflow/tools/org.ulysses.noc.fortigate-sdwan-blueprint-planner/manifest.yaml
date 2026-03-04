@@ -1,0 +1,133 @@
+canonical_id: org.ulysses.noc.fortigate-sdwan-blueprint-planner/1.0.8
+name: FortiGate SD-WAN Blueprint Planner
+version: 1.0.8
+description: "Generates CSV templates for new SD-WAN site deployments with recommended\
+  \ values.\n\nWorkflow:\n1. generate-template: Creates a CSV with all required site\
+  \ variables\n   - Auto-calculates next available values based on existing manifest\n\
+  \   - Includes recommended loopback IPs, site IDs, BGP ASNs, etc.\n   - User fills\
+  \ in site-specific values (hostname, WAN IPs, LAN subnets)\n\n2. plan-site: Reads\
+  \ completed CSV and generates FortiOS CLI configuration\n   - Validates all required\
+  \ fields\n   - Generates complete configuration including:\n     - System settings\
+  \ (hostname, interfaces)\n     - IPsec Phase1/Phase2 tunnels\n     - SD-WAN zones,\
+  \ members, health-checks, neighbors\n     - BGP configuration with neighbor-groups\n\
+  \     - Firewall policies\n   - Optionally adds device to manifest tracker\n\nMakes\
+  \ SD-WAN deployment EASY - tool does the heavy lifting.\n"
+metadata:
+  org_namespace: ulysses
+  domain: noc
+  intent: provision
+  vendor: fortinet
+  shelf: noc/fortigate
+  tags:
+  - fortigate
+  - sdwan
+  - blueprint
+  - template
+  - deployment
+  - greenfield
+  - planning
+runtime:
+  language: python
+  entry_point: main
+  source_file: org.ulysses.noc.fortigate-sdwan-blueprint-planner.py
+  python_packages:
+  - pyyaml>=6.0
+  files:
+  - config/sdwan-manifest.yaml
+parameters:
+  type: object
+  required:
+  - action
+  properties:
+    action:
+      type: string
+      enum:
+      - generate-template
+      - plan-site
+      - validate
+      description: 'Action to perform:
+
+        - generate-template: Create CSV template with recommended values
+
+        - plan-site: Read filled CSV and generate FortiOS config
+
+        - validate: Validate config text against contract schema
+
+        '
+    role:
+      type: string
+      enum:
+      - spoke
+      - hub
+      default: spoke
+      description: Device role (spoke or hub) - affects template variables
+    site_name:
+      type: string
+      description: Site name for template filename (e.g., "Branch3")
+    csv_path:
+      type: string
+      description: Path to filled CSV file (required for plan-site)
+    add_to_manifest:
+      type: boolean
+      default: false
+      description: Add planned site to manifest after generating config
+    output_format:
+      type: string
+      enum:
+      - cli
+      - json
+      default: cli
+      description: Output format for generated config
+    config_text:
+      type: string
+      description: CLI config text to validate (for validate action)
+    config_path:
+      type: string
+      description: Path to config file to validate (for validate action)
+output_schema:
+  type: object
+  properties:
+    success:
+      type: boolean
+    action:
+      type: string
+    template_path:
+      type: string
+      description: Path to generated CSV template
+    variables:
+      type: object
+      description: Variables with recommended values
+    config:
+      type: string
+      description: Generated FortiOS CLI configuration
+    validation_errors:
+      type: array
+      description: Any validation errors found
+capabilities:
+  filesystem:
+    read:
+    - config/*.yaml
+    - config/blueprints/*.csv
+    write:
+    - config/blueprints/*.csv
+    - config/sdwan-manifest.yaml
+  max_execution_time_ms: 60000
+status: certified
+skills_ref: Skills.md
+# v1.0.7 bug fixes:
+# - Fixed VPN tunnel naming in validation: HUB1_VPN1 -> HUB1-VPN1 (hyphen)
+# - Fixed loopback default: Branch-Lo -> Spoke-Lo (contract compliance)
+# v1.0.8 bug fixes (Site 8/9 deployment gaps):
+# - GAP-40: Removed tunnel interface pre-definitions (auto-created by phase1)
+# - GAP-42: Fixed localid format to spoke-HUB1-VPN1 (no site suffix)
+# - GAP-43: Added priority-out-sla 20 to SD-WAN members
+# - GAP-45: Removed tunnel-search selectors (not supported FortiOS 7.6.5)
+# - GAP-27: Fixed static route distance on VPN2 (equal for ECMP, not distance 20)
+# - Fixed site_vars NameError in static route generation
+# - Added forbidden pattern checks: tunnel-search, mode-cfg, type tunnel
+security:
+  certified: true
+  certified_at: '2026-01-26T21:05:39.091187Z'
+  certified_by: admin
+  algorithm: RSA-2048-PKCS1v15-SHA256
+  notes: v1.0.8 - GAP-40/42/43/45/27 fixes from Site 8/9 deployments

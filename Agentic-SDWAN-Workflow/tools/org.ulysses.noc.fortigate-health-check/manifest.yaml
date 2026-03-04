@@ -1,0 +1,146 @@
+canonical_id: org.ulysses.noc.fortigate-health-check/1.0.4
+name: FortiGate Health Check
+version: 1.0.4
+description: 'Check FortiGate device health metrics including CPU, memory,
+
+  session count, uptime, and firmware version.
+
+
+  v1.0.4: Re-signed to fix signature verification failure.
+
+  '
+metadata:
+  org_namespace: ulysses
+  domain: noc
+  intent: troubleshoot
+  vendor: fortinet
+  shelf: noc/fortigate
+  tags:
+  - fortigate
+  - health
+  - network
+  - firewall
+  - monitoring
+runtime:
+  language: python
+  entry_point: main
+  source_file: org.ulysses.noc.fortigate-health-check.py
+  python_packages:
+  - pyyaml>=6.0
+  dotnet_packages: []
+  files:
+  - config/fortigate_credentials.yaml
+  services: []
+parameters:
+  type: object
+  required:
+  - target_ip
+  properties:
+    target_ip:
+      type: string
+      description: FortiGate management IP address
+      format: ipv4
+    timeout:
+      type: integer
+      default: 30
+      description: Request timeout in seconds
+    verify_ssl:
+      type: boolean
+      default: false
+      description: Verify SSL certificate
+output_schema:
+  type: object
+  properties:
+    success:
+      type: boolean
+      description: Whether the health check succeeded
+    target_ip:
+      type: string
+      description: Target FortiGate IP address
+    hostname:
+      type: string
+      description: Device hostname
+    serial_number:
+      type: string
+      description: Device serial number
+    firmware_version:
+      type: string
+      description: FortiOS firmware version
+    build:
+      type: integer
+      description: FortiOS build number
+    model:
+      type: string
+      description: Device model code (e.g., FGT71F)
+    model_name:
+      type: string
+      description: Device model name
+    cpu_percent:
+      type: number
+      description: Current CPU utilization percentage
+    cpu_1hr_max:
+      type: number
+      description: Maximum CPU percentage in last hour
+    memory_percent:
+      type: number
+      description: Current memory utilization percentage
+    memory_1hr_max:
+      type: number
+      description: Maximum memory percentage in last hour
+    disk_percent:
+      type: number
+      description: Disk utilization percentage
+    session_count:
+      type: integer
+      description: Current active session count
+    session_1hr_max:
+      type: integer
+      description: Maximum session count in last hour
+    log_disk_status:
+      type: string
+      description: Log disk availability status
+    vdom:
+      type: string
+      description: Virtual domain name
+    error:
+      type: string
+      description: Error message if success is false
+credentials:
+- ref: vault://fortigate/admin
+  type: api_key
+  required: false
+  scope:
+  - read
+  description: FortiGate API key with read access
+- ref: local://config/fortigate_credentials.yaml
+  type: config_file
+  required: false
+  description: Local credential file (fallback when vault unavailable)
+capabilities:
+  network:
+    outbound:
+    - https:443
+    inbound: []
+  filesystem:
+    read:
+    - config/*.yaml
+    write: []
+  process:
+    spawn: false
+    elevated: false
+  max_execution_time_ms: 30000
+telemetry:
+  metrics_enabled: true
+  log_level: INFO
+  trace_enabled: false
+versioning:
+  breaking_change: false
+  supersedes: null
+status: certified
+skills_ref: Skills.md
+security:
+  certified: true
+  certified_at: '2026-01-24T01:48:57.634841Z'
+  certified_by: trust-anchor
+  algorithm: RSA-2048-PKCS1v15-SHA256
+  verified_via: trust-anchor-lookup
