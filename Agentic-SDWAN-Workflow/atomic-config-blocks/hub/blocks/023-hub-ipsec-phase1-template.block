@@ -1,0 +1,162 @@
+---
+block_id: 023
+name: hub-ipsec-phase1-template
+display_name: "Hub IPsec Phase1 Dynamic Templates"
+version: 1.0.0
+category: core
+device_role: hub
+vendor: fortinet
+platform: fortigate
+min_fortios: "7.4.0"
+
+description: |
+  IPsec Phase1 dynamic templates for ADVPN hub. Creates dynamic
+  phase1-interfaces that accept spoke connections. Uses network-overlay
+  and auto-discovery-sender for ADVPN functionality.
+
+  KEY DIFFERENCE FROM SPOKES: Hub uses type=dynamic, spokes use type=static.
+
+depends_on:
+  - block_id: 022
+    reason: "Interfaces must exist (needs BGP_Lo for exchange-ip-addr4)"
+
+provides:
+  - hub-ipsec-phase1
+  - hub-vpn-templates
+  - advpn-hub-sender
+
+parameters:
+  - name: WAN_INTERFACE
+    description: "WAN interface for IPsec"
+    type: string
+    required: false
+    default: "port1"
+
+  - name: PSK
+    description: "Pre-shared key for spoke authentication"
+    type: string
+    required: true
+    sensitive: true
+    example: "your-secure-psk-here"
+
+  - name: NETWORK_ID_VPN1
+    description: "Network overlay ID for VPN1 tunnel"
+    type: integer
+    required: false
+    default: 1
+
+  - name: NETWORK_ID_VPN2
+    description: "Network overlay ID for VPN2 tunnel"
+    type: integer
+    required: false
+    default: 2
+
+  - name: HUB_BGP_LOOPBACK
+    description: "Hub BGP loopback IP for exchange-ip-addr4"
+    type: ip_address
+    required: true
+    example: "172.16.255.252"
+
+  - name: IKE_VERSION
+    description: "IKE version (1 or 2)"
+    type: integer
+    required: false
+    default: 2
+    allowed_values: [1, 2]
+
+  - name: PROPOSAL
+    description: "IKE proposal encryption-hash"
+    type: string
+    required: false
+    default: "aes256-sha256"
+
+  - name: DHGRP
+    description: "Diffie-Hellman groups"
+    type: string
+    required: false
+    default: "20 21"
+    note: "Use group 20 (ECDH 384-bit) and 21 (ECDH 521-bit) for strong crypto"
+
+  - name: HUB_WAN_IP
+    description: "Hub WAN IP address for local-gw binding"
+    type: ip_address
+    required: true
+    example: "192.168.215.15"
+    note: "Must match WAN interface IP for proper tunnel binding"
+
+verification:
+  commands:
+    - "get vpn ipsec phase1-interface SPOKE_VPN1"
+    - "get vpn ipsec phase1-interface SPOKE_VPN2"
+  expected_patterns:
+    - "type: dynamic"
+    - "auto-discovery-sender: enable"
+    - "network-overlay: enable"
+    - "exchange-ip-addr4: {{HUB_BGP_LOOPBACK}}"
+    - "transport: udp"
+
+rollback:
+  commands:
+    - "config vpn ipsec phase1-interface"
+    - "delete SPOKE_VPN1"
+    - "delete SPOKE_VPN2"
+    - "end"
+
+notes: |
+  - Hub phase1 is type=dynamic (spokes are static)
+  - auto-discovery-sender=enable (hub sends shortcut info to spokes)
+  - network-overlay=enable required for ADVPN
+  - exchange-ip-addr4 should be hub's BGP loopback IP
+  - net-device=disable on hub (enable on spokes for SD-WAN)
+  - transport=udp (NOT tcp, even though ike-tcp-port is set)
+
+---
+
+config vpn ipsec phase1-interface
+    edit "SPOKE_VPN1"
+        set type dynamic
+        set interface "{{WAN_INTERFACE}}"
+        set ike-version {{IKE_VERSION}}
+        set local-gw {{HUB_WAN_IP}}
+        set peertype any
+        set authmethod psk
+        set psksecret {{PSK}}
+        set proposal {{PROPOSAL}}
+        set dpd on-idle
+        set dpd-retrycount 3
+        set dpd-retryinterval 5
+        set dhgrp {{DHGRP}}
+        set nattraversal enable
+        set add-route disable
+        set auto-discovery-sender enable
+        set network-overlay enable
+        set network-id {{NETWORK_ID_VPN1}}
+        set exchange-ip-addr4 {{HUB_BGP_LOOPBACK}}
+        set mode-cfg disable
+        set net-device disable
+        set transport udp
+    next
+    edit "SPOKE_VPN2"
+        set type dynamic
+        set interface "{{WAN_INTERFACE}}"
+        set ike-version {{IKE_VERSION}}
+        set local-gw {{HUB_WAN_IP}}
+        set peertype any
+        set authmethod psk
+        set psksecret {{PSK}}
+        set proposal {{PROPOSAL}}
+        set dpd on-idle
+        set dpd-retrycount 2
+        set dpd-retryinterval 3
+        set dhgrp {{DHGRP}}
+        set nattraversal enable
+        set add-route disable
+        set auto-discovery-sender enable
+        set network-overlay enable
+        set network-id {{NETWORK_ID_VPN2}}
+        set exchange-ip-addr4 {{HUB_BGP_LOOPBACK}}
+        set mode-cfg disable
+        set net-device disable
+        set transport udp
+    next
+end

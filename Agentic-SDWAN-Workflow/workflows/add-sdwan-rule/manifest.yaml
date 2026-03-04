@@ -1,0 +1,132 @@
+# Add SD-WAN Rule Workflow Manifest
+# Post-deployment configuration for customer-specific SD-WAN steering rules
+
+workflow_id: add-sdwan-rule
+name: "Add SD-WAN Rule"
+version: "1.0.0"
+description: "Add SD-WAN application steering rules to deployed spoke sites"
+
+solution_pack: fortigate-ops
+category: post-deployment
+vendor: fortinet
+platform: fortigate
+
+# Workflow metadata
+metadata:
+  author: "SecBot"
+  created: "2026-02-05"
+  updated: "2026-02-05"
+  status: "draft"
+
+# Prerequisites
+prerequisites:
+  - description: "Target device must have core SD-WAN config (blocks 1-12)"
+    check: "Device exists in sdwan-manifest.yaml with sdwan.status: enable"
+  - description: "Device must be accessible via Trust Anchor"
+    check: "list_accessible_devices() includes target IP"
+  - description: "Health-check must exist on device"
+    check: "show system sdwan health-check returns expected health-check name"
+
+# Block library reference
+block_library:
+  path: "C:/ProgramData/Ulysses/config/blocks/fortigate/sdwan-rules/"
+  blocks:
+    - id: 10101
+      name: "sdwan-rule-o365"
+      file: "10101-sdwan-rule-o365.block"
+      description: "Microsoft 365 application steering"
+    # Future blocks:
+    # - id: 10102
+    #   name: "sdwan-rule-teams"
+    #   file: "10102-sdwan-rule-teams.block"
+    # - id: 10103
+    #   name: "sdwan-rule-zoom"
+    #   file: "10103-sdwan-rule-zoom.block"
+
+# Tool dependencies
+tools:
+  query:
+    - id: "org.ulysses.noc.fortigate-ssh/1.0.9"
+      purpose: "Query existing config and push single rules"
+    - id: "org.ulysses.noc.fortigate-sdwan-status/1.1.0"
+      purpose: "Check SD-WAN status"
+  push:
+    - id: "org.ulysses.noc.fortigate-ssh/1.0.9"
+      purpose: "Single rule push (acceptable for small changes)"
+    - id: "org.ulysses.noc.fortigate-config-push/2.0.0"
+      purpose: "Multi-rule batch push"
+
+# Workflow steps
+steps:
+  - name: "Validate Prerequisites"
+    description: "Check device has SD-WAN base config and is accessible"
+    tools:
+      - list_accessible_devices
+      - fortigate-sdwan-status
+
+  - name: "Query Baseline"
+    description: "Get existing rules, health-checks, and members"
+    tools:
+      - fortigate-ssh (show system sdwan health-check)
+      - fortigate-ssh (get router sdwan service)
+      - fortigate-ssh (show system sdwan members)
+
+  - name: "Load Block"
+    description: "Read block file from library"
+    action: "Read block file, parse YAML header and CLI body"
+
+  - name: "Substitute Parameters"
+    description: "Replace {{PARAM}} placeholders with actual values"
+    parameters:
+      - RULE_ID
+      - RULE_NAME
+      - HEALTH_CHECK
+      - PRIORITY_MEMBERS
+
+  - name: "Push Rule"
+    description: "Deploy rule to target device"
+    tools:
+      - fortigate-ssh (single rule)
+      - config-push (multi-rule)
+
+  - name: "Verify"
+    description: "Confirm rule exists and is active"
+    tools:
+      - fortigate-ssh (get router sdwan service)
+    verification:
+      - "Rule appears in service list"
+      - "Rule ID matches expected"
+      - "Rule name matches expected"
+
+# Persona
+persona:
+  name: "SecBot"
+  reference: "add-sdwan-site/Skills.md"
+  traits:
+    - "Verification-obsessed: Query before push"
+    - "Escalates early: Stop if health-check missing"
+    - "Celebrates wins: Confirm rule is active"
+    - "Direct about problems: Clear error messages"
+
+# Test environment
+test_devices:
+  - name: "sdwan-spoke-07"
+    ip: "192.168.209.45"
+    role: "primary test"
+  - name: "sdwan-spoke-08"
+    ip: "192.168.209.31"
+    role: "secondary test"
+  - name: "sdwan-spoke-09"
+    ip: "192.168.209.41"
+    role: "backup"
+
+# Related documents
+references:
+  - path: "docs/NFRs/NFR-025-COMPOSABLE-CONFIG-BLOCK-FRAMEWORK.md"
+    description: "Block framework architecture"
+  - path: "docs/NFRs/NFR-026-ROCKY-LINUX-SDWAN-RULES-ENVIRONMENT.md"
+    description: "Rocky Linux environment setup"
+  - path: "workflows/add-sdwan-site/Skills.md"
+    description: "Full SecBot persona definition"
+  - path: "workflows/add-sdwan-site/BASELINE_TEMPLATE.yaml"
+    description: "Naming constants"

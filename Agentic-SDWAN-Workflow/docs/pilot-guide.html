@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FortiGate Operations - Human-AI Pilot Guide</title>
+    <style>
+        :root {
+            --fortinet-red: #DA291C;
+            --fortinet-dark: #1a1a2e;
+            --fortinet-gray: #2d2d44;
+            --text-light: #f0f0f0;
+            --accent-green: #4ade80;
+            --accent-yellow: #fbbf24;
+            --accent-blue: #60a5fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--fortinet-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--fortinet-red) 0%, #b91c1c 100%);
+            padding: 30px 0;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        header .pack-id {
+            font-family: monospace;
+            background: rgba(0,0,0,0.3);
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+
+        nav.toc {
+            background: var(--fortinet-gray);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        nav.toc h2 {
+            color: var(--fortinet-red);
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        nav.toc ul {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            list-style: none;
+        }
+
+        nav.toc a {
+            color: var(--accent-blue);
+            text-decoration: none;
+            padding: 8px 15px;
+            display: block;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+
+        nav.toc a:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        section {
+            background: var(--fortinet-gray);
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+
+        section h2 {
+            color: var(--fortinet-red);
+            border-bottom: 2px solid var(--fortinet-red);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        section h3 {
+            color: var(--accent-blue);
+            margin: 20px 0 10px;
+            font-size: 1.2em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        th {
+            background: rgba(218, 41, 28, 0.3);
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        code {
+            background: rgba(0,0,0,0.4);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: #0d1117;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 15px 0;
+            border-left: 4px solid var(--fortinet-red);
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .status-active { background: var(--accent-green); color: #000; }
+        .status-planned { background: var(--accent-yellow); color: #000; }
+        .status-noc { background: #3b82f6; color: #fff; }
+        .status-security { background: #ef4444; color: #fff; }
+        .status-provisioning { background: #8b5cf6; color: #fff; }
+        .status-response { background: #f97316; color: #fff; }
+
+        .device-card {
+            background: rgba(0,0,0,0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid var(--accent-green);
+        }
+
+        .device-card h4 {
+            color: var(--accent-green);
+            margin-bottom: 10px;
+        }
+
+        .device-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .capability-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .capability-card {
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 8px;
+            border-top: 3px solid var(--fortinet-red);
+        }
+
+        .capability-card h4 {
+            margin-bottom: 10px;
+        }
+
+        .capability-card .count {
+            font-size: 2em;
+            color: var(--fortinet-red);
+            font-weight: bold;
+        }
+
+        .command-example {
+            background: #0d1117;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow: hidden;
+        }
+
+        .command-example .header {
+            background: rgba(218, 41, 28, 0.3);
+            padding: 10px 15px;
+            font-weight: 600;
+        }
+
+        .command-example pre {
+            margin: 0;
+            border-radius: 0;
+            border-left: none;
+        }
+
+        .workflow-step {
+            display: flex;
+            align-items: flex-start;
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+        }
+
+        .step-number {
+            background: var(--fortinet-red);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        .alert-warning {
+            background: rgba(251, 191, 36, 0.2);
+            border-left: 4px solid var(--accent-yellow);
+        }
+
+        .alert-info {
+            background: rgba(96, 165, 250, 0.2);
+            border-left: 4px solid var(--accent-blue);
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: rgba(255,255,255,0.5);
+            font-size: 0.9em;
+        }
+
+        @media print {
+            body { background: white; color: black; }
+            section { border: 1px solid #ccc; }
+            header { background: var(--fortinet-red); -webkit-print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>FortiGate Operations</h1>
+            <p class="subtitle">Human-AI Pilot Guide | NOC + SOC + Provisioning + Response</p>
+            <span class="pack-id">org.ulysses.solution.fortigate-ops/1.0.0</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <nav class="toc">
+            <h2>Quick Navigation</h2>
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#capabilities">Capabilities Index</a></li>
+                <li><a href="#devices">Device Registry</a></li>
+                <li><a href="#use-cases">Use Cases</a></li>
+                <li><a href="#commands">Quick Commands</a></li>
+                <li><a href="#ai-integration">AI Integration</a></li>
+                <li><a href="#tools">Tools Reference</a></li>
+                <li><a href="#workflows">Workflows</a></li>
+                <li><a href="#onboarding">Device Onboarding</a></li>
+                <li><a href="#troubleshooting">Troubleshooting</a></li>
+            </ul>
+        </nav>
+
+        <!-- OVERVIEW -->
+        <section id="overview">
+            <h2>Overview</h2>
+            <p>The FortiGate Operations solution pack provides comprehensive management capabilities for Fortinet FortiGate next-generation firewalls. It enables both human operators and AI agents to monitor, secure, provision, and respond to incidents across your FortiGate infrastructure.</p>
+
+            <div class="capability-grid">
+                <div class="capability-card">
+                    <span class="status-badge status-noc">NOC</span>
+                    <h4>Network Operations</h4>
+                    <p>Health monitoring, interface status, routing, sessions</p>
+                    <div class="count">9</div>
+                    <small>tools available</small>
+                </div>
+                <div class="capability-card">
+                    <span class="status-badge status-security">Security</span>
+                    <h4>SOC Monitoring</h4>
+                    <p>Threat logs, policies, VPN status</p>
+                    <div class="count">0</div>
+                    <small>planned v1.1.0</small>
+                </div>
+                <div class="capability-card">
+                    <span class="status-badge status-provisioning">Provisioning</span>
+                    <h4>Device Setup</h4>
+                    <p>Onboarding, FortiFlex, SDWAN Hub</p>
+                    <div class="count">0</div>
+                    <small>planned v1.2.0</small>
+                </div>
+                <div class="capability-card">
+                    <span class="status-badge status-response">Response</span>
+                    <h4>Incident Response</h4>
+                    <p>Block IP, quarantine, kill sessions</p>
+                    <div class="count">0</div>
+                    <small>planned v1.3.0</small>
+                </div>
+            </div>
+        </section>
+
+        <!-- CAPABILITIES -->
+        <section id="capabilities">
+            <h2>Capabilities Index</h2>
+
+            <h3>Currently Available (v1.0.0)</h3>
+            <table>
+                <tr>
+                    <th>Capability</th>
+                    <th>Tool</th>
+                    <th>Domain</th>
+                    <th>Status</th>
+                </tr>
+                <tr>
+                    <td>Device health monitoring</td>
+                    <td><code>fortigate-health-check</code></td>
+                    <td><span class="status-badge status-noc">NOC</span></td>
+                    <td><span class="status-badge status-active">Active</span></td>
+                </tr>
+                <tr>
+                    <td>Interface status</td>
+                    <td><code>fortigate-interface-status</code></td>
+                    <td><span class="status-badge status-noc">NOC</span></td>
+                    <td><span class="status-badge status-active">Active</span></td>
+                </tr>
+                <tr>
+                    <td>Routing table</td>
+                    <td><code>fortigate-routing-table</code></td>
+                    <td><span class="status-badge status-noc">NOC</span></td>
+                    <td><span class="status-badge status-active">Active</span></td>
+                </tr>
+                <tr>
+                    <td>Session analysis</td>
+                    <td><code>fortigate-session-table</code></td>
+                    <td><span class="status-badge status-noc">NOC</span></td>
+                    <td><span class="status-badge status-active">Active</span></td>
+                </tr>
+                <tr>
+                    <td>ARP cache</td>
+                    <td><code>fortigate-arp-table</code></td>
+                    <td><span class="status-badge status-noc">NOC</span></td>
+                    <td><span class="status-badge status-active">Active</span></td>
+                </tr>
+                <tr>
+                    <td>Performance metrics</td>
+                    <td><code>fortigate-performance-status</code></td>
+                    <td><span class="status-badge status-noc">NOC</span></td>
+                    <td><span class="status-badge status-active">Active</span></td>
+                </tr>
+                <tr>
+                    <td>Process list</td>
+                    <td><code>fortigate-running-processes</code></td>
+                    <td><span class="status-badge status-noc">NOC</span></td>
+                    <td><span class="status-badge status-active">Active</span></td>
+                </tr>
+                <tr>
+                    <td>Network analysis</td>
+                    <td><code>fortigate-network-analyzer</code></td>
+                    <td><span class="status-badge status-noc">NOC</span></td>
+                    <td><span class="status-badge status-active">Active</span></td>
+                </tr>
+                <tr>
+                    <td>SSH commands</td>
+                    <td><code>fortigate-ssh</code></td>
+                    <td><span class="status-badge status-noc">NOC</span></td>
+                    <td><span class="status-badge status-active">Active</span></td>
+                </tr>
+            </table>
+
+            <h3>Roadmap</h3>
+            <table>
+                <tr>
+                    <th>Version</th>
+                    <th>Domain</th>
+                    <th>Features</th>
+                </tr>
+                <tr>
+                    <td>v1.1.0</td>
+                    <td><span class="status-badge status-security">Security</span></td>
+                    <td>Threat logs, policy analysis, VPN monitoring, IPS signatures</td>
+                </tr>
+                <tr>
+                    <td>v1.2.0</td>
+                    <td><span class="status-badge status-provisioning">Provisioning</span></td>
+                    <td>Device onboarding, FortiFlex licensing, SDWAN Hub builder, config backup</td>
+                </tr>
+                <tr>
+                    <td>v1.3.0</td>
+                    <td><span class="status-badge status-response">Response</span></td>
+                    <td>IP blocking, host quarantine, session termination, agentic workflows</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- DEVICES -->
+        <section id="devices">
+            <h2>Device Registry</h2>
+            <p>Managed FortiGate devices with stored credentials.</p>
+
+            <div class="device-grid">
+                <div class="device-card">
+                    <h4>lab-71f</h4>
+                    <table>
+                        <tr><td><strong>Model</strong></td><td>FortiGate 71F</td></tr>
+                        <tr><td><strong>IP Address</strong></td><td><code>192.168.209.62</code></td></tr>
+                        <tr><td><strong>Role</strong></td><td>Lab Primary</td></tr>
+                        <tr><td><strong>Features</strong></td><td>SDWAN, UTM</td></tr>
+                        <tr><td><strong>Auth</strong></td><td>API Token</td></tr>
+                    </table>
+                </div>
+                <div class="device-card">
+                    <h4>fw-50g</h4>
+                    <table>
+                        <tr><td><strong>Model</strong></td><td>FortiGate 50G</td></tr>
+                        <tr><td><strong>IP Address</strong></td><td><code>192.168.209.30</code></td></tr>
+                        <tr><td><strong>Role</strong></td><td>Lab Secondary</td></tr>
+                        <tr><td><strong>Features</strong></td><td>SDWAN</td></tr>
+                        <tr><td><strong>Auth</strong></td><td>API Token</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <div class="alert alert-info">
+                <strong>Credentials Location:</strong> <code>config/fortigate_credentials.yaml</code><br>
+                API tokens stored securely. Do not commit to version control.
+            </div>
+        </section>
+
+        <!-- USE CASES -->
+        <section id="use-cases">
+            <h2>Use Cases</h2>
+
+            <h3>Daily NOC Operations</h3>
+            <ul>
+                <li>Morning health check across all devices</li>
+                <li>Interface monitoring for link status changes</li>
+                <li>Session count trending and capacity planning</li>
+                <li>Routing table verification after changes</li>
+            </ul>
+
+            <h3>Troubleshooting</h3>
+            <ul>
+                <li>Connectivity issues - check interfaces, routes, sessions</li>
+                <li>Performance degradation - check CPU, memory, processes</li>
+                <li>ARP resolution failures - inspect ARP cache</li>
+            </ul>
+
+            <h3>Device Onboarding (v1.2.0)</h3>
+            <ul>
+                <li>Provision FortiFlex license token</li>
+                <li>Configure as SDWAN Hub</li>
+                <li>Push baseline security policies</li>
+                <li>Register in credential store</li>
+            </ul>
+
+            <h3>Incident Response (v1.3.0)</h3>
+            <ul>
+                <li>Block malicious IP addresses</li>
+                <li>Quarantine compromised hosts</li>
+                <li>Terminate suspicious sessions</li>
+                <li>Enable debug logging for forensics</li>
+            </ul>
+        </section>
+
+        <!-- QUICK COMMANDS -->
+        <section id="commands">
+            <h2>Quick Commands</h2>
+
+            <h3>Health Check</h3>
+            <div class="command-example">
+                <div class="header">Check FortiGate Health via Trust Anchor API</div>
+                <pre><code>curl -X POST http://192.168.209.115:8000/tools/execute \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tool_id": "org.ulysses.noc.fortigate-health-check/1.0.0",
+    "parameters": {
+      "target_ip": "192.168.209.62"
+    }
+  }'</code></pre>
+            </div>
+
+            <h3>Interface Status</h3>
+            <div class="command-example">
+                <div class="header">Get Interface Status</div>
+                <pre><code>curl -X POST http://192.168.209.115:8000/tools/execute \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tool_id": "org.ulysses.noc.fortigate-interface-status/1.0.0",
+    "parameters": {
+      "target_ip": "192.168.209.62"
+    }
+  }'</code></pre>
+            </div>
+
+            <h3>Run Triage Runbook</h3>
+            <div class="command-example">
+                <div class="header">Execute Full Triage</div>
+                <pre><code>curl -X POST http://192.168.209.115:8000/runbooks/execute \
+  -H "Content-Type: application/json" \
+  -d '{
+    "runbook_id": "org.ulysses.sop.fortigate-triage/1.0.0",
+    "device": "192.168.209.62"
+  }'</code></pre>
+            </div>
+
+            <h3>Direct FortiGate API (for reference)</h3>
+            <div class="command-example">
+                <div class="header">Direct API Call to FortiGate</div>
+                <pre><code># System Status
+curl -sk "https://192.168.209.62/api/v2/monitor/system/status" \
+  -H "Authorization: Bearer YOUR_API_TOKEN"
+
+# Interface List
+curl -sk "https://192.168.209.62/api/v2/monitor/system/interface" \
+  -H "Authorization: Bearer YOUR_API_TOKEN"</code></pre>
+            </div>
+        </section>
+
+        <!-- AI INTEGRATION -->
+        <section id="ai-integration">
+            <h2>AI Integration</h2>
+            <p>How to work with AI agents using this solution pack.</p>
+
+            <h3>Natural Language Examples</h3>
+            <table>
+                <tr>
+                    <th>You Say</th>
+                    <th>AI Executes</th>
+                </tr>
+                <tr>
+                    <td>"Check the health of the 71F"</td>
+                    <td><code>fortigate-health-check</code> → 192.168.209.62</td>
+                </tr>
+                <tr>
+                    <td>"Is the FortiGate healthy?"</td>
+                    <td><code>fortigate-health-check</code> → default device</td>
+                </tr>
+                <tr>
+                    <td>"Show interface status"</td>
+                    <td><code>fortigate-interface-status</code></td>
+                </tr>
+                <tr>
+                    <td>"What's the routing table on the 50G?"</td>
+                    <td><code>fortigate-routing-table</code> → 192.168.209.30</td>
+                </tr>
+                <tr>
+                    <td>"How many active sessions?"</td>
+                    <td><code>fortigate-session-table</code></td>
+                </tr>
+                <tr>
+                    <td>"Run triage on the firewall"</td>
+                    <td><code>fortigate-triage</code> runbook</td>
+                </tr>
+            </table>
+
+            <h3>Device Aliases</h3>
+            <p>The AI understands these aliases:</p>
+            <table>
+                <tr>
+                    <th>Alias</th>
+                    <th>Resolves To</th>
+                </tr>
+                <tr><td>"the 71F", "lab firewall", "primary"</td><td>192.168.209.62</td></tr>
+                <tr><td>"the 50G", "backup firewall", "secondary"</td><td>192.168.209.30</td></tr>
+            </table>
+
+            <h3>Confidence Thresholds</h3>
+            <table>
+                <tr>
+                    <th>Confidence</th>
+                    <th>AI Behavior</th>
+                </tr>
+                <tr>
+                    <td>>= 90%</td>
+                    <td>Execute immediately, no confirmation</td>
+                </tr>
+                <tr>
+                    <td>75-89%</td>
+                    <td>Brief confirmation before executing</td>
+                </tr>
+                <tr>
+                    <td>50-74%</td>
+                    <td>Ask for clarification on device or action</td>
+                </tr>
+                <tr>
+                    <td>&lt; 50%</td>
+                    <td>Request specific device and action</td>
+                </tr>
+            </table>
+        </section>
+
+        <!-- TOOLS REFERENCE -->
+        <section id="tools">
+            <h2>Tools Reference</h2>
+
+            <h3>fortigate-health-check</h3>
+            <table>
+                <tr><td><strong>ID</strong></td><td><code>org.ulysses.noc.fortigate-health-check/1.0.0</code></td></tr>
+                <tr><td><strong>Domain</strong></td><td>NOC</td></tr>
+                <tr><td><strong>Purpose</strong></td><td>CPU, memory, sessions, firmware status</td></tr>
+            </table>
+            <p><strong>Parameters:</strong></p>
+            <table>
+                <tr><th>Name</th><th>Type</th><th>Required</th><th>Default</th></tr>
+                <tr><td>target_ip</td><td>string (IPv4)</td><td>Yes</td><td>-</td></tr>
+                <tr><td>timeout</td><td>integer</td><td>No</td><td>30</td></tr>
+                <tr><td>verify_ssl</td><td>boolean</td><td>No</td><td>false</td></tr>
+            </table>
+            <p><strong>Output:</strong> hostname, serial_number, firmware_version, cpu_percent, memory_percent, session_count</p>
+
+            <h3>fortigate-interface-status</h3>
+            <table>
+                <tr><td><strong>ID</strong></td><td><code>org.ulysses.noc.fortigate-interface-status/1.0.0</code></td></tr>
+                <tr><td><strong>Domain</strong></td><td>NOC</td></tr>
+                <tr><td><strong>Purpose</strong></td><td>Interface up/down status, traffic counters</td></tr>
+            </table>
+
+            <h3>fortigate-routing-table</h3>
+            <table>
+                <tr><td><strong>ID</strong></td><td><code>org.ulysses.noc.fortigate-routing-table/1.0.0</code></td></tr>
+                <tr><td><strong>Domain</strong></td><td>NOC</td></tr>
+                <tr><td><strong>Purpose</strong></td><td>IPv4/IPv6 routing entries</td></tr>
+            </table>
+
+            <h3>fortigate-session-table</h3>
+            <table>
+                <tr><td><strong>ID</strong></td><td><code>org.ulysses.noc.fortigate-session-table/1.0.0</code></td></tr>
+                <tr><td><strong>Domain</strong></td><td>NOC</td></tr>
+                <tr><td><strong>Purpose</strong></td><td>Active session enumeration and filtering</td></tr>
+            </table>
+
+            <div class="alert alert-info">
+                <strong>Full tool documentation:</strong> See individual <code>Skills.md</code> files in each tool directory.
+            </div>
+        </section>
+
+        <!-- WORKFLOWS -->
+        <section id="workflows">
+            <h2>Workflows</h2>
+
+            <h3>Runbook: fortigate-triage</h3>
+            <p><strong>ID:</strong> <code>org.ulysses.sop.fortigate-triage/1.0.0</code></p>
+            <p>Sequential health check and diagnostics workflow.</p>
+
+            <div class="workflow-step">
+                <div class="step-number">1</div>
+                <div>
+                    <strong>Health Check</strong><br>
+                    Get CPU, memory, sessions, firmware version
+                </div>
+            </div>
+            <div class="workflow-step">
+                <div class="step-number">2</div>
+                <div>
+                    <strong>Interface Status</strong><br>
+                    Check all interfaces for link status
+                </div>
+            </div>
+            <div class="workflow-step">
+                <div class="step-number">3</div>
+                <div>
+                    <strong>Routing Table</strong><br>
+                    Verify routing entries and default gateway
+                </div>
+            </div>
+            <div class="workflow-step">
+                <div class="step-number">4</div>
+                <div>
+                    <strong>Session Summary</strong><br>
+                    Count active sessions and top talkers
+                </div>
+            </div>
+
+            <h3>Agentic Workflows (Planned v1.3.0)</h3>
+            <ul>
+                <li><strong>fortigate-intelligent-triage</strong> - LLM-driven assessment and remediation</li>
+                <li><strong>fortigate-onboard-provision</strong> - Automated device onboarding</li>
+            </ul>
+        </section>
+
+        <!-- DEVICE ONBOARDING -->
+        <section id="onboarding">
+            <h2>Device Onboarding</h2>
+            <p>Process for adding new FortiGate devices to the solution pack.</p>
+
+            <div class="alert alert-warning">
+                <strong>Current Status:</strong> Manual process. Automated tools planned for v1.2.0.
+            </div>
+
+            <h3>Manual Onboarding Steps</h3>
+
+            <div class="workflow-step">
+                <div class="step-number">1</div>
+                <div>
+                    <strong>Generate API Token on FortiGate</strong><br>
+                    System → Administrators → Create New → REST API Admin
+                </div>
+            </div>
+            <div class="workflow-step">
+                <div class="step-number">2</div>
+                <div>
+                    <strong>Add to Credentials File</strong><br>
+                    Edit <code>config/fortigate_credentials.yaml</code>
+                </div>
+            </div>
+            <div class="workflow-step">
+                <div class="step-number">3</div>
+                <div>
+                    <strong>Update solution-pack.yaml</strong><br>
+                    Add device to <code>device_registry</code> section
+                </div>
+            </div>
+            <div class="workflow-step">
+                <div class="step-number">4</div>
+                <div>
+                    <strong>Test Connectivity</strong><br>
+                    Run <code>fortigate-health-check</code> against new device
+                </div>
+            </div>
+
+            <h3>Credential File Format</h3>
+            <div class="command-example">
+                <div class="header">config/fortigate_credentials.yaml</div>
+                <pre><code>devices:
+  new-device-id:
+    host: "192.168.x.x"
+    api_token: "YOUR_API_TOKEN"
+    verify_ssl: false
+
+default_lookup:
+  "192.168.x.x": "new-device-id"</code></pre>
+            </div>
+
+            <h3>Planned Automation (v1.2.0)</h3>
+            <ul>
+                <li><code>fortigate-onboard</code> - Automated credential storage</li>
+                <li><code>fortiflex-provision</code> - License token provisioning</li>
+                <li><code>fortigate-sdwan-hub</code> - SDWAN Hub configuration</li>
+                <li><code>fortigate-push-baseline</code> - Baseline policy deployment</li>
+            </ul>
+        </section>
+
+        <!-- TROUBLESHOOTING -->
+        <section id="troubleshooting">
+            <h2>Troubleshooting</h2>
+
+            <table>
+                <tr>
+                    <th>Error</th>
+                    <th>Cause</th>
+                    <th>Resolution</th>
+                </tr>
+                <tr>
+                    <td><code>Connection refused</code></td>
+                    <td>Device unreachable</td>
+                    <td>Check network path, verify IP address, check HTTPS enabled</td>
+                </tr>
+                <tr>
+                    <td><code>401 Unauthorized</code></td>
+                    <td>Invalid API token</td>
+                    <td>Regenerate token on FortiGate, update credentials file</td>
+                </tr>
+                <tr>
+                    <td><code>403 Forbidden</code></td>
+                    <td>Insufficient permissions</td>
+                    <td>Check REST API admin profile permissions</td>
+                </tr>
+                <tr>
+                    <td><code>SSL certificate verify failed</code></td>
+                    <td>Self-signed certificate</td>
+                    <td>Set <code>verify_ssl: false</code> in parameters</td>
+                </tr>
+                <tr>
+                    <td><code>Timeout</code></td>
+                    <td>Device overloaded or slow</td>
+                    <td>Increase timeout, check device CPU/memory</td>
+                </tr>
+                <tr>
+                    <td><code>Device not found</code></td>
+                    <td>Unknown device alias</td>
+                    <td>Use explicit IP address or add to device_registry</td>
+                </tr>
+            </table>
+
+            <h3>Diagnostic Commands</h3>
+            <div class="command-example">
+                <div class="header">Test API Connectivity Directly</div>
+                <pre><code># Test HTTPS connectivity
+curl -svk https://192.168.209.62/api/v2/monitor/system/status \
+  -H "Authorization: Bearer YOUR_TOKEN" 2>&1 | head -30
+
+# Check if API is responding
+curl -sk -o /dev/null -w "%{http_code}" \
+  https://192.168.209.62/api/v2/monitor/system/status \
+  -H "Authorization: Bearer YOUR_TOKEN"</code></pre>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>FortiGate Operations Solution Pack | Project Ulysses | v1.0.0</p>
+        <p>Generated: 2025-01-14</p>
+    </footer>
+</body>
+</html>

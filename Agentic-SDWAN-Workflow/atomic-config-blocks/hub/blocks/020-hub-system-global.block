@@ -1,0 +1,68 @@
+---
+block_id: 020
+name: hub-system-global
+display_name: "Hub System Global Settings"
+version: 1.0.0
+category: core
+device_role: hub
+vendor: fortinet
+platform: fortigate
+min_fortios: "7.4.0"
+
+description: |
+  System global settings for SD-WAN hub. Includes hostname, timezone,
+  admin timeout, and REST API configuration.
+
+depends_on: []
+
+provides:
+  - hub-system-global
+  - hub-base-config
+
+parameters:
+  - name: HUB_HOSTNAME
+    description: "Hub hostname"
+    type: string
+    required: true
+    example: "sdwan-hub-primary"
+
+  - name: TIMEZONE
+    description: "System timezone"
+    type: string
+    required: false
+    default: "US/Pacific"
+
+  - name: ADMINTIMEOUT
+    description: "Admin session timeout in minutes"
+    type: integer
+    required: false
+    default: 480
+
+  - name: REST_API_KEY_URL_QUERY
+    description: "Enable REST API key in URL query"
+    type: string
+    required: false
+    default: "enable"
+    allowed_values: ["enable", "disable"]
+
+verification:
+  commands:
+    - "get system global"
+  expected_patterns:
+    - "hostname: {{HUB_HOSTNAME}}"
+    - "admintimeout: {{ADMINTIMEOUT}}"
+
+rollback:
+  commands:
+    - "config system global"
+    - "set hostname FortiGate"
+    - "end"
+
+---
+
+config system global
+    set hostname "{{HUB_HOSTNAME}}"
+    set timezone {{TIMEZONE}}
+    set admintimeout {{ADMINTIMEOUT}}
+    set rest-api-key-url-query {{REST_API_KEY_URL_QUERY}}
+end

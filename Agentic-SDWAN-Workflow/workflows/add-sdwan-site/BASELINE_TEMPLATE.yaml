@@ -1,0 +1,392 @@
+# SD-WAN Working Baseline Template
+# Extracted from production spokes on 2026-01-21
+# Source: Spoke-1 (192.168.209.30), Spoke-2 (192.168.209.35)
+# Updated: 2026-01-22 - Added system_global section, transport: udp
+# Updated: 2026-01-24 - Added NAMING_CONSTANTS section as single source of truth
+
+version: "1.2.0"
+extracted_from:
+  spoke_1: "192.168.209.30"
+  spoke_2: "192.168.209.35"
+  hub: "192.168.215.15"
+  extraction_date: "2026-01-21"
+
+# ============================================================================
+# NAMING CONSTANTS (Single Source of Truth)
+# ============================================================================
+# All tools MUST use these exact values. Do NOT hardcode names elsewhere.
+# If you need to change naming, ONLY change it here.
+
+naming_constants:
+  # Interface Names
+  loopback_interface: "Spoke-Lo"          # Hyphen, NOT underscore
+
+  # IPsec Tunnel Names (hyphen convention)
+  tunnel_vpn1: "HUB1-VPN1"                # Primary tunnel, network-id: 1
+  tunnel_vpn2: "HUB1-VPN2"                # Secondary tunnel, network-id: 2
+
+  # SD-WAN Zone Names (underscore convention)
+  sdwan_zone_overlay: "SDWAN_OVERLAY"     # Main overlay zone
+  sdwan_zone_underlay: "SDWAN_UNDERLAY"   # Optional underlay zone
+
+  # Health Check Names (underscore, FortiOS doesn't allow hyphens)
+  health_check_hub: "HUB_Health"          # Ping to hub loopback
+
+  # Firewall Objects
+  address_loopbacks: "SDWAN-Loopbacks"    # 172.16.0.0/16 address object
+  policy_overlay: "SDWAN_Overlay_Traffic" # Overlay traffic policy
+
+  # Hostname Pattern
+  hostname_pattern: "sdwan-spoke-{site_id:02d}"  # e.g., sdwan-spoke-04
+
+# Naming Rules:
+# - Interface names: Use hyphens (Spoke-Lo, HUB1-VPN1)
+# - Zone names: Use underscores (SDWAN_OVERLAY) - FortiOS convention
+# - Health checks: Use underscores (HUB_Health) - FortiOS doesn't allow hyphens
+# - Firewall addresses: Use hyphens (SDWAN-Loopbacks)
+# - Policies: Use underscores (SDWAN_Overlay_Traffic)
+
+# ============================================================================
+# CRITICAL SETTINGS (Must Match These Exactly)
+# ============================================================================
+
+critical_settings:
+  # System Settings
+  ike_tcp_port: 11443                     # NEVER use 443 - conflicts with HTTPS
+
+  # IPsec Phase1 (ADVPN Required)
+  transport: "udp"                        # NEVER use "auto" or "tcp"
+  net_device: "enable"                    # Required for SD-WAN routing
+  auto_discovery_sender: "enable"         # ADVPN shortcut discovery
+  auto_discovery_receiver: "enable"       # ADVPN shortcut discovery
+  tunnel_search: "selectors"              # ADVPN tunnel negotiation
+  ike_version: 2                          # Always IKEv2
+  add_route: "disable"                    # Routes via BGP, not IPsec
+  dpd: "on-idle"                          # Dead peer detection
+  dhgrp: "20 21"                          # Modern DH groups
+
+  # BGP
+  bgp_as: 65000                           # iBGP AS number (must match hub)
+
+# ============================================================================
+# SITE ID DERIVATION PATTERN (Discovered from Working Network)
+# ============================================================================
+#
+# The site_id is used as a seed to derive unique values:
+#
+#   site_id: 2  -->  spoke_loopback: 172.16.0.2
+#   site_id: 3  -->  spoke_loopback: 172.16.0.3
+#   site_id: N  -->  spoke_loopback: 172.16.0.N
+#
+# This pattern enables predictable, collision-free addressing.
+
+site_id_formula:
+  hostname: "sdwan-spoke-{site_id}"       # e.g., sdwan-spoke-04
+  spoke_loopback: "172.16.0.{site_id}"    # e.g., 172.16.0.4
+  location_id: "172.16.0.{site_id}"       # Same as spoke_loopback
+  exchange_ip_addr4: "172.16.0.{site_id}" # IPsec exchange address
+  # Optional extensions for future:
+  # lan_subnet: "10.{site_id}.1.0/24"
+  # management_vlan: "10.{site_id}.0.0/24"
+
+# ============================================================================
+# HUB REGISTRY (Constants)
+# ============================================================================
+
+hub_registry:
+  HUB1:
+    name: "HUB1"
+    management_ip: "192.168.215.15"
+    loopbacks:
+      - "172.16.255.252"  # BGP router-id / primary
+      - "172.16.255.253"  # Secondary / health-check target
+    vpn_endpoints:
+      VPN1:
+        interface: "HUB1-VPN1"
+        network_id: 1
+        ike_tcp_port: 11443
+      VPN2:
+        interface: "HUB1-VPN2"
+        network_id: 2
+        ike_tcp_port: 11444
+    bgp:
+      as_number: 65000
+      advertised_networks:
+        - "10.250.250.0/24"
+        - "192.168.215.0/24"
+
+# ============================================================================
+# SPOKE BASELINE TEMPLATE
+# ============================================================================
+
+spoke_template:
+
+  # ----- System Global Settings -----
+  # CRITICAL: These must be set for proper operation
+  system_global:
+    hostname: "sdwan-spoke-{site_id}"     # Derived from site_id (e.g., sdwan-spoke-04)
+    management_ip: "{target_ip}"          # Usually same as WAN IP for single-homed
+    timezone: "US/Pacific"                # Adjust per site location
+    admintimeout: 480                     # 8 hours - prevents session drops during config
+    rest_api_key_url_query: "enable"      # REQUIRED: Allow API token in URL query string
+    gui_auto_upgrade_setup_warning: "disable"  # Suppress upgrade prompts
+
+  # ----- System Settings -----
+  system_settings:
+    location_id: "{derived.spoke_loopback}"  # Used by SD-WAN for site identification
+    ike_tcp_port: 11443                      # CRITICAL: Avoids conflict with HTTPS 443
+    # Note: ike-tcp-port must match hub configuration
+
+  # ----- Loopback Interface -----
+  loopback:
+    name: "Spoke-Lo"
+    ip: "{derived.spoke_loopback}/32"
+    allowaccess: "ping"
+    type: "loopback"
+
+  # ----- IPsec Phase1 Template -----
+  ipsec_phase1:
+    HUB1-VPN1:
+      type: "dynamic"
+      interface: "{wan_interface}"  # Varies: "wan" or "port1"
+      ike-version: 2
+      transport: "udp"              # CRITICAL: Must be UDP for proper tunnel operation
+      peertype: "any"
+      net-device: "enable"
+      mode-cfg: "enable"
+      proposal: "aes256-sha256"
+      add-route: "disable"  # Routes handled by BGP
+      dpd: "on-idle"
+      dpd-retrycount: 3
+      dpd-retryinterval: 10
+      auto-discovery-sender: "enable"
+      auto-discovery-receiver: "enable"
+      network-overlay: "enable"
+      network-id: 1
+      exchange-ip-addr4: "{derived.spoke_loopback}"
+      tunnel-search: "selectors"
+      # PSK: Retrieved from credential store
+      # Remote gateway: Hub WAN IP (192.168.215.15)
+
+    HUB1-VPN2:
+      # Same structure, network-id: 2
+      network-id: 2
+
+  # ----- IPsec Phase2 Template -----
+  ipsec_phase2:
+    HUB1-VPN1:
+      phase1name: "HUB1-VPN1"
+      proposal: "aes256-sha256"
+      pfs: "enable"
+      auto-negotiate: "enable"
+      src-subnet: "0.0.0.0/0"
+      dst-subnet: "0.0.0.0/0"
+
+  # ----- Static Routes to Hub Loopbacks -----
+  static_routes:
+    - destination: "172.16.255.252/32"
+      device: "HUB1-VPN1"
+      distance: 10
+      comment: "Hub primary loopback via VPN1"
+
+    - destination: "172.16.255.253/32"
+      device: "HUB1-VPN1"
+      distance: 10
+      comment: "Hub secondary loopback via VPN1"
+
+    - destination: "172.16.255.252/32"
+      device: "HUB1-VPN2"
+      distance: 15
+      comment: "Hub primary loopback via VPN2 (backup)"
+
+    - destination: "172.16.255.253/32"
+      device: "HUB1-VPN2"
+      distance: 15
+      comment: "Hub secondary loopback via VPN2 (backup)"
+
+  # ----- BGP Configuration -----
+  bgp:
+    as_number: 65000
+    router_id: "{derived.spoke_loopback}"
+    neighbors:
+      - ip: "172.16.255.253"
+        remote_as: 65000
+        update_source: "Spoke-Lo"
+        route_reflector_client: false
+        # iBGP peering with hub
+    networks:
+      - "{lan_subnet}"  # Advertise local LAN
+    redistribute:
+      - "connected"
+
+  # ----- SD-WAN Configuration -----
+  sdwan:
+    status: "enable"
+
+    zones:
+      - name: "SDWAN_OVERLAY"
+        # All overlay tunnels go in this zone
+
+    members:
+      - seq_num: 1
+        interface: "HUB1-VPN1"
+        zone: "SDWAN_OVERLAY"
+        source: "{derived.spoke_loopback}"  # Use loopback as source
+        priority_in_sla: 10
+        priority_out_sla: 20
+
+      - seq_num: 2
+        interface: "HUB1-VPN2"
+        zone: "SDWAN_OVERLAY"
+        source: "{derived.spoke_loopback}"
+        priority_in_sla: 20
+        priority_out_sla: 10
+
+    health_check:
+      - name: "HUB_Health"
+        server: "172.16.255.253"  # Hub secondary loopback
+        protocol: "ping"
+        members:
+          - "HUB1-VPN1"
+          - "HUB1-VPN2"
+        sla:
+          - id: 1
+            latency_threshold: 100
+            jitter_threshold: 50
+            packetloss_threshold: 5
+
+  # ----- Firewall Policies -----
+  firewall_policies:
+    - name: "SDWAN_Overlay_Traffic"
+      srcintf: "Spoke-Lo"
+      dstintf: "SDWAN_OVERLAY"
+      srcaddr: "all"
+      dstaddr: "all"
+      action: "accept"
+      schedule: "always"
+      service: "ALL"
+      comments: "Allow overlay traffic from loopback"
+
+    - name: "LAN_to_Overlay"
+      srcintf: "{lan_interface}"
+      dstintf: "SDWAN_OVERLAY"
+      srcaddr: "{lan_subnet}"
+      dstaddr: "all"
+      action: "accept"
+      schedule: "always"
+      service: "ALL"
+      nat: "enable"
+      comments: "LAN access to SD-WAN destinations"
+
+# ============================================================================
+# OBSERVED DIFFERENCES BETWEEN SPOKES
+# ============================================================================
+
+observed_variations:
+  interface_naming:
+    spoke_1:
+      wan: "wan"
+      lan: "lan"
+    spoke_2:
+      wan: "port1"
+      lan: "port2"
+    note: "Hardware vs VM have different default interface names"
+
+  dpd_retryinterval:
+    spoke_1: 5
+    spoke_2: 20
+    recommended: 10
+    note: "Should standardize for consistency"
+
+  add_route:
+    spoke_1: "enable"
+    spoke_2: "disable"
+    recommended: "disable"
+    note: "Disable when using BGP for route distribution"
+
+  tunnel_count:
+    spoke_1: 2  # HUB1-VPN1, HUB2-VPN2
+    spoke_2: 2  # HUB1-VPN1, HUB1-VPN2
+    note: "Spoke-1 has HUB2 tunnels, Spoke-2 only HUB1"
+
+# ============================================================================
+# BLUEPRINT WIZARD Q/A (Proposed)
+# ============================================================================
+
+blueprint_wizard:
+  required_questions:
+    - id: "site_id"
+      question: "What site ID number for this spoke? (e.g., 4, 5, 6...)"
+      type: "integer"
+      validation: "must be unique, not 1 (hub), not 2 or 3 (existing)"
+      derives:
+        - hostname          # sdwan-spoke-{site_id}
+        - spoke_loopback    # 172.16.0.{site_id}
+        - location_id       # 172.16.0.{site_id}
+        - exchange_ip_addr4 # 172.16.0.{site_id}
+
+    - id: "site_name"
+      question: "Site name (e.g., 'branch-chicago', 'dc-east')?"
+      type: "string"
+      validation: "alphanumeric with hyphens, max 15 chars"
+
+    - id: "wan_interface"
+      question: "WAN interface name on this device?"
+      type: "string"
+      default: "wan"
+      hint: "Usually 'wan' for hardware, 'port1' for VM"
+
+    - id: "wan_ip"
+      question: "WAN IP address for this spoke?"
+      type: "ip_address"
+      validation: "must be reachable from hub"
+
+    - id: "lan_subnet"
+      question: "LAN subnet behind this spoke?"
+      type: "cidr"
+      hint: "e.g., 192.168.10.0/24"
+
+  optional_questions:
+    - id: "dual_hub"
+      question: "Connect to both HUB1 and HUB2?"
+      type: "boolean"
+      default: true
+
+    - id: "bgp_enabled"
+      question: "Enable BGP for route exchange?"
+      type: "boolean"
+      default: true
+
+# ============================================================================
+# VALIDATION CHECKS
+# ============================================================================
+
+validation:
+  pre_deploy:
+    - check: "site_id_unique"
+      description: "Verify site_id not already in use"
+      query: "Check sdwan-manifest.yaml for existing site_id"
+
+    - check: "hub_reachable"
+      description: "Ping hub from spoke WAN"
+      command: "execute ping 192.168.215.15"
+
+    - check: "loopback_not_in_use"
+      description: "Verify derived loopback is unique"
+      query: "Check no existing route to 172.16.0.{site_id}"
+
+  post_deploy:
+    - check: "ipsec_up"
+      description: "IPsec tunnel established"
+      command: "diagnose vpn ike gateway list"
+      expect: "established"
+
+    - check: "bgp_established"
+      description: "BGP session with hub"
+      command: "get router info bgp summary"
+      expect: "Established"
+
+    - check: "overlay_ping"
+      description: "Ping hub loopback from spoke loopback"
+      command: "execute ping-options source 172.16.0.{site_id}\nexecute ping 172.16.255.253"
+      expect: "bytes from"

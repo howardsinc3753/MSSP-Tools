@@ -1,0 +1,120 @@
+---
+block_id: 026
+name: hub-bgp-neighbor-range
+display_name: "Hub BGP Neighbor Range Configuration"
+version: 1.0.0
+category: core
+device_role: hub
+vendor: fortinet
+platform: fortigate
+min_fortios: "7.4.0"
+
+description: |
+  BGP neighbor-range configuration for SD-WAN hub. Accepts dynamic BGP
+  sessions from spokes using neighbor-range instead of explicit neighbors.
+
+  KEY: Hub accepts ANY spoke in the 172.16.0.0/16 range dynamically.
+
+depends_on:
+  - block_id: 025
+    reason: "BGP base must be configured first"
+
+provides:
+  - hub-bgp-neighbor-range
+  - hub-bgp-edge-group
+  - hub-bgp-networks
+
+parameters:
+  - name: NEIGHBOR_GROUP_NAME
+    description: "Neighbor group name for spokes"
+    type: string
+    required: false
+    default: "EDGE"
+
+  - name: NEIGHBOR_RANGE_PREFIX
+    description: "Spoke loopback range (prefix)"
+    type: string
+    required: false
+    default: "172.16.0.0"
+    note: "Hub accepts BGP sessions from any IP in this range"
+
+  - name: NEIGHBOR_RANGE_NETMASK
+    description: "Spoke loopback range netmask"
+    type: string
+    required: false
+    default: "255.255.0.0"
+
+  - name: REMOTE_AS
+    description: "Remote AS for spokes (same as hub for iBGP)"
+    type: integer
+    required: false
+    default: 65000
+    note: "Hub and spokes use same AS for iBGP ADVPN"
+
+  - name: ADVERTISED_NETWORKS
+    description: "Networks to advertise to spokes"
+    type: string
+    required: true
+    example: "10.250.250.0"
+    note: "Hub LAN networks advertised to spokes"
+
+  - name: ADVERTISED_NETMASK
+    description: "Netmask for advertised networks"
+    type: string
+    required: true
+    example: "255.255.255.0"
+
+verification:
+  commands:
+    - "get router bgp"
+  expected_patterns:
+    - "neighbor-group: {{NEIGHBOR_GROUP_NAME}}"
+    - "prefix: {{NEIGHBOR_RANGE_PREFIX}}"
+    - "remote-as: {{REMOTE_AS}}"
+
+rollback:
+  commands:
+    - "config router bgp"
+    - "config neighbor-group"
+    - "delete {{NEIGHBOR_GROUP_NAME}}"
+    - "end"
+    - "config neighbor-range"
+    - "delete 1"
+    - "end"
+    - "config network"
+    - "delete 1"
+    - "end"
+    - "end"
+
+notes: |
+  - Neighbor-range allows spokes to connect dynamically
+  - No need to pre-configure each spoke as a neighbor
+  - Spokes must use loopback IPs in the neighbor-range prefix
+  - advertisement-interval 1 for fast convergence
+  - soft-reconfiguration enables route refresh
+
+---
+
+config router bgp
+    config neighbor-group
+        edit "{{NEIGHBOR_GROUP_NAME}}"
+            set activate enable
+            set advertisement-interval 1
+            set link-down-failover enable
+            set next-hop-self enable
+            set soft-reconfiguration enable
+            set remote-as {{REMOTE_AS}}
+        next
+    end
+    config neighbor-range
+        edit 1
+            set prefix {{NEIGHBOR_RANGE_PREFIX}} {{NEIGHBOR_RANGE_NETMASK}}
+            set neighbor-group "{{NEIGHBOR_GROUP_NAME}}"
+        next
+    end
+    config network
+        edit 1
+            set prefix {{ADVERTISED_NETWORKS}} {{ADVERTISED_NETMASK}}
+        next
+    end
+end

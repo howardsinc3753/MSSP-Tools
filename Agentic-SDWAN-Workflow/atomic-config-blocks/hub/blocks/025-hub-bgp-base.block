@@ -1,0 +1,106 @@
+---
+block_id: 025
+name: hub-bgp-base
+display_name: "Hub BGP Base Configuration"
+version: 1.0.0
+category: core
+device_role: hub
+vendor: fortinet
+platform: fortigate
+min_fortios: "7.4.0"
+
+description: |
+  BGP base configuration for SD-WAN hub. Establishes AS number, router-ID,
+  and BGP timers. Hub uses neighbor-range (added in block 026) to accept
+  dynamic spoke BGP sessions.
+
+  KEY: Hub AS is constant (65000), spokes use 65000 + site_id.
+
+depends_on:
+  - block_id: 023
+    reason: "IPsec phase1 templates must exist for overlay routing"
+
+provides:
+  - hub-bgp-base
+  - bgp-as-65000
+  - hub-routing
+
+parameters:
+  - name: BGP_AS
+    description: "Hub BGP AS number"
+    type: integer
+    required: false
+    default: 65000
+    note: "Hub AS is always 65000"
+
+  - name: ROUTER_ID
+    description: "BGP router-ID (typically hub loopback IP)"
+    type: ip_address
+    required: true
+    example: "172.16.255.252"
+
+  - name: IBGP_MULTIPATH
+    description: "Enable iBGP multipath"
+    type: string
+    required: false
+    default: "enable"
+    allowed_values: ["enable", "disable"]
+
+  - name: GRACEFUL_RESTART
+    description: "Enable graceful restart"
+    type: string
+    required: false
+    default: "enable"
+    allowed_values: ["enable", "disable"]
+
+  - name: HOLDTIME_TIMER
+    description: "BGP hold time in seconds"
+    type: integer
+    required: false
+    default: 180
+
+  - name: KEEPALIVE_TIMER
+    description: "BGP keepalive time in seconds"
+    type: integer
+    required: false
+    default: 60
+
+verification:
+  commands:
+    - "get router bgp"
+  expected_patterns:
+    - "as: {{BGP_AS}}"
+    - "router-id: {{ROUTER_ID}}"
+    - "ibgp-multipath: {{IBGP_MULTIPATH}}"
+
+rollback:
+  commands:
+    - "config router bgp"
+    - "unset as"
+    - "end"
+
+notes: |
+  - Hub AS is 65000 (constant)
+  - Spokes use AS 65000 + site_id (e.g., site 7 = AS 65007)
+  - iBGP multipath allows ECMP across multiple spoke tunnels
+  - Graceful restart prevents route flapping during restarts
+  - This block does NOT configure neighbor-range (see block 026)
+  - This block does NOT advertise networks (add in separate block if needed)
+
+---
+
+config router bgp
+    set as {{BGP_AS}}
+    set router-id {{ROUTER_ID}}
+    set ibgp-multipath {{IBGP_MULTIPATH}}
+    set ebgp-multipath enable
+    set additional-path enable
+    set additional-path-select 4
+    set recursive-next-hop enable
+    set recursive-inherit-priority enable
+    set graceful-restart {{GRACEFUL_RESTART}}
+    set graceful-restart-time 120
+    set graceful-stalepath-time 360
+    set holdtime-timer {{HOLDTIME_TIMER}}
+    set keepalive-timer {{KEEPALIVE_TIMER}}
+end

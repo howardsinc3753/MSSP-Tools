@@ -1,0 +1,658 @@
+# =============================================================================
+# AGENTIC AI BLOCK STACKING WORKFLOW
+# Block 1: VM Provisioning
+# =============================================================================
+# Framework: Agentic AI Block Stacking Workflow v1.0
+# Master Document: ../manifest.yaml
+# Purpose: Sub-agent briefing for isolated block execution
+# =============================================================================
+
+block_id: provision
+block_number: 1
+name: "VM Provisioning"
+version: 1.2.0
+
+# =============================================================================
+# AI EXECUTION INSTRUCTIONS (CRITICAL)
+# =============================================================================
+ai_instructions:
+  execution_model: |
+    SINGLE-AGENT EXECUTION: Do NOT spawn sub-agents or use Task tool.
+    Execute this block directly in the main conversation context.
+    Sub-agents lose MCP tool context and default to Bash commands.
+
+  tool_policy: |
+    MANDATORY: Use ONLY MCP certified tools via execute_certified_tool.
+    DO NOT use Bash commands directly for:
+    - SSH connections (use fortigate-ssh or hypervisor tools)
+    - Device health checks (use fortigate-health-check)
+    - VM operations (use kvm-fortios-provision)
+    - Any FortiGate configuration (use fortigate-* tools)
+
+    The shell commands in preflight_checks and success_criteria are for
+    HUMAN VERIFICATION ONLY - they document what the tools do internally.
+
+    CORRECT: execute_certified_tool org.ulysses.sdwan.kvm-fortios-provision/1.0.11 {...}
+    WRONG: Bash("ssh root@hypervisor virsh create...")
+
+  tool_discovery: |
+    Before each step, use route_query to find the right tool:
+    - "provision fortigate vm" → kvm-fortios-provision
+    - "check fortigate health" → fortigate-health-check
+    - "get hypervisor credentials" → hypervisor-credential-manager
+
+  error_handling: |
+    If a tool returns an error:
+    1. Check the error message for guidance
+    2. Use route_query to find alternative tools
+    3. DO NOT fall back to Bash commands
+
+# =============================================================================
+# BOOTSTRAP ISO APPROACH (PRIMARY METHOD - Zero Password Dance)
+# =============================================================================
+# This eliminates the VNC console password change requirement by pre-configuring
+# admin credentials and network settings in a bootstrap ISO attached at boot.
+#
+bootstrap_iso:
+  description: |
+    FortiGate VMs can be bootstrapped via a config drive ISO containing a
+    configuration file. The VM reads the ISO on first boot and applies the
+    config automatically - NO VNC console interaction required.
+
+  requirements:
+    volume_label: "config2"  # CRITICAL - FortiOS looks for this exact label
+    config_file: "fgt-vm.conf"  # Must be at ISO root
+    format: "FortiOS CLI (same as 'show full-configuration')"
+
+  # -------------------------------------------------------------------------
+  # STATIC IP MODE (RECOMMENDED FOR PRODUCTION)
+  # -------------------------------------------------------------------------
+  static_bootstrap_config: |
+    # Static IP bootstrap - used when wan_ip and wan_gateway are provided
+    config system password-policy
+        set status disable
+    end
+    config system global
+        set hostname "{{ site_name }}"
+        set admintimeout 480
+    end
+    config system admin
+        edit "admin"
+            set password "{{ admin_password }}"
+            set force-password-change disable
+        next
+    end
+    config system interface
+        edit "port1"
+            set mode static
+            set ip {{ wan_ip }}
+            set allowaccess ping https ssh http fgfm
+            set role wan
+        next
+    end
+    config router static
+        edit 1
+            set gateway {{ wan_gateway }}
+            set device port1
+        next
+    end
+
+  # -------------------------------------------------------------------------
+  # DHCP MODE (LAB/TESTING ONLY)
+  # -------------------------------------------------------------------------
+  # WARNING: DHCP mode does NOT create a default gateway route!
+  # Agent must discover IP via MAC-to-ARP correlation after boot.
+  dhcp_bootstrap_config: |
+    # DHCP bootstrap - used when use_dhcp=true or wan_ip not provided
+    # NOTE: No default gateway route created - DHCP server must provide it
+    config system password-policy
+        set status disable
+    end
+    config system global
+        set hostname "{{ site_name }}"
+        set admintimeout 480
+    end
+    config system admin
+        edit "admin"
+            set password "{{ admin_password }}"
+            set force-password-change disable
+        next
+    end
+    config system interface
+        edit "port1"
+            set mode dhcp
+            set allowaccess ping https ssh http fgfm
+            set role wan
+        next
+    end
+
+  iso_creation_commands: |
+    # Run on hypervisor (Rocky Linux)
+    mkdir -p /tmp/fgt-bootstrap
+    cat > /tmp/fgt-bootstrap/fgt-vm.conf << 'FGTCONF'
+    {{ minimal_bootstrap_config }}
+    FGTCONF
+    genisoimage -o /var/lib/libvirt/images/{{ vm_name }}-bootstrap.iso \
+        -V "config2" -J -r /tmp/fgt-bootstrap/
+
+  attach_to_vm: |
+    virsh change-media {{ vm_name }} sdb \
+        /var/lib/libvirt/images/{{ vm_name }}-bootstrap.iso --insert
+    virsh start {{ vm_name }}
+
+# =============================================================================
+# DHCP IP DISCOVERY (for bootstrap DHCP mode)
+# =============================================================================
+# When using DHCP mode, we need to discover the assigned IP after VM boots.
+#
+dhcp_ip_discovery:
+  description: |
+    After VM boots with DHCP-enabled bootstrap config, discover the assigned
+    IP address by correlating the VM's MAC address with the ARP table.
+
+  method: "MAC-to-ARP correlation"
+
+  steps:
+    - name: "Get VM MAC address"
+      command: "virsh domiflist {{ vm_name }} | grep br0 | awk '{print $5}'"
+      output: "{{ mac_address }}"
+
+    - name: "Wait for DHCP lease (up to 30 seconds)"
+      command: |
+        for i in {1..6}; do
+            IP=$(arp -an | grep -i "{{ mac_address }}" | awk -F'[()]' '{print $2}')
+            if [ -n "$IP" ]; then
+                echo "$IP"
+                exit 0
+            fi
+            sleep 5
+        done
+        exit 1
+      output: "{{ management_ip }}"
+
+  one_liner: |
+    MAC=$(virsh domiflist {{ vm_name }} | grep br0 | awk '{print $5}') && \
+    arp -an | grep -i "$MAC" | awk -F'[()]' '{print $2}'
+
+  notes:
+    - "KVM VMs use MAC prefix 52:54:00 by default"
+    - "br0 is bridged to physical network 192.168.209.0/24"
+    - "DHCP server is on the physical network, not libvirt"
+    - "VM needs ~10-30 seconds after boot to get DHCP lease"
+    - "If ARP table empty, ping broadcast: ping -c 2 -b 192.168.209.255"
+
+# -----------------------------------------------------------------------------
+# SUB-AGENT GOAL
+# -----------------------------------------------------------------------------
+goal: |
+  Provision a FortiGate VM on KVM hypervisor and ensure it is accessible
+  via management IP with SSH/HTTPS responding.
+
+# -----------------------------------------------------------------------------
+# INPUTS (provided by Master Agent)
+# -----------------------------------------------------------------------------
+inputs:
+  required:
+    - name: site_name
+      type: string
+      description: "Unique site identifier (e.g., 'sdwan-spoke-03')"
+
+    - name: deployment_type
+      type: string
+      enum: [vm, hardware]
+      description: "VM deployment or hardware onboarding"
+
+    - name: hypervisor
+      type: string
+      default: "rocky-kvm-lab"
+      description: "Hypervisor name from MCP credential manager (e.g., rocky-kvm-lab)"
+
+    - name: admin_password
+      type: string
+      sensitive: true
+      default: "FG@dm!n2026!"
+      description: |
+        Admin password from BLOCK_0.
+        CRITICAL: This is passed through to OUTPUT for BLOCK_2 SSH access.
+        Default: FG@dm!n2026! (lab standard from kvm-fortios-provision v1.0.11+)
+
+    - name: site_id
+      type: integer
+      description: |
+        Site ID from BLOCK_0 (1-254).
+        Used by kvm-fortios-provision to derive LAN IP as 10.{site_id}.1.1/24
+        Example: site_id=7 → LAN IP 10.7.1.1/24
+
+    - name: lan_ip
+      type: string
+      description: |
+        Explicit LAN interface IP from BLOCK_0 (e.g., "10.7.1.1/24").
+        If provided, overrides site_id derivation.
+        This is the FortiGate's gateway address on the LAN subnet.
+
+  # ---------------------------------------------------------------------------
+  # STATIC IP PARAMETERS (CRITICAL - Read this!)
+  # ---------------------------------------------------------------------------
+  # For PRODUCTION deployments, ALWAYS use static IP mode.
+  # DHCP mode is only for lab/testing where IP is discovered post-boot.
+  #
+  # STATIC IP REQUIREMENTS:
+  #   - wan_ip: REQUIRED (e.g., "192.168.209.43/24")
+  #   - wan_gateway: REQUIRED (e.g., "192.168.209.62")
+  #   - use_dhcp: MUST be false (or omitted)
+  #
+  # If wan_ip is NOT provided, tool defaults to DHCP mode!
+  # ---------------------------------------------------------------------------
+
+  static_ip_config:
+    - name: wan_ip
+      type: string
+      required_for_static: true
+      description: |
+        Static WAN IP with CIDR notation (e.g., "192.168.209.43/24")
+        REQUIRED for static mode. If omitted, defaults to DHCP.
+
+    - name: wan_gateway
+      type: string
+      required_for_static: true
+      default: "192.168.209.62"
+      description: |
+        Default gateway IP for WAN interface.
+        REQUIRED for static mode - without this, no default route is created.
+
+    - name: use_dhcp
+      type: boolean
+      default: false
+      description: |
+        Set to true ONLY for lab environments where DHCP is available.
+        DHCP mode means: no default gateway route in bootstrap config.
+        Agent must discover IP via MAC-to-ARP correlation after boot.
+
+  optional:
+    - name: vcpus
+      type: integer
+      default: 2
+
+    - name: memory_mb
+      type: integer
+      default: 4096
+
+    - name: fallback_static_ip
+      type: string
+      description: "Static IP to use if DHCP fails (VNC console fallback)"
+
+# -----------------------------------------------------------------------------
+# SUCCESS CRITERIA
+# -----------------------------------------------------------------------------
+success_criteria:
+  - id: vm_running
+    description: "VM exists and is in running state"
+    verification:
+      command: "virsh list --all | grep {{ vm_name }}"
+      expected: "running"
+
+  - id: ip_assigned
+    description: "Management IP assigned (DHCP or static)"
+    verification:
+      # Primary: MAC-to-ARP correlation (works with DHCP on bridged network)
+      command: |
+        MAC=$(virsh domiflist {{ vm_name }} | grep br0 | awk '{print $5}')
+        arp -an | grep -i "$MAC" | awk -F'[()]' '{print $2}'
+      expected: "192.168.209.X"
+      # Fallback: virsh domifaddr (works with libvirt DHCP/virbr0)
+      fallback_command: "virsh domifaddr {{ vm_name }}"
+
+  - id: fortigate_responding
+    description: "FortiGate web interface responding"
+    verification:
+      command: "curl -k -s -o /dev/null -w '%{http_code}' https://{{ management_ip }}"
+      expected: "200 or 401"
+
+  - id: ssh_accessible
+    description: "SSH port responding"
+    verification:
+      command: "Test-NetConnection -ComputerName {{ management_ip }} -Port 22"
+      expected: "TcpTestSucceeded: True"
+
+# -----------------------------------------------------------------------------
+# OUTPUTS (report back to Master Agent)
+# -----------------------------------------------------------------------------
+outputs:
+  required:
+    - name: management_ip
+      type: string
+      description: "Discovered or assigned management IP"
+
+    - name: vm_name
+      type: string
+      description: "Actual VM name in libvirt (e.g., FortiGate-sdwan-spoke-03)"
+
+    - name: status
+      type: string
+      enum: [SUCCESS, FAILURE, BLOCKED]
+
+    - name: admin_password
+      type: string
+      sensitive: true
+      description: "Password set during bootstrap config - REQUIRED for BLOCK_2 SSH access"
+      note: "CRITICAL: This MUST be passed to BLOCK_2 for license application via SSH"
+
+  optional:
+    - name: vnc_port
+      type: integer
+      description: "VNC port for fallback console access"
+
+    - name: serial_number
+      type: string
+      description: "FortiGate serial (FGVM64-KVM if unlicensed)"
+
+    - name: errors
+      type: array
+      description: "Any errors encountered"
+
+    - name: warnings
+      type: array
+      description: "Non-fatal issues to note"
+
+# -----------------------------------------------------------------------------
+# TOOLS AVAILABLE
+# -----------------------------------------------------------------------------
+tools:
+  - id: org.ulysses.sdwan.kvm-fortios-provision/1.0.11
+    purpose: "Create/start/stop FortiGate VM on KVM hypervisor"
+    minimum_version: "1.0.11"  # Trust Anchor certified. start/stop: try tool first, Bash SSH fallback
+
+    # -------------------------------------------------------------------------
+    # STATIC IP MODE (RECOMMENDED)
+    # -------------------------------------------------------------------------
+    static_mode_example: |
+      execute_certified_tool("org.ulysses.sdwan.kvm-fortios-provision/1.0.11", {
+          "action": "provision",
+          "site_name": "sdwan-spoke-05",
+          "subnet_id": 5,
+          "wan_ip": "192.168.209.43/24",     # REQUIRED for static
+          "wan_gateway": "192.168.209.62",      # REQUIRED for static
+          "use_dhcp": false,                   # Explicit static mode
+          "admin_password": "FG@dm!n2026!",
+          "hypervisor": "rocky-kvm-lab"
+      })
+
+    # -------------------------------------------------------------------------
+    # DHCP MODE (LAB ONLY - Not recommended for production)
+    # -------------------------------------------------------------------------
+    dhcp_mode_example: |
+      # WARNING: DHCP mode does NOT create default gateway route in bootstrap!
+      # Agent must discover IP via MAC-to-ARP correlation after boot.
+      execute_certified_tool("org.ulysses.sdwan.kvm-fortios-provision/1.0.11", {
+          "action": "provision",
+          "site_name": "sdwan-spoke-05",
+          "subnet_id": 5,
+          "use_dhcp": true,                    # Defaults to DHCP
+          "admin_password": "FG@dm!n2026!",
+          "hypervisor": "rocky-kvm-lab"
+      })
+      # After VM boots, discover IP:
+      # MAC=$(virsh domiflist FortiGate-sdwan-spoke-05 | grep br0 | awk '{print $5}')
+      # arp -an | grep -i "$MAC" | awk -F'[()]' '{print $2}'
+
+  - id: org.ulysses.noc.fortigate-health-check/1.0.4
+    purpose: "Verify FortiGate is accessible and responding"
+    parameters:
+      target_ip: "{{ management_ip }}"
+
+  - id: org.ulysses.provisioning.hypervisor-credential-manager/1.0.0
+    purpose: "Get hypervisor connection details"
+    parameters:
+      action: "get"
+      hypervisor_name: "{{ hypervisor }}"
+
+# -----------------------------------------------------------------------------
+# HYPERVISOR REFERENCE
+# -----------------------------------------------------------------------------
+hypervisor_config:
+  credentials_source: "MCP server context (Trust Anchor manages hypervisor SSH credentials)"
+  current_hypervisor:
+    name: "rocky-kvm-lab"
+    host: "192.168.209.115"
+    auth_method: "key"
+    ssh_key_path: "Managed via MCP server — agent uses Bash SSH to root@192.168.209.115"
+    base_image_path: "/home/libvirt/images/fortios-7.6.5-base.qcow2"
+    vm_image_path: "/home/libvirt/images/"
+    wan_bridge: "br0"
+
+# -----------------------------------------------------------------------------
+# PRE-FLIGHT CHECKS
+# -----------------------------------------------------------------------------
+preflight_checks:
+  - name: "SSH to hypervisor"
+    command: "ssh -i {{ ssh_key_path }} -o StrictHostKeyChecking=no root@192.168.209.6215 'echo connected'"
+    on_failure: "Check RSA key exists and is deployed to hypervisor"
+
+  - name: "libvirtd running"
+    command: "ssh root@{{ hypervisor_host }} 'systemctl is-active libvirtd'"
+    expected: "active"
+    on_failure: "Run: systemctl start libvirtd"
+
+  - name: "Base image exists"
+    command: "ssh root@{{ hypervisor_host }} 'ls -la {{ base_image_path }}'"
+    on_failure: "Base image missing - check path or upload FortiOS qcow2"
+
+  - name: "Disk space available"
+    command: "ssh root@{{ hypervisor_host }} 'df -h {{ vm_image_path }} | tail -1'"
+    expected: ">5GB free"
+    on_failure: "Clean up orphaned VM images"
+
+  - name: "Bridge exists"
+    command: "ssh root@{{ hypervisor_host }} 'ip link show br0'"
+    on_failure: "Create br0 bridge or use virbr0 as fallback"
+
+  - name: "VM name available"
+    command: "ssh root@{{ hypervisor_host }} 'virsh list --all | grep -i {{ vm_name }}'"
+    expected: "no output"
+    on_failure: "VM name conflict - check if existing VM is target"
+
+# -----------------------------------------------------------------------------
+# ERROR HANDLING (What-If Scenarios)
+# -----------------------------------------------------------------------------
+error_handling:
+  # Scenario 1: No DHCP available
+  - condition: "vm_running and no_dhcp_lease"
+    description: "VM booted but did not receive DHCP address"
+    detection:
+      - "virsh domifaddr returns no IP after 120 seconds"
+      - "Console shows 'port1 link up' but no IP configured"
+    remediation:
+      - action: "Get VNC port for fallback access"
+        command: "virsh vncdisplay {{ vm_name }}"
+      - action: "Configure static IP via console"
+        steps:
+          - "virsh console {{ vm_name }}"
+          - "Login: admin / (blank)"
+          - "config system interface"
+          - "edit port1"
+          - "set ip {{ fallback_static_ip }} 255.255.255.0"
+          - "set allowaccess ping https ssh http"
+          - "end"
+          - "config router static"
+          - "edit 1"
+          - "set gateway {{ wan_gateway }}"
+          - "set device port1"
+          - "end"
+      - action: "Continue workflow with static IP"
+    escalation: "If console automation fails, report VNC coordinates: {{ hypervisor_host }}:{{ vnc_port }}"
+
+  # Scenario 2: Wrong base image path
+  - condition: "base_image_not_found"
+    description: "FortiOS base qcow2 image not at expected path"
+    detection:
+      - "ls {{ base_image_path }} returns 'No such file'"
+    remediation:
+      - action: "Search for FortiOS images"
+        command: "find /home -name 'fortios*.qcow2' -o -name 'FGT*.qcow2' 2>/dev/null"
+      - action: "If found, update hypervisor_credentials.yaml with correct path"
+      - action: "If not found, escalate for image upload"
+    escalation: "Cannot proceed - base image required"
+
+  # Scenario 3: Disk full
+  - condition: "insufficient_disk_space"
+    description: "Not enough free space for VM disk"
+    detection:
+      - "df shows <5GB free on {{ vm_image_path }}"
+      - "qemu-img create fails with 'No space left'"
+    remediation:
+      - action: "List existing VM images"
+        command: "ls -lah {{ vm_image_path }}/*.qcow2"
+      - action: "Compare with running VMs"
+        command: "virsh list --all"
+      - action: "Identify orphaned images for cleanup"
+    escalation: "Disk full - cleanup required before provisioning"
+
+  # Scenario 4: VM name conflict
+  - condition: "vm_name_conflict"
+    description: "VM with this name already exists"
+    detection:
+      - "virsh list --all shows {{ vm_name }}"
+      - "virt-install returns 'domain already exists'"
+    remediation:
+      - action: "Check if existing VM is our target"
+        command: "virsh domifaddr {{ vm_name }}"
+      - action: "If IP matches target, skip provisioning (already done)"
+      - action: "If different, suggest unique name: {{ site_name }}-{{ timestamp }}"
+      - action: "If orphaned, offer destroy/recreate (requires approval)"
+    escalation: "VM name conflict - operator decision required"
+
+  # Scenario 5: Bridge missing
+  - condition: "bridge_not_found"
+    description: "WAN bridge (br0) not configured"
+    detection:
+      - "ip link show br0 returns 'not found'"
+    remediation:
+      - action: "List available bridges"
+        command: "brctl show && virsh net-list --all"
+      - action: "If virbr0 exists, use as fallback (NAT mode)"
+        note: "NAT limits inbound connectivity - not ideal for SD-WAN"
+      - action: "Create br0 if approved"
+    escalation: "No suitable bridge - network config required"
+
+  # Scenario 6: libvirt unavailable
+  - condition: "libvirt_unavailable"
+    description: "libvirtd not running"
+    detection:
+      - "systemctl is-active libvirtd returns 'inactive'"
+      - "virsh list returns 'failed to connect to hypervisor'"
+    remediation:
+      - action: "Start libvirtd"
+        command: "systemctl start libvirtd"
+      - action: "Verify socket"
+        command: "ls -la /var/run/libvirt/libvirt-sock"
+    escalation: "libvirt unavailable - system admin required"
+
+  # Scenario 7: SSH to hypervisor failed
+  - condition: "hypervisor_ssh_failed"
+    description: "Cannot SSH to KVM host"
+    detection:
+      - "SSH connection timeout"
+      - "Permission denied (publickey)"
+    remediation:
+      - action: "Verify SSH access to hypervisor"
+        command: "ssh root@192.168.209.115 'hostname'"
+      - action: "If key auth fails, check agent's SSH key is in hypervisor authorized_keys"
+        steps:
+          - "Verify ~/.ssh/id_rsa exists on this endpoint"
+          - "Copy public key to hypervisor: ssh-copy-id root@192.168.209.115"
+      - action: "Test with verbose output"
+        command: "ssh -v -i {{ ssh_key_path }} root@{{ hypervisor_host }}"
+    escalation: "Cannot reach hypervisor - check network and credentials"
+
+  # Scenario 8: FortiOS boot failure
+  - condition: "vm_boot_failure"
+    description: "VM created but FortiOS won't boot"
+    detection:
+      - "virsh console shows no output after 180s"
+      - "VNC shows black screen or kernel panic"
+    remediation:
+      - action: "Check VM XML config"
+        command: "virsh dumpxml {{ vm_name }}"
+      - action: "Verify SCSI disk controller (CRITICAL)"
+        note: "FortiOS requires bus=scsi, not virtio for boot disk"
+      - action: "Check base image integrity"
+        command: "qemu-img check {{ vm_disk_path }}"
+      - action: "Destroy and recreate with correct virt-install"
+    escalation: "Boot failure - verify base image and disk controller"
+
+  # Scenario 9: First-time password change required (GAP #5)
+  - condition: "first_time_password_prompt"
+    description: "FortiGate prompts for password change on first SSH login"
+    detection:
+      - "SSH connection hangs after 'admin' login"
+      - "Console shows 'You are forced to change your password'"
+      - "fortigate-ssh times out on fresh device"
+    remediation:
+      - action: "Use fortigate-cli-execute tool with password parameter"
+        tool: "org.ulysses.noc.fortigate-cli-execute/1.0.1"
+        parameters:
+          target_ip: "{{ management_ip }}"
+          username: "admin"
+          password: ""  # Empty for first login
+          commands:
+            - "{{ new_password }}"  # Type new password at prompt
+            - "{{ new_password }}"  # Confirm password
+          interactive_responses:
+            "New Password:": "{{ new_password }}"
+            "Confirm Password:": "{{ new_password }}"
+      - action: "Alternative: Use VNC console for manual password set"
+        steps:
+          - "Connect to VNC: {{ hypervisor_host }}:{{ vnc_port }}"
+          - "Login: admin / (blank)"
+          - "Enter new password twice when prompted"
+          - "Store password: {{ admin_password }}"
+      - action: "Update credentials after password set"
+        tool: "org.ulysses.provisioning.fortigate-device-register/1.0.0"
+        parameters:
+          target_ip: "{{ management_ip }}"
+          admin_password: "{{ new_password }}"
+    notes:
+      - "This scenario is common on newly provisioned VMs without bootstrap config"
+      - "FortiZTP integration will eliminate this by pre-configuring admin password"
+      - "Password must meet FortiGate complexity requirements (8+ chars, mixed case)"
+    escalation: "If interactive password change fails, use VNC console access"
+
+# -----------------------------------------------------------------------------
+# EXECUTION CONSTRAINTS
+# -----------------------------------------------------------------------------
+constraints:
+  max_duration_minutes: 15
+  max_retries: 2
+  requires_approval_for:
+    - "Destroying existing VM"
+    - "Creating network bridges"
+    - "Using NAT fallback mode"
+
+# -----------------------------------------------------------------------------
+# SUB-AGENT REPORTING FORMAT
+# -----------------------------------------------------------------------------
+report_format: |
+  ## Block 1: VM Provisioning - {{ status }}
+
+  ### Outputs
+  - **Management IP:** {{ management_ip }}
+  - **VM Name:** {{ vm_name }}
+  - **VNC Port:** {{ vnc_port }}
+  - **Serial:** {{ serial_number }}
+
+  ### Verification Results
+  | Check | Result |
+  |-------|--------|
+  | VM Running | {{ vm_running_result }} |
+  | IP Assigned | {{ ip_assigned_result }} |
+  | HTTPS Responding | {{ https_result }} |
+  | SSH Accessible | {{ ssh_result }} |
+
+  ### Errors
+  {{ errors | default("None") }}
+
+  ### Warnings
+  {{ warnings | default("None") }}
+
+  ### Ready for Block 2
+  {{ ready_for_next_block }}

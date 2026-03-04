@@ -1,0 +1,171 @@
+---
+block_id: 029
+name: hub-firewall-policies
+display_name: "Hub Firewall Policies"
+version: 1.1.0
+category: core
+device_role: hub
+vendor: fortinet
+platform: fortigate
+min_fortios: "7.4.0"
+
+description: |
+  Firewall policies for SD-WAN hub. Allows traffic between overlay, LAN,
+  and WAN interfaces. Based on production hub configuration.
+
+  CRITICAL: Uses edit 0 for auto-assign policy IDs to avoid overwriting
+  existing policies. Verify by policy NAME, not ID.
+
+  KEY POLICIES:
+  - SDWAN_Overlay_Traffic: Hub loopback + overlay bidirectional
+  - SDWAN_OL_To_Port2: Overlay to LAN (NAT for spoke access to hub LAN)
+  - SDWAN-BGP-LOOPBACK: Overlay to BGP_Lo (spoke BGP sessions)
+  - BGP-TO-SDWAN: BGP_Lo to overlay (hub BGP replies)
+  - SDWAN-to-INET: Overlay to WAN (spoke internet breakout via hub)
+
+  SECURITY NOTE: No WAN_to_LAN policy - this would expose hub LAN to internet.
+
+depends_on:
+  - block_id: 027
+    reason: "SD-WAN zone must exist"
+  - block_id: 022
+    reason: "LAN, WAN, Hub_Lo, and BGP_Lo interfaces must exist"
+
+provides:
+  - hub-firewall-policies
+  - hub-overlay-routing
+  - hub-bgp-loopback-policies
+
+parameters:
+  - name: LAN_INTERFACE
+    description: "LAN interface name"
+    type: string
+    required: false
+    default: "port2"
+
+  - name: WAN_INTERFACE
+    description: "WAN interface name"
+    type: string
+    required: false
+    default: "port1"
+
+  - name: ZONE_NAME
+    description: "SD-WAN zone name"
+    type: string
+    required: false
+    default: "SDWAN_OVERLAY"
+
+  - name: HUB_LOOPBACK
+    description: "Hub loopback interface name"
+    type: string
+    required: false
+    default: "Hub_Lo"
+
+  - name: BGP_LOOPBACK
+    description: "BGP loopback interface name"
+    type: string
+    required: false
+    default: "BGP_Lo"
+
+verification:
+  commands:
+    - "show firewall policy | grep -A2 'set name'"
+  expected_patterns:
+    - 'name "SDWAN_Overlay_Traffic"'
+    - 'name "SDWAN_OL_To_Port2"'
+    - 'name "SDWAN-BGP-LOOPBACK"'
+    - 'name "BGP-TO-SDWAN"'
+    - 'name "SDWAN-to-INET"'
+  note: |
+    Verify by policy NAME not ID. IDs are auto-assigned and may vary.
+
+rollback:
+  note: |
+    Rollback must delete by name, not ID. IDs vary per deployment.
+    Run these commands manually or via CLI script:
+  commands:
+    - "config firewall policy"
+    - 'delete "SDWAN_Overlay_Traffic"'
+    - 'delete "SDWAN_OL_To_Port2"'
+    - 'delete "SDWAN-BGP-LOOPBACK"'
+    - 'delete "BGP-TO-SDWAN"'
+    - 'delete "SDWAN-to-INET"'
+    - "end"
+  warning: |
+    FortiOS delete command may require policy ID, not name.
+    Query IDs first: get firewall policy | grep -B1 "name.*SDWAN"
+
+notes: |
+  GPOT FIXES (v1.1.0):
+  - Changed from fixed IDs (1-6) to edit 0 (auto-assign) to avoid overwriting
+  - REMOVED dangerous WAN_to_LAN policy (allow-all from WAN to LAN)
+  - REMOVED LAN_to_WAN policy (not needed for hub - spokes don't route via hub LAN)
+  - ADDED BGP loopback policies for spoke BGP sessions
+  - ADDED Hub_Lo in overlay traffic policy for hub services
+  - Verification now uses policy names, not IDs
+  - Based on production hub howard-sdwan-hub-1 (192.168.215.15)
+
+---
+
+config firewall policy
+    edit 0
+        set name "SDWAN_Overlay_Traffic"
+        set srcintf "{{HUB_LOOPBACK}}" "{{ZONE_NAME}}"
+        set dstintf "{{HUB_LOOPBACK}}" "{{ZONE_NAME}}"
+        set action accept
+        set srcaddr "all"
+        set dstaddr "all"
+        set schedule "always"
+        set service "ALL"
+        set logtraffic all
+        set comments "Hub loopback + overlay bidirectional - spoke-to-spoke via hub"
+    next
+    edit 0
+        set name "SDWAN_OL_To_Port2"
+        set srcintf "{{ZONE_NAME}}"
+        set dstintf "{{LAN_INTERFACE}}"
+        set action accept
+        set srcaddr "all"
+        set dstaddr "all"
+        set schedule "always"
+        set service "ALL"
+        set logtraffic all
+        set nat enable
+        set comments "Spoke access to hub LAN resources"
+    next
+    edit 0
+        set name "SDWAN-BGP-LOOPBACK"
+        set srcintf "{{ZONE_NAME}}"
+        set dstintf "{{BGP_LOOPBACK}}"
+        set action accept
+        set srcaddr "all"
+        set dstaddr "all"
+        set schedule "always"
+        set service "ALL"
+        set comments "Spoke BGP sessions to hub BGP loopback"
+    next
+    edit 0
+        set name "BGP-TO-SDWAN"
+        set srcintf "{{BGP_LOOPBACK}}"
+        set dstintf "{{ZONE_NAME}}"
+        set action accept
+        set srcaddr "all"
+        set dstaddr "all"
+        set schedule "always"
+        set service "ALL"
+        set comments "Hub BGP replies to spokes"
+    next
+    edit 0
+        set name "SDWAN-to-INET"
+        set srcintf "{{ZONE_NAME}}"
+        set dstintf "{{WAN_INTERFACE}}"
+        set action accept
+        set srcaddr "all"
+        set dstaddr "all"
+        set schedule "always"
+        set service "ALL"
+        set logtraffic all
+        set nat enable
+        set comments "Spoke internet breakout via hub (central breakout)"
+    next
+end

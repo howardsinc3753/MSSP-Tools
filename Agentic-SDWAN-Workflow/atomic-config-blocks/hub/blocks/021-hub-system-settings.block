@@ -1,0 +1,64 @@
+---
+block_id: 021
+name: hub-system-settings
+display_name: "Hub System Settings"
+version: 1.0.0
+category: core
+device_role: hub
+vendor: fortinet
+platform: fortigate
+min_fortios: "7.4.0"
+
+description: |
+  System settings for SD-WAN hub. Configures location-id for VPN overlay
+  identification and ike-tcp-port for IKE over TCP support.
+
+depends_on:
+  - block_id: 020
+    reason: "System global must be configured first"
+
+provides:
+  - hub-system-settings
+  - ike-tcp-port-11443
+
+parameters:
+  - name: LOCATION_ID
+    description: "Hub location ID (typically loopback or 0.0.0.0)"
+    type: ip_address
+    required: false
+    default: "0.0.0.0"
+    note: "0.0.0.0 means hub advertises its WAN IP as location"
+
+  - name: IKE_TCP_PORT
+    description: "IKE over TCP port (must match spokes)"
+    type: integer
+    required: false
+    default: 11443
+
+verification:
+  commands:
+    - "get system settings"
+  expected_patterns:
+    - "ike-tcp-port: {{IKE_TCP_PORT}}"
+    - "location-id: {{LOCATION_ID}}"
+
+rollback:
+  commands:
+    - "config system settings"
+    - "unset location-id"
+    - "unset ike-tcp-port"
+    - "end"
+
+notes: |
+  - location-id accepts IP address format in FortiOS 7.x (verified on hub)
+  - location-id 0.0.0.0 allows hub to advertise WAN IP
+  - ike-tcp-port 11443 must match spoke configuration
+  - Both settings are required for ADVPN overlay
+  - GPOT clarification: FortiOS 7.x location-id IS ip_address type, not integer
+
+---
+
+config system settings
+    set location-id {{LOCATION_ID}}
+    set ike-tcp-port {{IKE_TCP_PORT}}
+end

@@ -1,0 +1,661 @@
+# =============================================================================
+# AGENTIC AI BLOCK STACKING WORKFLOW
+# Block 2: License Application + API Onboarding
+# =============================================================================
+# Framework: Agentic AI Block Stacking Workflow v1.0
+# Master Document: ../manifest.yaml
+# Purpose: Sub-agent briefing for isolated block execution
+# =============================================================================
+
+block_id: license
+block_number: 2
+name: "License Application + API Onboarding"
+version: 1.5.0  # v1.5.0: Allow Bash/SSH flexibility - tools preferred but not mandatory (2026-01-24)
+
+# =============================================================================
+# AI EXECUTION INSTRUCTIONS
+# =============================================================================
+ai_instructions:
+  execution_model: |
+    SINGLE-AGENT EXECUTION: Do NOT spawn sub-agents or use Task tool.
+    Execute this block directly in the main conversation context.
+
+  # ===========================================================================
+  # TOOL PREFERENCE (NOT MANDATORY)
+  # ===========================================================================
+  approach: |
+    PREFERRED: Use MCP certified tools when available (route_query to discover)
+    FALLBACK: Use Bash/SSH directly when tools fail or don't exist
+
+    You have flexibility to choose the best approach for each task.
+    If a tool fails, you can troubleshoot using Bash commands directly.
+
+  # ===========================================================================
+  # FRESH VM WORKFLOW
+  # ===========================================================================
+  fresh_vm_workflow: |
+    For NEW VMs from BLOCK_1, you have SSH access but NO API token yet.
+
+    OPTION A (Preferred): Use fortigate-onboard tool
+    ─────────────────────────────────────────────────
+    execute_certified_tool("org.ulysses.noc.fortigate-onboard/1.0.1", {
+      "target_ip": "<management_ip>",
+      "admin_password": "<admin_password>",
+      "device_id": "<site_name>"
+    })
+
+    OPTION B (Fallback): Use Bash SSH directly
+    ─────────────────────────────────────────────────
+    ssh admin@<management_ip> and run CLI commands manually
+
+  # ===========================================================================
+  # AVAILABLE TOOLS (use route_query to discover more)
+  # ===========================================================================
+  recommended_tools: |
+    - fortigate-onboard: Create API user + register device (SSH-based)
+    - fortigate-cli-execute: Run CLI commands via SSH
+    - fortiflex-entitlements-list: Find existing PENDING tokens
+    - fortiflex-token-create: Generate new license token
+    - fortigate-health-check: Verify device status via API
+
+# -----------------------------------------------------------------------------
+# DEPENDENCIES
+# -----------------------------------------------------------------------------
+depends_on:
+  - block: BLOCK_1_PROVISION
+    required_outputs:
+      - management_ip
+      - vm_name
+      - admin_password
+
+# -----------------------------------------------------------------------------
+# SUB-AGENT GOAL
+# -----------------------------------------------------------------------------
+goal: |
+  Apply FortiFlex license to FortiGate VM (or validate hardware license),
+  create REST API admin user, generate API token, and register device
+  in local credentials file.
+
+# -----------------------------------------------------------------------------
+# INPUTS (from Master + Block 1 outputs)
+# -----------------------------------------------------------------------------
+inputs:
+  from_block_1:
+    - name: management_ip
+      type: string
+      description: "FortiGate management IP from Block 1"
+
+    - name: vm_name
+      type: string
+      description: "VM name in libvirt (for virsh commands if needed)"
+
+    - name: admin_password
+      type: string
+      sensitive: true
+      description: "Admin password set in Block 1"
+
+  from_master:
+    - name: site_name
+      type: string
+      description: "Site identifier for device registration"
+
+    - name: license_type
+      type: string
+      enum: [fortiflex, standard]
+      description: "FortiFlex (VM) or standard (hardware)"
+
+    - name: fortiflex_config_id
+      type: string
+      required_if: "license_type == 'fortiflex' and not fortiflex_token"
+      description: "FortiFlex configuration ID for token generation. Required if creating new token (Steps 3-4). Not needed if reusing an existing PENDING token."
+
+    - name: fortiflex_program_serial
+      type: string
+      required_if: "license_type == 'fortiflex'"
+      description: "FortiFlex program serial (ELAVMSXXXXXXXX) for entitlement discovery (Step 1). Without this, token discovery is skipped and config_id becomes mandatory."
+      example: "ELAVMS0000003536"
+
+  optional:
+    - name: fortiflex_token
+      type: string
+      description: "Pre-generated token (skip token generation if provided)"
+
+    - name: api_username
+      type: string
+      default: "ulysses-api"
+      description: "REST API admin username to create"
+
+# -----------------------------------------------------------------------------
+# SUCCESS CRITERIA
+# -----------------------------------------------------------------------------
+success_criteria:
+  - id: license_active
+    description: "License status shows ACTIVE"
+    condition: "license_type == 'fortiflex'"  # Hardware devices have pre-installed licenses
+    verification:
+      command: "get system status | grep License"
+      expected: "License Status: Valid"
+
+  - id: serial_assigned
+    description: "FortiFlex serial number assigned (not FGVM64-KVM)"
+    condition: "license_type == 'fortiflex'"  # Hardware serials are FGT*/FWF*, not FGVMMLTM*
+    verification:
+      command: "get system status | grep Serial"
+      expected: "FGVMMLTM*"
+
+  - id: api_user_created
+    description: "REST API admin user exists"
+    verification:
+      api: "GET /api/v2/cmdb/system/api-user/{{ api_username }}"
+      expected: "HTTP 200"
+
+  - id: api_token_works
+    description: "API token can authenticate"
+    verification:
+      api: "GET /api/v2/monitor/system/status"
+      auth: "Bearer {{ api_token }}"
+      expected: "HTTP 200 with JSON response"
+
+  - id: device_registered
+    description: "Device registered in credentials file"
+    verification:
+      file: "~/.config/mcp/fortigate_credentials.yaml"
+      expected: "devices.{{ site_name }} exists"
+
+# -----------------------------------------------------------------------------
+# OUTPUTS (report back to Master Agent)
+# -----------------------------------------------------------------------------
+outputs:
+  required:
+    - name: management_ip
+      type: string
+      description: "Confirmed management IP after license reboot (may differ from BLOCK_1 if DHCP reassigned)"
+
+    - name: serial_number
+      type: string
+      description: "FortiFlex serial (e.g., FGVMMLTM26000304)"
+
+    - name: api_token
+      type: string
+      sensitive: true
+      description: "Generated REST API token"
+
+    - name: device_id
+      type: string
+      description: "Device ID in credentials file"
+
+    - name: status
+      type: string
+      enum: [SUCCESS, FAILURE, BLOCKED]
+
+  optional:
+    - name: fortiflex_token_used
+      type: string
+      description: "Token that was applied"
+
+    - name: token_source
+      type: string
+      enum: [existing_pending, new_entitlement, pre_provided]
+      description: "Where the token came from"
+
+    - name: license_end_date
+      type: string
+      description: "License expiration date"
+
+    - name: pending_tokens_found
+      type: integer
+      description: "Number of PENDING tokens discovered"
+
+    - name: user_decision
+      type: string
+      description: "User's choice: use_existing, create_new, or skip"
+
+    - name: errors
+      type: array
+
+    - name: warnings
+      type: array
+
+# -----------------------------------------------------------------------------
+# TOOLS AVAILABLE
+# -----------------------------------------------------------------------------
+tools:
+  - id: org.ulysses.cloud.fortiflex-entitlements-list/1.0.0
+    purpose: "Discover existing PENDING tokens before creating new ones"
+    parameters:
+      program_serial_number: "{{ fortiflex_program_serial }}"
+    note: "Run FIRST to find reusable tokens - saves FortiFlex points"
+
+  - id: org.ulysses.cloud.fortiflex-config-list/1.0.0
+    purpose: "List available FortiFlex configurations"
+    parameters:
+      program_serial_number: "{{ fortiflex_program_serial }}"
+    note: "Use to show user config options if creating new entitlement"
+
+  - id: org.ulysses.cloud.fortiflex-token-create/1.0.3
+    purpose: "Generate FortiFlex license token (only if user chooses)"
+    parameters:
+      config_id: "{{ fortiflex_config_id }}"
+      description: "{{ site_name }} - SD-WAN Spoke"
+    note: "Skip if user chooses existing PENDING token"
+
+  - id: org.ulysses.noc.fortigate-onboard/1.0.1
+    purpose: "MANDATORY: Create API user, generate token, register device"
+    parameters:
+      target_ip: "{{ management_ip }}"
+      admin_user: "admin"
+      admin_password: "{{ admin_password }}"
+      device_id: "{{ site_name }}"
+      api_username: "{{ api_username }}"
+    note: |
+      This tool handles SSH-based API user creation.
+      MUST run after license reboot and BEFORE any API-based tools.
+      Without this, ALL API verification tools return 401 Unauthorized.
+      This is the ROOT CAUSE fix for Site 08 verification failures.
+
+  - id: org.ulysses.noc.fortigate-health-check/1.0.4
+    purpose: "Verify device status after license (via API — requires onboard first)"
+    parameters:
+      target_ip: "{{ management_ip }}"
+
+  - id: org.ulysses.noc.fortigate-cli-execute/1.0.1
+    purpose: "Apply FortiFlex license via SSH (write commands)"
+    parameters:
+      target_ip: "{{ management_ip }}"
+      password: "{{ admin_password }}"
+      commands:
+        - "execute vm-license {{ fortiflex_token }}"
+      interactive_responses:
+        "(y/n)": "y"
+    note: "Supports execute and config blocks - replaces plink workaround"
+
+# -----------------------------------------------------------------------------
+# TOOL GAPS (RESOLVED)
+# -----------------------------------------------------------------------------
+tool_gaps:
+  - tool: "org.ulysses.noc.fortigate-ssh"
+    issue: "Read-only commands only - cannot run 'execute vm-license'"
+    status: "RESOLVED"
+    resolution: |
+      Use fortigate-cli-execute/1.0.1 instead:
+      - Supports password auth (vs SSH keys)
+      - Supports execute and config blocks
+      - Handles interactive prompts (y/n)
+
+  - tool: "org.ulysses.provisioning.fortigate-onboard"
+    issue: "Writes credentials to ~/config/ instead of ~/.config/mcp/ (PRIMARY)"
+    status: "KNOWN"
+    workaround: |
+      After running, verify credentials appear at PRIMARY path:
+      ~/.config/mcp/fortigate_credentials.yaml
+      If onboard wrote to ~/config/, copy token to PRIMARY file.
+
+# -----------------------------------------------------------------------------
+# EXECUTION STEPS
+# -----------------------------------------------------------------------------
+execution_steps:
+  # =========================================================================
+  # FORTIFLEX DISCOVERY (NEW - prevents wasted points)
+  # =========================================================================
+  - step: 1
+    name: "Discover Existing FortiFlex Entitlements"
+    condition: "license_type == 'fortiflex'"
+    tool: "fortiflex-entitlements-list"
+    purpose: "Find any PENDING tokens that can be reused"
+    action: |
+      Call fortiflex-entitlements-list with program_serial_number
+      Filter results for status == "PENDING"
+      Collect: serial_number, config_id, config_name, token
+    output: "pending_entitlements"
+    autonomy: "ai_autonomous"  # Discovery is safe
+
+  - step: 2
+    name: "Present Token Options to User"
+    condition: "license_type == 'fortiflex'"
+    autonomy: "human_required"  # Financial/licensing decision
+    action: |
+      IF pending_entitlements is not empty:
+        Present to user:
+        "Found {{ pending_entitlements | length }} existing PENDING token(s):
+        {% for ent in pending_entitlements %}
+        - {{ ent.config_name }}: Token {{ ent.token[:8] }}... (Config ID: {{ ent.config_id }})
+        {% endfor %}
+
+        Options:
+        A) Use existing token [recommended - no additional cost]
+        B) Create new entitlement from existing config
+        C) Create new configuration + entitlement
+
+        Which would you like?"
+      ELSE:
+        Inform user: "No PENDING tokens found. Will need to create new entitlement."
+        Proceed to config selection.
+    outputs:
+      - user_choice: "[A|B|C]"
+      - selected_token: "if A, the token to use"
+      - selected_config_id: "if B, config to create from"
+
+  - step: 3
+    name: "List Available Configs (if needed)"
+    condition: "user_choice in ['B', 'C'] or pending_entitlements is empty"
+    tool: "fortiflex-config-list"
+    action: |
+      Call fortiflex-config-list to show available configurations
+      Present to user for selection if creating new entitlement
+    output: "available_configs"
+
+  - step: 4
+    name: "Generate FortiFlex Token"
+    condition: "license_type == 'fortiflex' and user_choice != 'A' and not fortiflex_token"
+    tool: "fortiflex-token-create"
+    output: "fortiflex_token"
+    note: "Only executed if user chose to create new, not reuse existing"
+
+  - step: 5
+    name: "Apply License via SSH"
+    condition: "license_type == 'fortiflex'"
+    tool: "org.ulysses.noc.fortigate-cli-execute/1.0.1"
+    parameters:
+      target_ip: "{{ management_ip }}"
+      password: "{{ admin_password }}"
+      commands:
+        - "execute vm-license {{ fortiflex_token }}"
+      interactive_responses:
+        "(y/n)": "y"
+    action: |
+      Use fortigate-cli-execute to apply license via SSH.
+      Tool handles password auth and interactive prompts automatically.
+      Wait for reboot (device will shut off and restart).
+    critical_notes:
+      - "Correct syntax: 'execute vm-license TOKEN' (no 'install' keyword)"
+      - "Device will reboot after license applied"
+      - "Serial number changes from FGVM64-KVM to FGVMMLTM*"
+      - "fortiflex_token comes from either existing PENDING or newly created"
+
+  - step: 6
+    name: "Restart VM After License Shutdown"
+    critical: true
+    action: |
+      After license application, the FortiGate VM SHUTS DOWN (not reboot).
+      You MUST restart it. Use kvm-fortios-provision/1.0.11 or Bash SSH fallback.
+
+      STEP 6a: Wait 15 seconds for VM to fully shut down
+
+      STEP 6b: Start the VM using kvm-fortios-provision start action:
+
+        execute_certified_tool("org.ulysses.sdwan.kvm-fortios-provision/1.0.11", {
+            "action": "start",
+            "site_name": "{{ site_name }}",
+            "hypervisor": "rocky-kvm-lab",
+            "wait_for_boot": true,
+            "boot_timeout": 120
+        })
+        NOTE: Namespace is 'sdwan', NOT 'noc'. Trust Anchor certified: v1.0.11.
+        Trust Anchor certified: v1.0.11. Fall back to Bash SSH if start action unsupported.
+
+        The tool handles: virsh start, wait for boot, DHCP IP discovery.
+        Returns: management_ip, state, interfaces.
+
+      STEP 6c: If management_ip returned, use it for remaining steps.
+               If null, wait 30 seconds and run action=status to re-discover.
+
+      STEP 6d: Verify FortiGate is reachable:
+
+        execute_certified_tool("org.ulysses.noc.fortigate-health-check/1.0.4", {
+            "target_ip": "{{ management_ip }}"
+        })
+
+    fallback: |
+      If kvm-fortios-provision/1.0.11 is not available, use Bash SSH (key-based, autonomous):
+        Bash("ssh -o BatchMode=yes root@192.168.209.115 'virsh start {{ vm_name }}'")
+        Wait ~60 seconds, then re-discover IP via MAC-to-ARP correlation.
+        Note: SSH key auth configured — no password prompt, fully autonomous.
+
+    notes:
+      - "kvm-fortios-provision/1.0.11 (Trust Anchor certified) — try start action, Bash SSH fallback"
+      - "The tool SSHes to the hypervisor and runs virsh start internally"
+      - "wait_for_boot=true makes the tool wait and discover the DHCP IP"
+      - "If the tool is unavailable, Bash SSH to hypervisor is the fallback"
+    verification: "ping {{ management_ip }} responds within 180 seconds"
+
+  - step: 7
+    name: "Verify License Applied"
+    action: "SSH and run: get system status"
+    verification:
+      - "Serial shows FGVMMLTM* (not FGVM64-KVM)"
+      - "License Status: Valid"
+
+  - step: 8
+    name: "MANDATORY: Create API User and Token (fortigate-onboard)"
+    tool: "org.ulysses.noc.fortigate-onboard/1.0.1"
+    output: "api_token"
+    critical: true
+    action: |
+      This step is NON-NEGOTIABLE. Without it, ALL API-based tools in
+      BLOCK_3 and BLOCK_4 will fail with 401 Unauthorized.
+
+      execute_certified_tool("org.ulysses.noc.fortigate-onboard/1.0.1", {
+          "target_ip": "{{ management_ip }}",
+          "admin_password": "{{ admin_password }}",
+          "device_id": "{{ site_name }}"
+      })
+
+      The tool will:
+      1. SSH to the FortiGate (password auth)
+      2. Enable rest-api-key-url-query in system global
+      3. Create API admin user 'ulysses-api'
+      4. Generate API token
+      5. Test the token via HTTPS
+      6. Register device in credentials file
+
+      If this step fails, DO NOT proceed to BLOCK_3.
+    note: |
+      After onboard completes, verify the token is in the PRIMARY
+      credentials file: ~/.config/mcp/fortigate_credentials.yaml
+      The onboard tool writes to ~/config/ (relative path bug) — copy to PRIMARY if needed.
+
+  - step: 9
+    name: "Verify Credentials in Primary Path"
+    action: |
+      Check that the device was registered in the PRIMARY credentials file:
+        ~/.config/mcp/fortigate_credentials.yaml
+
+      If fortigate-onboard wrote to ~/config/ (relative path bug), copy:
+        copy ~/config/fortigate_credentials.yaml ~/.config/mcp/fortigate_credentials.yaml
+
+      Verify the entry has:
+        - host: {{ management_ip }}
+        - api_token: (non-empty, non-null value)
+        - device name in default_lookup
+
+  - step: 10
+    name: "Verify API Access"
+    tool: "org.ulysses.noc.fortigate-health-check/1.0.4"
+    verification: "Returns device status via API (HTTP 200, not 401)"
+    action: |
+      execute_certified_tool("org.ulysses.noc.fortigate-health-check/1.0.4", {
+          "target_ip": "{{ management_ip }}"
+      })
+
+      If this returns 401:
+      1. Check ~/.config/mcp/fortigate_credentials.yaml has the correct token
+      2. Ensure api_token is NOT "none" or empty
+      3. Re-run fortigate-onboard if needed
+
+# -----------------------------------------------------------------------------
+# ERROR HANDLING (What-If Scenarios)
+# -----------------------------------------------------------------------------
+error_handling:
+  # Scenario 0: Entitlement discovery fails
+  - condition: "entitlement_discovery_failed"
+    description: "Cannot list FortiFlex entitlements"
+    detection:
+      - "fortiflex-entitlements-list returns error"
+      - "HTTP 401 Unauthorized"
+      - "Invalid program serial"
+    remediation:
+      - action: "Verify FortiCloud credentials in config"
+      - action: "Verify program_serial_number is correct (ELAVMSXXXXXXXX format)"
+      - action: "Check FortiCloud API availability"
+    escalation: "Proceed without discovery - will need config_id to create new"
+    autonomy: "ai_autonomous"  # Can retry or proceed without
+
+  # Scenario 0b: Zero points available
+  - condition: "zero_points_available"
+    description: "FortiFlex program has 0 points (may be prepaid MSSP)"
+    detection:
+      - "fortiflex-config-list shows 0 available_points"
+      - "Cannot create new tokens"
+    remediation:
+      - action: "Check for existing PENDING tokens (often prepaid)"
+      - action: "MSSP accounts show 0 points but have prepaid entitlements"
+      - action: "Present existing PENDING tokens to user"
+    escalation: "If no PENDING tokens, contact account team for point allocation"
+    autonomy: "human_required"  # Financial decision
+
+  # Scenario 1: Token rejected
+  - condition: "token_rejected"
+    description: "FortiGate rejected the FortiFlex license token"
+    detection:
+      - "execute vm-license returns 'Invalid token'"
+      - "execute vm-license returns 'Token expired'"
+      - "execute vm-license returns 'Token already used'"
+    remediation:
+      - action: "Verify token format (20 chars, alphanumeric)"
+      - action: "Generate new token with fortiflex-token-create"
+      - action: "Check FortiFlex portal for token/entitlement status"
+    escalation: "Token issue - verify FortiFlex account has available points"
+
+  # Scenario 2: VM shut off after license (EXPECTED — NOT an error)
+  # This is NORMAL FortiGate behavior. The VM shuts down after license, it does NOT reboot.
+  - condition: "license_no_reboot"
+    description: "License applied but VM shut off instead of rebooting — THIS IS EXPECTED"
+    detection:
+      - "virsh list shows state 'shut off'"
+      - "No ping response after 60 seconds"
+      - "FortiGate CLI session dropped after vm-license command"
+    remediation:
+      - action: "Use kvm-fortios-provision start action to restart VM (v1.0.11)"
+        tool: "org.ulysses.sdwan.kvm-fortios-provision/1.0.11"
+        parameters:
+          action: "start"
+          site_name: "{{ site_name }}"
+          hypervisor: "rocky-kvm-lab"
+          wait_for_boot: true
+          boot_timeout: 120
+        expected: "state: running, management_ip discovered"
+      - action: "Verify FortiGate is reachable and serial changed to FGVMMLTM*"
+    fallback:
+      - action: "If tool unavailable, use Bash SSH to restart"
+        commands:
+          - 'Bash("ssh root@192.168.209.115 ''virsh start {{ vm_name }}''")'
+          - 'Bash("ssh root@192.168.209.115 ''virsh domstate {{ vm_name }}''")'
+        expected: "running"
+    notes:
+      - "GAP-35 is CLOSED — kvm-fortios-provision/1.0.11 has native start action"
+      - "The tool handles virsh start + wait for boot + DHCP IP discovery"
+      - "Bash SSH is now the FALLBACK, not the primary method"
+      - "This matches Step 6 in the main execution flow"
+    escalation: "If both tool and SSH fail, ask user to run: virsh start {{ vm_name }} on the hypervisor"
+
+  # Scenario 3: SSH tool read-only (RESOLVED)
+  - condition: "ssh_tool_readonly"
+    description: "fortigate-ssh tool blocks execute commands"
+    status: "RESOLVED"
+    detection:
+      - "Tool returns 'command not in allowed list'"
+    remediation:
+      - action: "Use fortigate-cli-execute/1.0.1"
+        tool: "org.ulysses.noc.fortigate-cli-execute/1.0.1"
+        parameters:
+          target_ip: "{{ management_ip }}"
+          password: "{{ admin_password }}"
+          commands:
+            - "execute vm-license {{ fortiflex_token }}"
+          interactive_responses:
+            "(y/n)": "y"
+      - action: "Tool supports execute and config blocks with password auth"
+    escalation: "None - gap closed with fortigate-cli-execute"
+
+  # Scenario 4: API token creation fails
+  - condition: "api_token_failed"
+    description: "Cannot create REST API token"
+    detection:
+      - "REST endpoint returns HTML redirect"
+      - "401 Unauthorized"
+    remediation:
+      - action: "Use fortigate-onboard tool (handles session auth)"
+      - action: "Verify admin credentials correct"
+    escalation: "API access issue - may need FortiOS version handling"
+
+  # Scenario 5: IP changed after reboot
+  - condition: "ip_changed_after_reboot"
+    description: "Device has different IP after license reboot"
+    detection:
+      - "Original management_ip not responding"
+    remediation:
+      - action: "Use virsh domifaddr to find new IP"
+        command: "ssh root@192.168.209.115 'virsh domifaddr {{ vm_name }}'"
+      - action: "Update management_ip for remaining steps"
+    escalation: "Device relocated - workflow needs IP update"
+
+  # Scenario 6: Auth failure after license
+  - condition: "password_changed"
+    description: "Cannot authenticate after license application"
+    detection:
+      - "SSH permission denied"
+      - "API returns 401"
+    remediation:
+      - action: "Try admin/(blank) - some licenses reset password"
+      - action: "Try original admin_password"
+      - action: "Console password reset if needed"
+    escalation: "Cannot authenticate - console access required"
+
+# -----------------------------------------------------------------------------
+# EXECUTION CONSTRAINTS
+# -----------------------------------------------------------------------------
+constraints:
+  max_duration_minutes: 10
+  max_retries: 2
+  wait_for_reboot_seconds: 180
+
+# -----------------------------------------------------------------------------
+# SUB-AGENT REPORTING FORMAT
+# -----------------------------------------------------------------------------
+report_format: |
+  ## Block 2: License + API Onboarding - {{ status }}
+
+  ### FortiFlex Discovery
+  - **PENDING Tokens Found:** {{ pending_tokens_found | default(0) }}
+  - **User Decision:** {{ user_decision | default("N/A") }}
+  - **Token Source:** {{ token_source | default("unknown") }}
+
+  ### License Details
+  - **Token Applied:** {{ fortiflex_token_used }}
+  - **New Serial:** {{ serial_number }}
+  - **License Status:** {{ license_status }}
+  - **Expiration:** {{ license_end_date }}
+
+  ### API Credentials
+  - **API User:** {{ api_username }}
+  - **API Token:** {{ api_token[:10] }}...{{ api_token[-4:] }}
+  - **Device ID:** {{ device_id }}
+  - **Credentials File:** ~/.config/mcp/fortigate_credentials.yaml (PRIMARY)
+
+  ### Verification Results
+  | Check | Result |
+  |-------|--------|
+  | License Active | {{ license_active_result }} |
+  | Serial Assigned | {{ serial_assigned_result }} |
+  | API User Created | {{ api_user_result }} |
+  | API Token Works | {{ api_token_result }} |
+  | Device Registered | {{ device_registered_result }} |
+
+  ### Errors
+  {{ errors | default("None") }}
+
+  ### Workarounds Used
+  {{ workarounds | default("None") }}
+
+  ### Ready for Block 3
+  {{ ready_for_next_block }}

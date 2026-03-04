@@ -1,0 +1,764 @@
+# =============================================================================
+# AGENTIC AI BLOCK STACKING WORKFLOW
+# Block 3: SD-WAN Configuration Deployment
+# =============================================================================
+# Framework: Agentic AI Block Stacking Workflow v1.0
+# Master Document: ../manifest.yaml
+# Purpose: Sub-agent briefing for isolated block execution
+# =============================================================================
+
+block_id: configure
+block_number: 3
+name: "SD-WAN Configuration Deployment"
+version: 1.2.0  # Added ai_instructions for MCP tool enforcement (2026-01-22)
+
+# =============================================================================
+# AI EXECUTION INSTRUCTIONS (CRITICAL)
+# =============================================================================
+ai_instructions:
+  execution_model: |
+    SINGLE-AGENT EXECUTION: Do NOT spawn sub-agents or use Task tool.
+    Execute this block directly in the main conversation context.
+    Sub-agents lose MCP tool context and default to Bash commands.
+
+  tool_policy: |
+    MANDATORY: Use ONLY MCP certified tools via execute_certified_tool.
+    DO NOT use Bash/curl/API calls directly for:
+    - FortiGate API configuration (use fortigate-* config tools)
+    - SD-WAN setup (use fortigate-sdwan-* tools)
+    - BGP configuration (use fortigate-bgp-config)
+    - IPsec tunnels (use fortigate-ipsec)
+    - Atomic CLI pushes (use fortigate-cli-execute with ordered blocks)
+
+    CORRECT: execute_certified_tool org.ulysses.noc.fortigate-sdwan-member/1.0.3 {...}
+    WRONG: Bash("curl -X POST https://192.168.209.40/api/v2/...")
+
+  tool_discovery: |
+    Use route_query to find tools:
+    - "configure fortigate sdwan" -> fortigate-sdwan-member, fortigate-sdwan-zone
+    - "configure bgp" -> fortigate-bgp-config
+    - "create ipsec tunnel" -> fortigate-ipsec
+    - "push fortigate config" -> fortigate-config-push
+    - "push fortigate cli" -> fortigate-cli-execute
+    - "generate spoke template" -> fortigate-sdwan-spoke-template
+
+# -----------------------------------------------------------------------------
+# DEPENDENCIES
+# -----------------------------------------------------------------------------
+depends_on:
+  - block: BLOCK_1_PROVISION
+    required_outputs:
+      - management_ip
+      - vm_name
+      - admin_password
+
+  - block: BLOCK_2_LICENSE
+    required_outputs:
+      - serial_number
+      - api_token
+      - device_id
+
+# -----------------------------------------------------------------------------
+# SUB-AGENT GOAL
+# -----------------------------------------------------------------------------
+goal: |
+  Deploy complete SD-WAN configuration to the FortiGate spoke device:
+  - Absorb device into SD-WAN manifest
+  - Generate site-specific blueprint
+  - Push IPsec tunnels, BGP, SD-WAN zones, health checks, and policies
+  - Verify configuration applied successfully
+
+# -----------------------------------------------------------------------------
+# INPUTS
+# -----------------------------------------------------------------------------
+inputs:
+  from_previous_blocks:
+    - name: management_ip
+      type: string
+      source: "BLOCK_1"
+
+    - name: admin_password
+      type: string
+      source: "BLOCK_1"
+      sensitive: true
+      description: |
+        Admin password from BLOCK_1 bootstrap.
+        Used for SSH fallback if API token fails.
+        Default: FG@dm!n2026! (lab standard)
+
+    - name: serial_number
+      type: string
+      source: "BLOCK_2"
+
+    - name: api_token
+      type: string
+      source: "BLOCK_2"
+      sensitive: true
+
+    - name: device_id
+      type: string
+      source: "BLOCK_2"
+
+  from_master:
+    - name: site_name
+      type: string
+
+    - name: spoke_loopback
+      type: string
+      description: "Spoke loopback IP (e.g., 172.16.0.3)"
+      aliases: ["loopback_ip"]  # BLOCK_0 outputs loopback_ip, map to spoke_loopback
+
+    - name: hub_wan_ip
+      type: string
+      default: "192.168.215.15"
+
+    - name: hub_loopback
+      type: string
+      default: "172.16.255.253"
+
+    - name: hub_bgp_loopback
+      type: string
+      default: "172.16.255.252"
+
+    - name: vpn_psk
+      type: string
+      default: "password"
+      sensitive: true
+      aliases: ["ipsec_psk"]  # BLOCK_0 outputs ipsec_psk, map to vpn_psk
+      note: |
+        PSK NAMING: BLOCK_0 outputs 'ipsec_psk', BLOCK_3 uses 'vpn_psk'.
+        Accept either name for compatibility. Default 'password' matches hub.
+        WARNING: Previous default was 'fortinet' — GAP-39 confirmed hub uses 'password'.
+
+    - name: bgp_as
+      type: integer
+      default: 65000
+
+# -----------------------------------------------------------------------------
+# SUCCESS CRITERIA
+# -----------------------------------------------------------------------------
+success_criteria:
+  - id: device_in_manifest
+    description: "Device absorbed into SD-WAN manifest"
+    verification:
+      tool: "fortigate-sdwan-manifest-tracker action=list"
+      expected: "spoke_{{ management_ip | replace('.','_') }} exists"
+
+  - id: blueprint_generated
+    description: "Blueprint config file created"
+    verification:
+      file: "C:/ProgramData/Ulysses/config/blueprints/{{ site_name }}_config.conf"
+      expected: "File exists with >100 lines"
+
+  - id: hostname_set
+    description: "Device hostname configured"
+    verification:
+      tool: "org.ulysses.noc.fortigate-cli-execute/1.0.1"
+      commands: ["get system status"]
+      match: "Hostname: {{ site_name }}"
+
+  - id: loopback_created
+    description: "Loopback interface exists"
+    verification:
+      tool: "org.ulysses.noc.fortigate-health-check/1.0.4"
+      note: "Health check returns interface list; verify Spoke-Lo present"
+      expected: "Spoke-Lo interface exists"
+
+  - id: ipsec_tunnels_created
+    description: "IPsec Phase1/Phase2 configured"
+    verification:
+      tool: "org.ulysses.noc.fortigate-cli-execute/1.0.1"
+      commands: ["get vpn ipsec tunnel summary"]
+      expected: "HUB1-VPN1, HUB1-VPN2 listed"
+
+  - id: sdwan_enabled
+    description: "SD-WAN is enabled with zone and members"
+    verification:
+      tool: "org.ulysses.noc.fortigate-sdwan-status/1.1.0"
+      expected: "Shows HUB1-VPN1, HUB1-VPN2 members in SDWAN_OVERLAY zone"
+
+  - id: bgp_configured
+    description: "BGP neighbor configured"
+    verification:
+      tool: "org.ulysses.noc.fortigate-bgp-troubleshoot/1.0.2"
+      expected: "Neighbor {{ hub_bgp_loopback }} listed"
+
+# -----------------------------------------------------------------------------
+# OUTPUTS
+# -----------------------------------------------------------------------------
+outputs:
+  required:
+    - name: loopback_ip
+      type: string
+      description: "Assigned spoke loopback IP"
+
+    - name: tunnel_names
+      type: array
+      description: "IPsec tunnel names created"
+
+    - name: sdwan_zone
+      type: string
+      description: "SD-WAN zone name"
+
+    - name: status
+      type: string
+      enum: [SUCCESS, FAILURE, BLOCKED]
+
+  optional:
+    - name: blueprint_path
+      type: string
+      description: "Path to generated config file"
+
+    - name: components_created
+      type: array
+      description: "List of config objects created"
+
+    - name: errors
+      type: array
+
+    - name: warnings
+      type: array
+
+# -----------------------------------------------------------------------------
+# TOOLS AVAILABLE
+# -----------------------------------------------------------------------------
+tools:
+  - id: org.ulysses.noc.fortigate-sdwan-manifest-tracker/1.0.0
+    purpose: "Absorb device into manifest, track license"
+    actions:
+      - action: "absorb"
+        parameters:
+          target_ip: "{{ management_ip }}"
+      - action: "update-license"
+        condition: "license_type == 'fortiflex'"  # Hardware devices have pre-installed licenses
+        parameters:
+          device_key: "spoke_{{ management_ip | replace('.','_') }}"
+          license_type: "{{ license_type }}"
+          fortiflex_serial: "{{ serial_number }}"
+
+  - id: org.ulysses.noc.fortigate-sdwan-blueprint-planner/1.0.7
+    purpose: "Generate site-specific configuration (v1.0.7: fixed tunnel naming + loopback)"
+    actions:
+      - action: "generate-template"
+        parameters:
+          site_name: "{{ site_name }}"
+          role: "spoke"
+        output: "C:/ProgramData/Ulysses/config/blueprints/{{ site_name }}_template.csv"
+      - action: "plan-site"
+        parameters:
+          csv_path: "C:/ProgramData/Ulysses/config/blueprints/{{ site_name }}_template.csv"
+          output_format: "cli"
+          # add_to_manifest removed — Step 1 absorb already adds device to manifest
+
+  - id: org.ulysses.noc.fortigate-config-push/2.0.0
+    purpose: "Push CLI config to FortiGate via SSH (atomic section-based push)"
+    parameters:
+      target_ip: "{{ management_ip }}"
+      config_path: "C:/ProgramData/Ulysses/config/blueprints/{{ site_name }}_config.conf"
+    note: "PRIMARY TOOL - SSH CLI push. Certified in Trust Anchor 2026-01-26."
+    capabilities:
+      - "SSH-based CLI push (not API translation)"
+      - "Section-based parsing: splits config into atomic blocks"
+      - "Handles all FortiOS config blocks including nested SD-WAN"
+      - "dry_run mode for validation"
+
+  - id: org.ulysses.provisioning.fortigate-sdwan-spoke-template/1.3.0
+    purpose: "Apply complete SD-WAN spoke configuration via REST API (v1.3.0: ADVPN zone+neighbor)"
+    parameters:
+      target_ip: "{{ management_ip }}"
+      hub_wan_ip: "{{ hub_wan_ip }}"
+      loopback_ip: "{{ spoke_loopback }}"
+      psk: "{{ vpn_psk }}"
+    note: "BACKUP - CLI argument parsing broken, uses hardcoded target_ip"
+
+  - id: org.ulysses.noc.fortigate-cli-execute/1.0.1
+    purpose: "Atomic CLI push when config-push parser fails on core blocks"
+    parameters:
+      target_ip: "{{ management_ip }}"
+      commands:
+        - "<ordered CLI blocks from atomic config file>"
+    note: |
+      Use for nested SD-WAN (health-check -> sla, neighbor), system settings,
+      and firewall policies with multi-interface srcintf/dstintf lists.
+
+  # NEW TOOLS (Added from sdwan-spoke-02 deployment lessons)
+  - id: org.ulysses.noc.fortigate-ipsec/1.0.3
+    purpose: "IPsec Phase1/Phase2 CRUD - supports localid, transport, auto-discovery-sender"
+    actions:
+      - action: "update"
+        parameters:
+          target_ip: "{{ management_ip }}"
+          phase: "1"
+          name: "HUB1-VPN1"
+          localid: "spoke-HUB1-VPN1"
+          auto_discovery_sender: "enable"
+    critical_note: "localid is REQUIRED if hub validates spoke identity"
+
+  - id: org.ulysses.noc.fortigate-system-global/1.0.0
+    purpose: "Configure system global settings"
+    actions:
+      - action: "set"
+        parameters:
+          target_ip: "{{ management_ip }}"
+          management_ip: "{{ management_ip }}"
+          rest_api_key_url_query: "enable"
+
+  - id: org.ulysses.noc.fortigate-system-settings/1.0.0
+    purpose: "Configure system settings (location-id, ike-tcp-port)"
+    actions:
+      - action: "set"
+        parameters:
+          target_ip: "{{ management_ip }}"
+          location_id: "{{ spoke_loopback }}"
+          ike_tcp_port: 11443
+
+  - id: org.ulysses.noc.fortigate-bgp-config/1.0.0
+    purpose: "Configure BGP global settings"
+    actions:
+      - action: "set"
+        parameters:
+          target_ip: "{{ management_ip }}"
+          as: "{{ bgp_as }}"
+          router_id: "{{ spoke_loopback }}"
+          scan_time: 5
+          ibgp_multipath: "enable"
+          recursive_next_hop: "enable"
+          graceful_restart: "enable"
+
+  - id: org.ulysses.noc.fortigate-sdwan-member/1.0.3
+    purpose: "Configure SD-WAN member priorities"
+    actions:
+      - action: "update"
+        parameters:
+          target_ip: "{{ management_ip }}"
+          seq_num: 3
+          priority_in_sla: 10
+          priority_out_sla: 20
+
+  - id: org.ulysses.noc.fortigate-static-route/1.0.0
+    purpose: "Add static routes for health check and BGP peer"
+    note: "Required routes: 172.16.255.253/32 and 172.16.255.252/32 via VPN tunnels"
+
+  - id: org.ulysses.noc.fortigate-sdwan-health-check/1.2.0
+    purpose: "Configure SD-WAN health checks"
+    note: "v1.2.0 has correct credential paths (v1.0.x is broken)"
+
+  - id: org.ulysses.noc.fortigate-sdwan-neighbor/1.2.0
+    purpose: "Configure SD-WAN BGP neighbors"
+    note: "v1.2.0 has correct credential paths"
+
+# -----------------------------------------------------------------------------
+# CRITICAL CONFIGURATION SETTINGS (Lessons from sdwan-spoke-02)
+# -----------------------------------------------------------------------------
+# These settings are REQUIRED for proper SD-WAN operation but may be
+# missing from generated blueprints. Verify and apply manually if needed.
+
+critical_settings:
+  # IPsec Phase1 - MUST HAVE for hub authentication
+  ipsec_phase1:
+    - setting: localid
+      example: "spoke-HUB1-VPN1"
+      purpose: "Hub validates spoke identity via localid"
+      symptom_if_missing: "AUTHENTICATION_FAILED in diagnose vpn ike log"
+      tool: "org.ulysses.noc.fortigate-ipsec/1.0.3"
+
+    - setting: auto-discovery-sender
+      value: "enable"
+      purpose: "Required for ADVPN shortcut formation"
+      tool: "org.ulysses.noc.fortigate-ipsec/1.0.3"
+
+    - setting: transport
+      value: "udp"
+      purpose: "MUST be UDP to avoid conflict with HTTPS management (443)"
+      warning: "If set to 'auto' or 'tcp', may lose API access"
+      tool: "org.ulysses.noc.fortigate-ipsec/1.0.3"
+
+  # System Global Settings
+  system_global:
+    - setting: management-ip
+      example: "192.168.209.35"
+      purpose: "Required for proper device identification"
+      tool: "org.ulysses.noc.fortigate-system-global/1.0.0"
+
+    - setting: rest-api-key-url-query
+      value: "enable"
+      purpose: "Allows API key in URL for certain operations"
+      tool: "org.ulysses.noc.fortigate-system-global/1.0.0"
+
+  # System Settings
+  system_settings:
+    - setting: location-id
+      example: "172.16.0.3"
+      purpose: "Spoke loopback IP for SD-WAN identification"
+      tool: "org.ulysses.noc.fortigate-system-settings/1.0.0"
+
+    - setting: ike-tcp-port
+      value: 11443
+      purpose: "IKE TCP port if needed (non-default)"
+      tool: "org.ulysses.noc.fortigate-system-settings/1.0.0"
+
+  # BGP Settings
+  bgp:
+    - setting: scan-time
+      value: 5
+      purpose: "Faster route convergence (default 60s is too slow)"
+      tool: "org.ulysses.noc.fortigate-bgp-config/1.0.0"
+
+  # SD-WAN Member Settings
+  sdwan_members:
+    - setting: priority-in-sla
+      value: 10
+      purpose: "Priority when SLA is met (lower = preferred)"
+      tool: "org.ulysses.noc.fortigate-sdwan-member/1.0.3"
+
+    - setting: priority-out-sla
+      value: 20
+      purpose: "Priority when SLA is not met"
+      tool: "org.ulysses.noc.fortigate-sdwan-member/1.0.3"
+
+# -----------------------------------------------------------------------------
+# TOOL GAPS (KNOWN ISSUES)
+# -----------------------------------------------------------------------------
+tool_gaps:
+  - tool: "org.ulysses.provisioning.fortigate-sdwan-spoke-template"
+    issue: "Hardcoded target_ip in __main__ block - always targets 192.168.209.30"
+    workaround: |
+      Option 1: Use blueprint file directly and push via SSH
+      Option 2: Call tool programmatically with correct parameters (not CLI)
+      Option 3: Use REST API to push individual objects
+
+  - tool: "org.ulysses.noc.fortigate-config-push"
+    issue: |
+      v1.0.0 API-translation parser failed on core blocks: system settings,
+      phase1 mode-cfg ordering, SD-WAN nested health-check/sla, SD-WAN neighbor,
+      firewall policy srcintf/dstintf lists.
+    resolution: |
+      v2.0.0 uses SSH CLI push instead of API translation. Certified in Trust Anchor 2026-01-26.
+      Fallback: fortigate-cli-execute/1.0.1 with ordered atomic CLI blocks.
+    status: "CLOSED - resolved by config-push/2.0.0 (SSH mode)"
+
+# -----------------------------------------------------------------------------
+# BLUEPRINT REFERENCE
+# -----------------------------------------------------------------------------
+blueprint_info:
+  template_path: "C:/ProgramData/Ulysses/config/blueprints/{{ site_name }}_template.csv"
+  config_path: "C:/ProgramData/Ulysses/config/blueprints/{{ site_name }}_config.conf"
+
+  config_sections:
+    - section: "System Hostname"
+      fortios: "config system global"
+    - section: "Interfaces"
+      fortios: "config system interface"
+      objects: ["port1 (WAN)", "port2 (LAN)", "Spoke-Lo (loopback)", "HUB1-VPN1", "HUB1-VPN2"]
+    - section: "IPsec Phase1"
+      fortios: "config vpn ipsec phase1-interface"
+      objects: ["HUB1-VPN1", "HUB1-VPN2"]
+    - section: "IPsec Phase2"
+      fortios: "config vpn ipsec phase2-interface"
+      objects: ["HUB1-VPN1", "HUB1-VPN2"]
+    - section: "Static Routes"
+      fortios: "config router static"
+    - section: "Firewall Addresses"
+      fortios: "config firewall address"
+    - section: "SD-WAN"
+      fortios: "config system sdwan"
+      subsections: ["zones", "members", "health-check", "neighbor"]
+    - section: "BGP"
+      fortios: "config router bgp"
+    - section: "Firewall Policies"
+      fortios: "config firewall policy"
+
+# -----------------------------------------------------------------------------
+# EXECUTION STEPS
+# -----------------------------------------------------------------------------
+execution_steps:
+  - step: 1
+    name: "Absorb Device into Manifest"
+    tool: "fortigate-sdwan-manifest-tracker"
+    action: "absorb"
+    verification: "Device appears in manifest list"
+
+  - step: 2
+    name: "Update License Info in Manifest"
+    tool: "fortigate-sdwan-manifest-tracker"
+    action: "update-license"
+    verification: "FortiFlex serial recorded"
+
+  - step: 3
+    name: "Generate Blueprint Template"
+    tool: "fortigate-sdwan-blueprint-planner/1.0.7"
+    action: "generate-template"
+    parameters:
+      site_name: "{{ site_name }}"
+      role: "spoke"
+    output: "C:/ProgramData/Ulysses/config/blueprints/{{ site_name }}_template.csv"
+
+  - step: 4
+    name: "Generate FortiOS Config from CSV"
+    tool: "fortigate-sdwan-blueprint-planner/1.0.7"
+    action: "plan-site"
+    parameters:
+      csv_path: "C:/ProgramData/Ulysses/config/blueprints/{{ site_name }}_template.csv"
+      output_format: "cli"
+      # add_to_manifest removed — Step 1 absorb already adds device to manifest
+    output: "{{ site_name }}_config.conf"
+    note: "CRITICAL: plan-site requires csv_path, NOT site_name"
+
+  - step: 5
+    name: "Push Configuration"
+    tool: "fortigate-config-push/2.0.0"
+    parameters:
+      target_ip: "{{ management_ip }}"
+      config_path: "C:/ProgramData/Ulysses/config/blueprints/{{ site_name }}_config.conf"
+    verification: "blocks_success equals blocks_total in response"
+    optional_dry_run: "Add dry_run=true to validate parsing first"
+    fallback: |
+      If config-push/2.0.0 fails, use fortigate-cli-execute/1.0.1 with commands
+      array stripped of comments/blank lines from the atomic .conf file.
+
+  - step: 6
+    name: "Verify Configuration"
+    actions:
+      - "get system status (hostname)"
+      - "get system interface (loopback exists)"
+      - "get vpn ipsec tunnel summary (tunnels exist)"
+      - "diagnose sys sdwan member (SD-WAN configured)"
+      - "get router info bgp summary (BGP configured)"
+
+# -----------------------------------------------------------------------------
+# ERROR HANDLING
+# -----------------------------------------------------------------------------
+error_handling:
+  # Scenario 1: Config push credentials error
+  - condition: "config_push_creds_error"
+    description: "config-push can't find credentials file"
+    detection:
+      - "FileNotFoundError: credentials file not found"
+      - "No API token for {{ management_ip }}"
+    remediation:
+      - action: "Verify credentials exist at PRIMARY path"
+        command: "cat ~/.config/mcp/fortigate_credentials.yaml"
+      - action: "Verify device entry exists in credentials"
+      - action: "Ensure API token is valid"
+    escalation: "Credentials path mismatch - sync credential files"
+
+  # Scenario 2: Template args broken
+  - condition: "template_args_failed"
+    description: "spoke-template ignores CLI arguments"
+    detection:
+      - "Config applied to wrong device (192.168.209.30)"
+    remediation:
+      - action: "Use blueprint file directly"
+      - action: "Call tool via MCP framework (not CLI)"
+    escalation: "Fix spoke-template argument parser"
+
+  # Scenario 3: Config syntax error
+  - condition: "config_syntax_error"
+    description: "FortiOS rejected configuration"
+    detection:
+      - "Command fail. Return code -651"
+      - "Unknown attribute"
+    remediation:
+      - action: "Identify failing command"
+      - action: "Check FortiOS 7.6 compatibility"
+      - action: "Push config section by section"
+    escalation: "Config incompatible - review blueprint"
+
+  # Scenario 4: Object exists
+  - condition: "object_exists"
+    description: "Config object already exists"
+    detection:
+      - "Object already exists error"
+    remediation:
+      - action: "Check if existing config is compatible"
+      - action: "Skip if identical, delete+recreate if different"
+    escalation: "Config conflict - manual review"
+
+  # Scenario 5: PSK mismatch
+  - condition: "psk_mismatch"
+    description: "IPsec won't establish - PSK wrong"
+    detection:
+      - "diagnose vpn ike log shows PSK mismatch"
+    remediation:
+      - action: "Verify PSK matches hub"
+      - action: "Simplify to 'password' for testing"
+    escalation: "PSK mismatch - verify hub config"
+
+  # Scenario 6: Network-id mismatch
+  - condition: "network_id_mismatch"
+    description: "SD-WAN overlay routing broken"
+    detection:
+      - "Tunnel up but no shortcut paths"
+    remediation:
+      - action: "Verify network-id matches hub (VPN1=1, VPN2=2)"
+      - action: "Update phase1 config"
+    escalation: "Network-id mismatch"
+
+  # Scenario 7: Blueprint generation failed
+  - condition: "blueprint_failed"
+    description: "Could not generate blueprint"
+    detection:
+      - "Missing parameters"
+      - "Manifest lookup failed"
+    remediation:
+      - action: "Verify device in manifest"
+      - action: "Check manifest has hub info"
+    escalation: "Blueprint issue - check manifest"
+
+  # Scenario 8: Wrong credentials path
+  - condition: "wrong_creds_path"
+    description: "API credentials not found"
+    detection:
+      - "Tools can't find credentials"
+    remediation:
+      - action: "Check ~/.config/mcp/fortigate_credentials.yaml (PRIMARY)"
+      - action: "If onboard wrote to ~/config/, copy to ~/.config/mcp/"
+    escalation: "Fix credential paths"
+
+  # Scenario 9: IPsec AUTHENTICATION_FAILED (NEW - from sdwan-spoke-02)
+  - condition: "ipsec_auth_failed"
+    description: "IPsec Phase1 fails with AUTHENTICATION_FAILED"
+    detection:
+      - "diagnose vpn ike log shows AUTHENTICATION_FAILED"
+      - "Tunnel stuck in down state"
+    remediation:
+      - action: "Verify PSK matches hub exactly"
+      - action: "Check localid setting - hub may require specific localid"
+        tool: "fortigate-ipsec action=update localid=spoke-HUB1-VPN1"
+      - action: "Verify proposal/dhgrp match hub settings"
+      - action: "Check transport is UDP (not auto/tcp)"
+    escalation: "Compare spoke config with working spoke or hub config"
+    lesson_learned: "If one tunnel works and another doesn't, compare their configs"
+
+  # Scenario 10: BGP stuck in Connect/Active state (NEW)
+  - condition: "bgp_not_establishing"
+    description: "BGP shows Connect or Active, never Established"
+    detection:
+      - "get router info bgp summary shows Active/Connect instead of prefix count"
+    remediation:
+      - action: "Verify IPsec tunnel is UP first"
+      - action: "Check static routes exist for BGP peer IP via VPN tunnels"
+        commands:
+          - "fortigate-static-route action=add dst_subnet=172.16.255.252/32 device=HUB1-VPN1"
+          - "fortigate-static-route action=add dst_subnet=172.16.255.252/32 device=HUB1-VPN2"
+      - action: "Verify scan-time is set (default 60s may be too slow)"
+        command: "fortigate-bgp-config action=set scan_time=5"
+      - action: "Check hub has route back to spoke loopback"
+    escalation: "BGP requires both tunnel UP and routes to peer"
+
+  # Scenario 11: SD-WAN health check dead (NEW)
+  - condition: "sdwan_health_dead"
+    description: "SD-WAN health check shows dead even with tunnel UP"
+    detection:
+      - "diagnose sys sdwan health-check shows dead"
+    remediation:
+      - action: "Verify static route to health check target exists"
+        command: "fortigate-static-route action=add dst_subnet=172.16.255.253/32 device=HUB1-VPN1"
+      - action: "Verify firewall policy allows health check traffic"
+      - action: "Check health check is bound to correct members"
+    escalation: "Health check needs routes AND policies"
+
+  # Scenario 12: Tool version mismatch (NEW)
+  - condition: "tool_version_stale"
+    description: "Tool returns 401 or 'No credentials found'"
+    detection:
+      - "HTTP 401 Unauthorized"
+      - "No credentials found for X.X.X.X"
+    remediation:
+      - action: "Check tool version - older versions may have stale credential paths"
+      - action: "Use latest certified version of tool"
+        examples:
+          - "fortigate-sdwan-health-check/1.2.0 (not 1.0.x)"
+          - "fortigate-sdwan-neighbor/1.2.0 (not 1.0.x)"
+          - "fortigate-ipsec/1.0.3 (for localid support)"
+      - action: "Re-sign tool with MCP credential paths if needed"
+    escalation: "Tool needs re-signing with updated credential loading"
+
+  # Scenario 13: API 401 on Unlicensed Device (GAP #6)
+  - condition: "api_401_unlicensed"
+    description: "FortiGate REST API returns 401 before FortiFlex license is applied"
+    detection:
+      - "fortigate-onboard returns HTTP 401 during API test"
+      - "fortigate-api-token-create fails with 401"
+      - "Device is fresh VM without license"
+    root_cause: |
+      FortiGate VMs without license have limited functionality.
+      The REST API may reject connections until the device is licensed.
+      This is a licensing restriction, not an authentication failure.
+    remediation:
+      - action: "CRITICAL: Apply FortiFlex license BEFORE creating API token"
+        order: "BLOCK_2 (license) must complete before BLOCK_3 (onboard)"
+        tool: "org.ulysses.noc.fortigate-cli-execute/1.0.1"
+        parameters:
+          target_ip: "{{ management_ip }}"
+          password: "{{ admin_password }}"
+          commands:
+            - "execute vm-license {{ fortiflex_token }}"
+          interactive_responses:
+            "(y/n)": "y"
+      - action: "Wait for device reboot (license triggers automatic reboot)"
+        wait: "120-180 seconds"
+      - action: "Verify license applied successfully"
+        commands:
+          - "get system status | grep License"
+          - "Expected: License Status: Valid"
+      - action: "THEN run fortigate-onboard to create API token"
+        tool: "org.ulysses.noc.fortigate-onboard/1.0.1"
+    workflow_note: |
+      CORRECT EXECUTION ORDER:
+        1. BLOCK_1: Provision VM
+        2. BLOCK_2: Apply license via SSH (fortigate-cli-execute)
+        3. BLOCK_2 Step 8: Create API token via fortigate-onboard/1.0.1 (MANDATORY)
+        4. BLOCK_3: Push SD-WAN config via fortigate-config-push/2.0.0
+
+      INCORRECT (causes 401):
+        1. BLOCK_1: Provision VM
+        2. BLOCK_3: Try to create API token (FAILS - 401)
+        3. BLOCK_2: Apply license (too late)
+    escalation: "If 401 persists after license, check license validity date"
+
+# -----------------------------------------------------------------------------
+# CONSTRAINTS
+# -----------------------------------------------------------------------------
+constraints:
+  max_duration_minutes: 15
+  current_status: "READY"
+  note: "config-push tool available - all steps automated"
+
+# -----------------------------------------------------------------------------
+# REPORTING FORMAT
+# -----------------------------------------------------------------------------
+report_format: |
+  ## Block 3: SD-WAN Configuration - {{ status }}
+
+  ### Manifest Status
+  - **Device Key:** spoke_{{ management_ip | replace('.','_') }}
+  - **In Manifest:** {{ in_manifest }}
+  - **License Tracked:** {{ license_tracked }}
+
+  ### Blueprint
+  - **Template:** {{ template_path }}
+  - **Config:** {{ config_path }}
+  - **Lines Generated:** {{ config_line_count }}
+
+  ### Configuration Applied
+  | Component | Status |
+  |-----------|--------|
+  | Hostname | {{ hostname_status }} |
+  | Loopback | {{ loopback_status }} |
+  | IPsec Phase1 | {{ phase1_status }} |
+  | IPsec Phase2 | {{ phase2_status }} |
+  | SD-WAN Zone | {{ sdwan_zone_status }} |
+  | SD-WAN Members | {{ sdwan_members_status }} |
+  | Health Check | {{ health_check_status }} |
+  | BGP | {{ bgp_status }} |
+  | Policies | {{ policy_status }} |
+
+  ### Errors
+  {{ errors | default("None") }}
+
+  ### Blocking Issues
+  {{ blocking_issues | default("None") }}
+
+  ### Ready for Block 4
+  {{ ready_for_next_block }}

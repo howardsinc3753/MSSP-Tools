@@ -1,0 +1,282 @@
+# FortiGate Operations Solution Pack
+# ==================================
+# Comprehensive FortiGate firewall management: NOC monitoring, SOC security,
+# provisioning, and incident response.
+#
+# Author: Project Ulysses
+# Created: 2025-01-14
+
+canonical_id: "org.ulysses.solution.fortigate-ops/1.0.0"
+name: "FortiGate Operations"
+version: "1.0.0"
+
+description: |
+  Complete FortiGate firewall operations solution pack providing:
+
+  - NOC Monitoring: Health checks, interface status, routing, sessions
+  - SOC Security: Threat logs, policy analysis, VPN monitoring
+  - Provisioning: Device onboarding, FortiFlex licensing, SDWAN configuration
+  - Incident Response: IP blocking, host quarantine, session termination
+
+  Supports FortiGate models across all tiers (Entry, Mid-Range, High-End).
+  Integrates with FortiFlex for license provisioning.
+
+category: "infrastructure"
+priority: "P0"
+status: "draft"
+
+author:
+  name: "Project Ulysses"
+  email: "admin@ulysses.local"
+
+license: "proprietary"
+
+# =============================================================================
+# DEPENDENCIES
+# =============================================================================
+dependencies:
+  solution_packs: []  # Future: fortinet-ecosystem, fortimanager-central
+  services:
+    - redis
+    - trust-anchor
+  system:
+    - python3
+
+# =============================================================================
+# COMPONENTS - Existing Tools
+# =============================================================================
+components:
+  tools:
+    # NOC Monitoring Tools
+    - canonical_id: "org.ulysses.noc.fortigate-health-check/1.0.0"
+      name: "FortiGate Health Check"
+      description: "CPU, memory, sessions, firmware status"
+      domain: noc
+
+    - canonical_id: "org.ulysses.noc.fortigate-interface-status/1.0.0"
+      name: "FortiGate Interface Status"
+      description: "Interface up/down, traffic counters"
+      domain: noc
+
+    - canonical_id: "org.ulysses.noc.fortigate-routing-table/1.0.0"
+      name: "FortiGate Routing Table"
+      description: "IPv4/IPv6 routing entries"
+      domain: noc
+
+    - canonical_id: "org.ulysses.noc.fortigate-session-table/1.0.0"
+      name: "FortiGate Session Table"
+      description: "Active session enumeration"
+      domain: noc
+
+    - canonical_id: "org.ulysses.noc.fortigate-arp-table/1.0.0"
+      name: "FortiGate ARP Table"
+      description: "ARP cache entries"
+      domain: noc
+
+    - canonical_id: "org.ulysses.noc.fortigate-performance-status/1.0.0"
+      name: "FortiGate Performance Status"
+      description: "Detailed performance metrics"
+      domain: noc
+
+    - canonical_id: "org.ulysses.noc.fortigate-running-processes/1.0.0"
+      name: "FortiGate Running Processes"
+      description: "System process enumeration"
+      domain: noc
+
+    - canonical_id: "org.ulysses.noc.fortigate-network-analyzer/1.0.0"
+      name: "FortiGate Network Analyzer"
+      description: "Traffic analysis and diagnostics"
+      domain: noc
+
+    - canonical_id: "org.ulysses.noc.fortigate-ssh/1.0.0"
+      name: "FortiGate SSH"
+      description: "SSH command execution"
+      domain: noc
+
+    # SOC Security Tools (Planned)
+    # - canonical_id: "org.ulysses.security.fortigate-threat-log/1.0.0"
+    # - canonical_id: "org.ulysses.security.fortigate-policy-list/1.0.0"
+    # - canonical_id: "org.ulysses.security.fortigate-vpn-status/1.0.0"
+
+    # Provisioning Tools (Planned)
+    # - canonical_id: "org.ulysses.provisioning.fortigate-backup-config/1.0.0"
+    # - canonical_id: "org.ulysses.provisioning.fortigate-push-policy/1.0.0"
+    # - canonical_id: "org.ulysses.provisioning.fortiflex-provision/1.0.0"
+    # - canonical_id: "org.ulysses.provisioning.fortigate-sdwan-hub/1.0.0"
+
+    # Response Tools (Planned)
+    # - canonical_id: "org.ulysses.response.fortigate-block-ip/1.0.0"
+    # - canonical_id: "org.ulysses.response.fortigate-quarantine-host/1.0.0"
+
+  runbooks:
+    - runbook_id: "org.ulysses.sop.fortigate-triage/1.0.0"
+      name: "FortiGate Triage"
+      description: "Sequential health check and diagnostics"
+
+    # Planned Runbooks
+    # - runbook_id: "org.ulysses.sop.fortigate-onboard/1.0.0"
+    # - runbook_id: "org.ulysses.sop.fortigate-daily-backup/1.0.0"
+    # - runbook_id: "org.ulysses.sop.fortigate-incident-block/1.0.0"
+
+  workflows:
+    # Agentic Workflows (Planned)
+    # - workflow_id: "org.ulysses.workflow.fortigate-intelligent-triage/1.0.0"
+    # - workflow_id: "org.ulysses.workflow.fortigate-onboard-provision/1.0.0"
+
+# =============================================================================
+# DEVICE REGISTRY
+# =============================================================================
+device_registry:
+  description: "Managed FortiGate devices"
+  credential_ref: "config/fortigate_credentials.yaml"
+  devices:
+    - device_id: "lab-71f"
+      model: "FortiGate 71F"
+      ip: "192.168.209.62"
+      role: "lab-primary"
+      features:
+        - sdwan
+        - utm
+
+    - device_id: "fw-50g"
+      model: "FortiGate 50G"
+      ip: "192.168.209.30"
+      role: "lab-secondary"
+      features:
+        - sdwan
+
+# =============================================================================
+# API COVERAGE
+# =============================================================================
+api_coverage:
+  fortigate_rest_api:
+    monitor:
+      implemented:
+        - "GET /api/v2/monitor/system/status"
+        - "GET /api/v2/monitor/system/interface"
+        - "GET /api/v2/monitor/router/ipv4"
+        - "GET /api/v2/monitor/system/resource/usage"
+        - "GET /api/v2/monitor/firewall/session"
+        - "GET /api/v2/monitor/network/arp"
+      planned:
+        - "GET /api/v2/monitor/system/ha-peer"
+        - "GET /api/v2/monitor/vpn/ipsec"
+        - "GET /api/v2/log/threat"
+    cmdb:
+      implemented: []
+      planned:
+        - "GET /api/v2/cmdb/firewall/policy"
+        - "POST /api/v2/cmdb/firewall/address"
+        - "PUT /api/v2/cmdb/system/interface"
+
+# =============================================================================
+# TOOL DOMAINS
+# =============================================================================
+tool_domains:
+  noc:
+    description: "NOC monitoring and health tools"
+    intent_patterns:
+      - "check fortigate health"
+      - "fortigate status"
+      - "interface up/down"
+      - "routing table"
+      - "session count"
+    tools_count: 9
+
+  security:
+    description: "SOC security monitoring and analysis"
+    intent_patterns:
+      - "threat logs"
+      - "blocked traffic"
+      - "policy violations"
+      - "vpn status"
+    tools_count: 0  # Planned
+
+  provisioning:
+    description: "Device onboarding and configuration"
+    intent_patterns:
+      - "onboard fortigate"
+      - "provision license"
+      - "backup config"
+      - "push policy"
+      - "sdwan setup"
+    tools_count: 0  # Planned
+
+  response:
+    description: "Incident response and remediation"
+    intent_patterns:
+      - "block ip"
+      - "quarantine host"
+      - "kill session"
+    tools_count: 0  # Planned
+
+# =============================================================================
+# INSTALLATION
+# =============================================================================
+installation:
+  pre_install:
+    - description: "Verify Trust Anchor running"
+      check: "curl -s http://192.168.209.115:8000/health"
+    - description: "Verify FortiGate reachable"
+      check: "curl -sk https://192.168.209.62/api/v2/monitor/system/status"
+
+  install:
+    - description: "Register tools with Trust Anchor"
+      command: "python scripts/register_pack_tools.py --pack fortigate-ops"
+    - description: "Load runbooks"
+      command: "python scripts/load_runbook.py --runbook org.ulysses.sop.fortigate-triage"
+
+  post_install:
+    - description: "Verify tools registered"
+      command: "curl http://192.168.209.115:8000/tools | grep fortigate"
+    - description: "Run QA tests"
+      command: "python solution_packs/fortigate-ops/tests/qa_fortigate_ops_tests.py"
+
+# =============================================================================
+# TAGS
+# =============================================================================
+tags:
+  - fortinet
+  - fortigate
+  - firewall
+  - ngfw
+  - sdwan
+  - security
+  - noc
+  - soc
+  - network
+  - infrastructure
+
+# =============================================================================
+# ROADMAP
+# =============================================================================
+roadmap:
+  v1.0.0:
+    status: "current"
+    features:
+      - "NOC monitoring tools (9 tools)"
+      - "FortiGate triage runbook"
+      - "Device credential management"
+
+  v1.1.0:
+    status: "planned"
+    features:
+      - "SOC security tools"
+      - "Threat log analysis"
+      - "Policy management"
+
+  v1.2.0:
+    status: "planned"
+    features:
+      - "Provisioning tools"
+      - "FortiFlex integration"
+      - "SDWAN Hub builder"
+      - "Config backup/restore"
+
+  v1.3.0:
+    status: "planned"
+    features:
+      - "Response tools"
+      - "IP blocking"
+      - "Host quarantine"
+      - "Agentic workflows"

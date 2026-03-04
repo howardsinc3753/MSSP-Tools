@@ -1,0 +1,129 @@
+---
+block_id: 022
+name: hub-interfaces
+display_name: "Hub Interface Configuration"
+version: 1.0.0
+category: core
+device_role: hub
+vendor: fortinet
+platform: fortigate
+min_fortios: "7.4.0"
+
+description: |
+  Interface configuration for SD-WAN hub. Creates WAN interface (port1),
+  LAN interface (port2), and dual loopback interfaces (Hub_Lo for hub
+  services, BGP_Lo for BGP operations).
+
+  KEY: Hub uses TWO loopbacks:
+  - Hub_Lo: Hub system services, ADVPN hub identifier
+  - BGP_Lo: BGP router-ID, BGP update-source, IPsec exchange-ip-addr4
+
+depends_on:
+  - block_id: 020
+    reason: "System global must be configured first"
+
+provides:
+  - hub-interfaces
+  - hub-loopbacks
+  - hub-wan-interface
+  - hub-lan-interface
+
+parameters:
+  - name: WAN_INTERFACE
+    description: "WAN interface name"
+    type: string
+    required: false
+    default: "port1"
+
+  - name: WAN_IP_CIDR
+    description: "WAN IP address with CIDR"
+    type: cidr
+    required: true
+    example: "192.168.215.15/24"
+
+  - name: LAN_INTERFACE
+    description: "LAN interface name"
+    type: string
+    required: false
+    default: "port2"
+
+  - name: LAN_IP_CIDR
+    description: "LAN IP address with CIDR"
+    type: cidr
+    required: true
+    example: "10.250.250.1/24"
+
+  - name: HUB_LOOPBACK_IP
+    description: "Hub loopback IP (for hub services)"
+    type: ip_address
+    required: true
+    example: "172.16.255.253"
+
+  - name: BGP_LOOPBACK_IP
+    description: "BGP loopback IP (for BGP operations)"
+    type: ip_address
+    required: true
+    example: "172.16.255.252"
+
+verification:
+  commands:
+    - "get system interface {{WAN_INTERFACE}}"
+    - "get system interface {{LAN_INTERFACE}}"
+    - "get system interface Hub_Lo"
+    - "get system interface BGP_Lo"
+  expected_patterns:
+    - "ip: {{WAN_IP_CIDR}}"
+    - "ip: {{LAN_IP_CIDR}}"
+    - "ip: {{HUB_LOOPBACK_IP}}"
+    - "ip: {{BGP_LOOPBACK_IP}}"
+
+rollback:
+  commands:
+    - "config system interface"
+    - "delete Hub_Lo"
+    - "delete BGP_Lo"
+    - "end"
+
+notes: |
+  - Hub_Lo is used for hub system identification
+  - BGP_Lo is used for BGP router-ID and update-source
+  - IPsec phase1 exchange-ip-addr4 should use BGP_Lo
+  - Spokes static route to BGP_Lo (not Hub_Lo) for BGP reachability
+
+---
+
+config system interface
+    edit "{{WAN_INTERFACE}}"
+        set vdom "root"
+        set ip {{WAN_IP_CIDR}}
+        set allowaccess ping https ssh http fgfm
+        set type physical
+        set alias "WAN"
+        set lldp-reception enable
+        set role wan
+    next
+    edit "{{LAN_INTERFACE}}"
+        set vdom "root"
+        set ip {{LAN_IP_CIDR}}
+        set allowaccess ping https ssh http
+        set type physical
+        set alias "LAN"
+        set role lan
+    next
+    edit "Hub_Lo"
+        set vdom "root"
+        set ip {{HUB_LOOPBACK_IP}} 255.255.255.255
+        set allowaccess ping
+        set type loopback
+        set alias "Hub Loopback"
+        set role undefined
+    next
+    edit "BGP_Lo"
+        set vdom "root"
+        set ip {{BGP_LOOPBACK_IP}} 255.255.255.255
+        set allowaccess ping
+        set type loopback
+        set alias "BGP Loopback"
+        set role undefined
+    next
+end

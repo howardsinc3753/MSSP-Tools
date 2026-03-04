@@ -1,0 +1,791 @@
+# =============================================================================
+# AGENTIC AI BLOCK STACKING WORKFLOW
+# Block 4: Connectivity Verification
+# =============================================================================
+# Framework: Agentic AI Block Stacking Workflow v1.0
+# Master Document: ../manifest.yaml
+# Purpose: Sub-agent briefing for isolated block execution
+# =============================================================================
+
+block_id: verify
+block_number: 4
+name: "Connectivity Verification"
+version: 1.3.0  # Added post-deploy manifest re-absorb step (2026-01-22)
+
+# =============================================================================
+# AI EXECUTION INSTRUCTIONS (CRITICAL)
+# =============================================================================
+ai_instructions:
+  execution_model: |
+    SINGLE-AGENT EXECUTION: Do NOT spawn sub-agents or use Task tool.
+    Execute this block directly in the main conversation context.
+    Sub-agents lose MCP tool context and default to Bash commands.
+
+  tool_policy: |
+    PREFERRED: Use MCP certified tools via execute_certified_tool when available.
+    Fallback to Bash SSH if certified tools fail or are unavailable.
+
+    Tool mapping for verification:
+    - Health checks → fortigate-health-check/1.0.4
+    - IPsec status → fortigate-ipsec action=get
+    - BGP verification → fortigate-bgp-troubleshoot/1.0.2
+    - SD-WAN health → fortigate-sdwan-status/1.1.0
+    - CLI diagnostics → fortigate-cli-execute/1.0.1 or fortigate-ssh/1.0.9
+    - Overlay ping/traceroute → fortigate-cli-execute/1.0.1
+
+    VERIFICATION NOTE: Success criteria and verification_commands use FortiOS CLI
+    shorthand (e.g., "get vpn ipsec tunnel summary"). Execute these via MCP tools
+    first; fall back to Bash SSH if tools return errors.
+
+    PREREQUISITE: BLOCK_2 must have run fortigate-onboard/1.0.1 to create
+    the API token. Without it, ALL API-based tools return 401 Unauthorized.
+
+  tool_discovery: |
+    Use route_query to find tools:
+    - "check fortigate health" → fortigate-health-check/1.0.4
+    - "verify ipsec tunnel" → fortigate-ipsec
+    - "check bgp status" → fortigate-bgp-troubleshoot/1.0.2
+    - "verify sdwan health" → fortigate-sdwan-status/1.1.0
+
+# -----------------------------------------------------------------------------
+# DEPENDENCIES
+# -----------------------------------------------------------------------------
+depends_on:
+  - block: BLOCK_1_PROVISION
+    required_outputs:
+      - management_ip
+      - admin_password
+
+  - block: BLOCK_2_LICENSE
+    required_outputs:
+      - api_token
+
+  - block: BLOCK_3_CONFIGURE
+    required_outputs:
+      - loopback_ip
+      - tunnel_names
+      - sdwan_zone
+
+# -----------------------------------------------------------------------------
+# SUB-AGENT GOAL
+# -----------------------------------------------------------------------------
+goal: |
+  Verify complete SD-WAN connectivity from spoke to hub:
+  - IPsec tunnels are UP
+  - BGP peering is Established
+  - SD-WAN health checks are GREEN
+  - Overlay reachability confirmed (ping spoke loopback → hub loopback)
+
+# -----------------------------------------------------------------------------
+# INPUTS
+# -----------------------------------------------------------------------------
+inputs:
+  from_previous_blocks:
+    - name: management_ip
+      source: "BLOCK_1"
+    - name: api_token
+      source: "BLOCK_2"
+      sensitive: true
+    - name: loopback_ip
+      source: "BLOCK_3"
+      description: "Spoke loopback (e.g., 172.16.0.3)"
+    - name: tunnel_names
+      source: "BLOCK_3"
+      description: "['HUB1-VPN1', 'HUB1-VPN2']"
+
+  from_master:
+    - name: hub_loopback
+      default: "172.16.255.253"
+      description: "Hub loopback for health check verification"
+    - name: hub_bgp_loopback
+      default: "172.16.255.252"
+      description: "Hub BGP loopback for peering verification"
+
+# -----------------------------------------------------------------------------
+# SUCCESS CRITERIA (Final Workflow Success)
+# -----------------------------------------------------------------------------
+success_criteria:
+  - id: ipsec_tunnels_up
+    description: "All IPsec tunnels show status UP"
+    verification:
+      command: "get vpn ipsec tunnel summary"
+      expected: "HUB1-VPN1: up, HUB1-VPN2: up"
+    critical: true
+
+  - id: bgp_established
+    description: "BGP neighbor state is Established"
+    verification:
+      command: "get router info bgp neighbor {{ hub_bgp_loopback }}"
+      expected: "BGP state = Established"
+    critical: true
+
+  - id: sdwan_health_green
+    description: "SD-WAN health check to hub is alive"
+    verification:
+      command: "diagnose sys sdwan health-check status"
+      expected: "HUB_Health: alive"
+    critical: true
+
+  - id: overlay_ping_success
+    description: "Can ping hub loopback from spoke loopback"
+    verification:
+      commands:
+        - "execute ping-options source {{ loopback_ip }}"
+        - "execute ping {{ hub_loopback }}"
+      expected: "0% packet loss"
+    critical: true
+
+  - id: routes_learned
+    description: "BGP routes learned from hub"
+    verification:
+      command: "get router info bgp routing"
+      expected: "Hub networks visible in routing table (prefix count > 0)"
+      note: "'get router info bgp network' shows locally configured networks, not learned routes"
+    critical: false
+
+  # CRITICAL: Gap #3 fix - Check BEFORE testing BGP (root cause of past POC failures)
+  - id: bgp_bootstrap_routes_exist
+    description: "Static routes to hub BGP loopbacks exist via both tunnels (required for BGP)"
+    verification:
+      commands:
+        - "get router static | grep 172.16.255.252"
+        - "get router static | grep 172.16.255.253"
+      expected:
+        - "172.16.255.252/32 via HUB1-VPN1"
+        - "172.16.255.252/32 via HUB1-VPN2"
+        - "172.16.255.253/32 via HUB1-VPN1"
+        - "172.16.255.253/32 via HUB1-VPN2"
+    critical: true
+    note: |
+      Without these routes, BGP cannot establish even if IPsec is UP.
+      Both VPN1 and VPN2 routes are required for ECMP redundancy.
+    if_missing:
+      action: "Add missing routes via fortigate-static-route tool"
+      tool: "org.ulysses.noc.fortigate-static-route/1.0.0"
+      parameters_per_route:
+        - { dst_subnet: "172.16.255.252/32", device: "HUB1-VPN1" }
+        - { dst_subnet: "172.16.255.252/32", device: "HUB1-VPN2" }
+        - { dst_subnet: "172.16.255.253/32", device: "HUB1-VPN1" }
+        - { dst_subnet: "172.16.255.253/32", device: "HUB1-VPN2" }
+
+# -----------------------------------------------------------------------------
+# OUTPUTS
+# -----------------------------------------------------------------------------
+outputs:
+  required:
+    - name: status
+      type: string
+      enum: [SUCCESS, FAILURE, PARTIAL]
+      description: "Overall verification status"
+
+    - name: ipsec_status
+      type: object
+      description: "Status of each tunnel"
+
+    - name: bgp_status
+      type: object
+      description: "BGP neighbor state and prefixes"
+
+    - name: sdwan_health
+      type: object
+      description: "Health check results"
+
+    - name: overlay_reachability
+      type: boolean
+      description: "Can reach hub via overlay"
+
+  optional:
+    - name: latency_ms
+      type: integer
+      description: "Ping latency to hub loopback"
+
+    - name: routes_learned_count
+      type: integer
+      description: "Number of BGP routes from hub"
+
+    - name: diagnostics
+      type: object
+      description: "Detailed diagnostic output for troubleshooting"
+
+    - name: errors
+      type: array
+
+    - name: warnings
+      type: array
+
+# -----------------------------------------------------------------------------
+# TOOLS AVAILABLE
+# -----------------------------------------------------------------------------
+tools:
+  - id: org.ulysses.noc.fortigate-health-check/1.0.4
+    purpose: "Quick device health status (API-based — requires onboard token)"
+    parameters:
+      target_ip: "{{ management_ip }}"
+
+  - id: org.ulysses.noc.fortigate-bgp-troubleshoot/1.0.2
+    purpose: "BGP diagnostics — FortiOS 7.6.5 compatible"
+    actions:
+      - action: "summary"
+        parameters:
+          target_ip: "{{ management_ip }}"
+        note: "Uses /monitor/router/bgp/neighbors (not /bgp/summary which returns 404 on 7.6.5)"
+      - action: "report"
+        parameters:
+          target_ip: "{{ management_ip }}"
+        note: "Full BGP report with neighbor details, routes received/advertised"
+    note: |
+      v1.0.3 fixes: FortiOS 7.6.5 endpoint compatibility, MCP context.credentials support,
+      CMDB enrichment for router_id and local_as. Published 2026-01-26.
+
+  - id: org.ulysses.noc.fortigate-sdwan-status/1.1.0
+    purpose: "SD-WAN operational status — FortiOS 7.6.5 compatible"
+    parameters:
+      target_ip: "{{ management_ip }}"
+      check: "all"
+    note: |
+      v1.2.0 fixes: MCP context.credentials support, virtual-wan/members fallback,
+      proper error propagation (no silent failures). Published 2026-01-26.
+
+  - id: org.ulysses.noc.fortigate-ssh/1.0.9
+    purpose: "Execute diagnostic commands (fallback if API tools fail)"
+    parameters:
+      target_ip: "{{ management_ip }}"
+      commands:
+        - "get vpn ipsec tunnel summary"
+        - "diagnose vpn ike gateway list"
+        - "get router info bgp summary"
+        - "get router info bgp neighbor {{ hub_bgp_loopback }}"
+        - "diagnose sys sdwan health-check status"
+        - "diagnose sys sdwan member"
+    note: "Read-only commands. Use as fallback if API-based tools return 401."
+
+  # NEW TOOLS (Added from sdwan-spoke-02 lessons)
+  - id: org.ulysses.noc.fortigate-ipsec/1.0.3
+    purpose: "Check IPsec tunnel configuration"
+    actions:
+      - action: "list"
+        parameters:
+          target_ip: "{{ management_ip }}"
+          phase: "1"
+      - action: "get"
+        parameters:
+          target_ip: "{{ management_ip }}"
+          phase: "1"
+          name: "HUB1-VPN1"
+    critical_checks:
+      - "Verify localid is set"
+      - "Verify auto-discovery-sender is enable"
+      - "Verify transport is udp (not auto)"
+
+  - id: org.ulysses.noc.fortigate-ipsec-troubleshoot/1.0.0
+    purpose: "Diagnose IPsec tunnel issues"
+    parameters:
+      target_ip: "{{ management_ip }}"
+      tunnel_name: "HUB1-VPN1"
+    note: "Use when tunnel is DOWN to identify root cause"
+
+  - id: org.ulysses.noc.fortigate-bgp-neighbor/1.0.0
+    purpose: "Check BGP neighbor configuration"
+    actions:
+      - action: "list"
+        parameters:
+          target_ip: "{{ management_ip }}"
+
+  - id: org.ulysses.noc.fortigate-bgp-config/1.0.0
+    purpose: "Check BGP global settings"
+    actions:
+      - action: "get"
+        parameters:
+          target_ip: "{{ management_ip }}"
+    critical_checks:
+      - "Verify scan-time is 5 (not 60)"
+      - "Verify ibgp-multipath is enable"
+      - "Verify recursive-next-hop is enable"
+
+  - id: org.ulysses.noc.fortigate-sdwan-health-check/1.2.0
+    purpose: "Check SD-WAN health check config (CMDB-level)"
+    actions:
+      - action: "list"
+        parameters:
+          target_ip: "{{ management_ip }}"
+    note: |
+      For runtime status use fortigate-sdwan-status/1.1.0 (above).
+      This tool checks CMDB configuration, not live health-check metrics.
+
+  - id: org.ulysses.noc.fortigate-sdwan-member/1.0.3
+    purpose: "Check SD-WAN member configuration"
+    actions:
+      - action: "list"
+        parameters:
+          target_ip: "{{ management_ip }}"
+    critical_checks:
+      - "Verify priority-in-sla is set (e.g., 10)"
+      - "Verify priority-out-sla is set (e.g., 20)"
+
+  - id: org.ulysses.noc.fortigate-static-route/1.0.0
+    purpose: "Check static routes for health check and BGP peer"
+    actions:
+      - action: "list"
+        parameters:
+          target_ip: "{{ management_ip }}"
+    required_routes:
+      - "172.16.255.253/32 via HUB1-VPN1 (health check)"
+      - "172.16.255.253/32 via HUB1-VPN2 (health check backup)"
+      - "172.16.255.252/32 via HUB1-VPN1 (BGP peer)"
+      - "172.16.255.252/32 via HUB1-VPN2 (BGP peer backup)"
+
+# -----------------------------------------------------------------------------
+# VERIFICATION COMMANDS
+# -----------------------------------------------------------------------------
+verification_commands:
+  # IPsec Verification
+  ipsec:
+    - name: "Tunnel Summary"
+      command: "get vpn ipsec tunnel summary"
+      parse_for: "name status"
+      success: "Both tunnels show 'up'"
+
+    - name: "Phase1 Status"
+      command: "diagnose vpn ike gateway list"
+      parse_for: "name: HUB1-VPN created"
+      success: "Gateway entries exist"
+
+    - name: "Phase2 Status"
+      command: "diagnose vpn tunnel list"
+      parse_for: "name=HUB1-VPN"
+      success: "Tunnel entries exist"
+
+  # BGP Verification
+  bgp:
+    - name: "BGP Summary"
+      command: "get router info bgp summary"
+      parse_for: "Neighbor State/PfxRcd"
+      success: "State shows numeric prefix count (not Active/Connect)"
+
+    - name: "BGP Neighbor Detail"
+      command: "get router info bgp neighbor {{ hub_bgp_loopback }}"
+      parse_for: "BGP state ="
+      success: "BGP state = Established"
+
+    - name: "BGP Routes Learned"
+      command: "get router info bgp routing"
+      parse_for: "Network"
+      success: "Hub networks visible in BGP routing table"
+
+  # SD-WAN Verification
+  sdwan:
+    - name: "Health Check Status"
+      command: "diagnose sys sdwan health-check status"
+      parse_for: "HUB"
+      success: "Status shows 'alive'"
+
+    - name: "SD-WAN Members"
+      command: "diagnose sys sdwan member"
+      parse_for: "HUB1-VPN"
+      success: "Both VPN members listed with status"
+
+    - name: "SD-WAN Service Status"
+      command: "diagnose sys sdwan service"
+      success: "Services show proper routing"
+
+  # Overlay Connectivity
+  overlay:
+    - name: "Set Ping Source"
+      command: "execute ping-options source {{ loopback_ip }}"
+      success: "Options set"
+
+    - name: "Ping Hub Loopback"
+      command: "execute ping {{ hub_loopback }}"
+      parse_for: "packet loss"
+      success: "0% packet loss"
+
+    - name: "Traceroute to Hub"
+      command: "execute traceroute {{ hub_loopback }}"
+      success: "Reaches hub via tunnel interface"
+
+  # CONFIG VERIFICATION (Gap #4 fix - verify config correctness, not just connectivity)
+  config_verification:
+    purpose: "Verify config matches contract requirements (not just connectivity)"
+    note: |
+      CRITICAL: Connectivity checks alone are insufficient.
+      A device can have tunnels UP with WRONG config (e.g., transport=tcp instead of udp).
+      This causes subtle failures like GUI breakage or future IPsec issues.
+
+    checks:
+      - name: "transport_udp"
+        cmd: "get vpn ipsec phase1-interface HUB1-VPN1 | grep transport"
+        expected: "set transport udp"
+        error: "Transport must be UDP, not TCP - IKE will fail over TCP with VPN issues"
+        critical: true
+
+      - name: "ike_tcp_port"
+        cmd: "get system settings | grep ike-tcp-port"
+        expected: "set ike-tcp-port 11443"
+        error: "IKE TCP port must be 11443 to match hub for fallback"
+        critical: true
+
+      - name: "net_device_enable"
+        cmd: "get vpn ipsec phase1-interface HUB1-VPN1 | grep net-device"
+        expected: "set net-device enable"
+        error: "net-device must be enabled for SD-WAN - spoke template requirement"
+        critical: true
+
+      - name: "exchange_ip_addr4"
+        cmd: "get vpn ipsec phase1-interface HUB1-VPN1 | grep exchange-ip-addr4"
+        expected: "set exchange-ip-addr4 {{ loopback_ip }}"
+        error: "exchange-ip-addr4 must be set to spoke loopback for ADVPN"
+        critical: true
+
+      - name: "bgp_as_65000"
+        cmd: "get router bgp | grep \"set as\""
+        expected: "set as 65000"
+        error: "BGP AS must be 65000 to match hub AS (iBGP requirement)"
+        critical: true
+
+      - name: "loopback_exists"
+        cmd: "get system interface Spoke-Lo"
+        expected: "name: Spoke-Lo"
+        error: "Loopback interface Spoke-Lo required for BGP/health checks"
+        critical: true
+
+      - name: "sdwan_zone_exists"
+        cmd: "config system sdwan; show | grep zone"
+        expected: "edit \"SDWAN_OVERLAY\""
+        error: "SD-WAN zone SDWAN_OVERLAY must exist"
+        critical: true
+
+      - name: "health_check_exists"
+        cmd: "config system sdwan; config health-check; show"
+        expected: "edit \"HUB_Health\""
+        error: "Health check HUB_Health must exist"
+        critical: true
+
+      # ADVPN-specific checks (added per GPT review)
+      - name: "auto_discovery_sender"
+        cmd: "get vpn ipsec phase1-interface HUB1-VPN1 | grep auto-discovery-sender"
+        expected: "set auto-discovery-sender enable"
+        error: "auto-discovery-sender must be enabled for ADVPN shortcut tunnels"
+        critical: true
+
+      - name: "tunnel_search_selectors"
+        cmd: "get vpn ipsec phase1-interface HUB1-VPN1 | grep tunnel-search"
+        expected: "set tunnel-search selectors"
+        error: "tunnel-search must be 'selectors' for ADVPN to work"
+        critical: true
+
+      - name: "add_route_disable"
+        cmd: "get vpn ipsec phase1-interface HUB1-VPN1 | grep add-route"
+        expected: "set add-route disable"
+        error: "add-route must be disabled - SD-WAN controls routing, not IPsec"
+        critical: true
+
+      - name: "dpd_on_idle"
+        cmd: "get vpn ipsec phase1-interface HUB1-VPN1 | grep \"set dpd\""
+        expected: "set dpd on-idle"
+        error: "DPD should be on-idle for ADVPN spoke"
+        critical: false
+
+      - name: "tunnel_names_exist"
+        cmd: "get vpn ipsec phase1-interface | grep name"
+        expected: "HUB1-VPN1 and HUB1-VPN2"
+        error: "Both tunnel names HUB1-VPN1 and HUB1-VPN2 must exist"
+        critical: true
+
+# -----------------------------------------------------------------------------
+# ERROR HANDLING
+# -----------------------------------------------------------------------------
+error_handling:
+  # IPsec Issues
+  - condition: "ipsec_down"
+    description: "IPsec tunnel(s) not establishing"
+    detection:
+      - "get vpn ipsec tunnel summary shows 'down'"
+      - "diagnose vpn ike gateway list shows no entries"
+    remediation:
+      - action: "Check Phase1 negotiation"
+        command: "diagnose vpn ike log filter name HUB1-VPN1"
+      - action: "Verify PSK matches hub"
+      - action: "Check hub is reachable on WAN"
+        command: "execute ping {{ hub_wan_ip }}"
+      - action: "Verify firewall allows IKE (UDP 500/4500)"
+    escalation: "IPsec not establishing - check hub config and PSK"
+
+  # BGP Issues
+  - condition: "bgp_not_established"
+    description: "BGP stuck in Active or Connect state"
+    detection:
+      - "get router info bgp summary shows Active/Connect"
+      - "Neighbor never reaches Established"
+    remediation:
+      - action: "Verify tunnel is UP first"
+      - action: "Check BGP neighbor IP"
+        command: "get router info bgp neighbor"
+      - action: "Verify AS number matches"
+      - action: "Check loopback reachability"
+        command: "execute ping {{ hub_bgp_loopback }}"
+    escalation: "BGP not establishing - verify tunnel and AS config"
+
+  # Health Check Issues
+  - condition: "health_check_failing"
+    description: "SD-WAN health check shows dead"
+    detection:
+      - "diagnose sys sdwan health-check shows 'dead'"
+    remediation:
+      - action: "Verify tunnel is UP"
+      - action: "Check health check target IP"
+      - action: "Verify policy allows health check traffic"
+      - action: "Check hub loopback is pingable"
+    escalation: "Health check failing - verify overlay connectivity"
+
+  # Overlay Connectivity Issues
+  - condition: "overlay_unreachable"
+    description: "Cannot ping hub loopback via overlay"
+    detection:
+      - "execute ping {{ hub_loopback }} shows 100% loss"
+    remediation:
+      - action: "Verify tunnel interface UP"
+      - action: "Check routing table"
+        command: "get router info routing-table all"
+      - action: "Verify firewall policy allows traffic"
+      - action: "Check hub has route back to spoke"
+    escalation: "Overlay unreachable - check routing and policies"
+
+  # Partial Success
+  - condition: "partial_connectivity"
+    description: "Some checks pass, others fail"
+    detection:
+      - "Tunnel UP but BGP not Established"
+      - "BGP UP but health check dead"
+    remediation:
+      - action: "Identify which layer is failing"
+      - action: "Fix in order: IPsec → BGP → SD-WAN → Overlay"
+    escalation: "Partial connectivity - troubleshoot layer by layer"
+
+  # NEW ERROR SCENARIOS (from sdwan-spoke-02 lessons)
+
+  # One tunnel UP, one DOWN
+  - condition: "asymmetric_tunnel_state"
+    description: "HUB1-VPN1 DOWN but HUB1-VPN2 UP (or vice versa)"
+    detection:
+      - "One tunnel shows UP, other shows DOWN/AUTHENTICATION_FAILED"
+    remediation:
+      - action: "Compare working tunnel config with broken tunnel"
+        tool: "fortigate-ipsec action=get phase=1 name=HUB1-VPN1"
+      - action: "Check localid - hub may expect different localid per tunnel"
+      - action: "Verify PSK is identical on both tunnels"
+      - action: "Check hub-side config for the failing tunnel"
+    lesson_learned: |
+      In sdwan-spoke-02, HUB1-VPN2 worked but HUB1-VPN1 failed.
+      Root cause was hub-side SPOKE_VPN1 tunnel had wrong PSK.
+      Spoke config was correct - issue was hub-side.
+
+  # Missing static routes
+  - condition: "missing_static_routes"
+    description: "BGP peer or health check unreachable"
+    detection:
+      - "Tunnel UP but can't ping 172.16.255.252 or 172.16.255.253"
+      - "BGP stuck in Connect state"
+      - "Health check shows dead"
+    remediation:
+      - action: "Add static routes for health check target"
+        commands:
+          - target_ip: "{{ management_ip }}"
+            action: "add"
+            dst_subnet: "172.16.255.253/32"
+            device: "HUB1-VPN1"
+          - target_ip: "{{ management_ip }}"
+            action: "add"
+            dst_subnet: "172.16.255.253/32"
+            device: "HUB1-VPN2"
+      - action: "Add static routes for BGP peer"
+        commands:
+          - target_ip: "{{ management_ip }}"
+            action: "add"
+            dst_subnet: "172.16.255.252/32"
+            device: "HUB1-VPN1"
+          - target_ip: "{{ management_ip }}"
+            action: "add"
+            dst_subnet: "172.16.255.252/32"
+            device: "HUB1-VPN2"
+    lesson_learned: |
+      Static routes are REQUIRED for health check and BGP peer IPs.
+      Without them, traffic won't traverse the overlay tunnels.
+
+  # Missing localid causing auth failure
+  - condition: "localid_missing"
+    description: "IPsec AUTHENTICATION_FAILED due to missing localid"
+    detection:
+      - "diagnose vpn ike log shows AUTHENTICATION_FAILED"
+      - "Other spokes work, this one doesn't"
+    remediation:
+      - action: "Compare localid with working spoke"
+      - action: "Set localid to match hub expectation"
+        tool: "fortigate-ipsec action=update phase=1 name=HUB1-VPN1 localid=spoke-HUB1-VPN1"
+      - action: "Also enable auto-discovery-sender if missing"
+        tool: "fortigate-ipsec action=update phase=1 name=HUB1-VPN1 auto_discovery_sender=enable"
+    lesson_learned: |
+      Hub may validate spoke identity via localid.
+      If localid is empty but hub expects one, auth fails.
+
+  # Tool 401 errors
+  - condition: "tool_auth_failure"
+    description: "Verification tools return 401 Unauthorized"
+    detection:
+      - "HTTP Error 401: Unauthorized"
+      - "No credentials found for X.X.X.X"
+    remediation:
+      - action: "FIRST: Check if fortigate-onboard/1.0.1 was run in BLOCK_2"
+        note: "This is the #1 cause of 401 errors — missing API token"
+      - action: "If onboard was NOT run, run it now"
+        tool: "org.ulysses.noc.fortigate-onboard/1.0.1"
+        parameters:
+          target_ip: "{{ management_ip }}"
+          admin_password: "{{ admin_password }}"
+          device_id: "{{ site_name }}"
+      - action: "Use tool versions with MCP credential support"
+        examples:
+          - "fortigate-sdwan-status/1.1.0 (Trust Anchor certified)"
+          - "fortigate-bgp-troubleshoot/1.0.2 (Trust Anchor certified)"
+          - "fortigate-health-check/1.0.4"
+      - action: "Verify device is in PRIMARY credentials file"
+        file: "~/.config/mcp/fortigate_credentials.yaml"
+        checks:
+          - "api_token is NOT 'none' or empty"
+          - "default_lookup has IP → device_key mapping"
+          - "host matches target_ip"
+    lesson_learned: |
+      Root cause of Site 08 verification failures:
+      1. fortigate-onboard was not run (no API token existed)
+      2. Onboard writes to ~/config/ but tools read ~/.config/mcp/ FIRST (priority 1)
+      3. PRIMARY path: ~/.config/mcp/fortigate_credentials.yaml
+      FIX: Always run fortigate-onboard/1.0.1 in BLOCK_2 step 8.
+      Verify new token lands at ~/.config/mcp/fortigate_credentials.yaml.
+
+# -----------------------------------------------------------------------------
+# CONSTRAINTS
+# -----------------------------------------------------------------------------
+constraints:
+  max_duration_minutes: 10
+  retry_interval_seconds: 30
+  max_retries: 3
+  convergence_wait_seconds: 60
+
+# -----------------------------------------------------------------------------
+# REPORTING FORMAT
+# -----------------------------------------------------------------------------
+report_format: |
+  ## Block 4: Connectivity Verification - {{ status }}
+
+  ### IPsec Tunnel Status
+  | Tunnel | Phase1 | Phase2 | Traffic |
+  |--------|--------|--------|---------|
+  | HUB1-VPN1 | {{ vpn1_phase1 }} | {{ vpn1_phase2 }} | {{ vpn1_traffic }} |
+  | HUB1-VPN2 | {{ vpn2_phase1 }} | {{ vpn2_phase2 }} | {{ vpn2_traffic }} |
+
+  ### BGP Status
+  - **Neighbor:** {{ hub_bgp_loopback }}
+  - **State:** {{ bgp_state }}
+  - **Prefixes Received:** {{ prefixes_received }}
+  - **Uptime:** {{ bgp_uptime }}
+
+  ### SD-WAN Health Check
+  | Check | Target | Status | Latency |
+  |-------|--------|--------|---------|
+  | HUB | {{ hub_loopback }} | {{ health_status }} | {{ health_latency }}ms |
+
+  ### Overlay Connectivity
+  - **Source:** {{ loopback_ip }} (Spoke-Lo)
+  - **Destination:** {{ hub_loopback }} (Hub-Lo)
+  - **Ping Result:** {{ ping_result }}
+  - **Latency:** {{ overlay_latency }}ms
+
+  ### Final Verification Summary
+  | Criterion | Status | Critical |
+  |-----------|--------|----------|
+  | IPsec Tunnels UP | {{ ipsec_result }} | YES |
+  | BGP Established | {{ bgp_result }} | YES |
+  | Health Check GREEN | {{ health_result }} | YES |
+  | Overlay Ping | {{ overlay_result }} | YES |
+  | Routes Learned | {{ routes_result }} | NO |
+
+  ### Errors
+  {{ errors | default("None") }}
+
+  ### Diagnostics Captured
+  {{ diagnostics_summary }}
+
+  ---
+  ## WORKFLOW COMPLETE: {{ final_status }}
+
+  Site **{{ site_name }}** is {{ "PRODUCTION READY" if status == "SUCCESS" else "REQUIRES ATTENTION" }}
+
+# -----------------------------------------------------------------------------
+# POST-DEPLOY ACTIONS (Execute after SUCCESS)
+# -----------------------------------------------------------------------------
+post_deploy_actions:
+  description: |
+    After successful verification, these actions finalize the deployment
+    by updating the SD-WAN manifest with the fully-configured device.
+
+  steps:
+    - id: manifest_reabsorb
+      name: "Re-absorb device into SD-WAN manifest"
+      condition: "status == SUCCESS"
+      critical: false
+      tool:
+        id: org.ulysses.noc.fortigate-sdwan-manifest-tracker/1.0.0
+        action: absorb
+        parameters:
+          action: "absorb"
+          target_ip: "{{ management_ip }}"
+      purpose: |
+        Captures the FULLY-CONFIGURED device state including:
+        - All IPsec phase1/phase2 tunnels
+        - SD-WAN zones, members, health-checks
+        - BGP neighbors and settings
+        - Firewall policies and address objects
+        - Interface configurations
+        This updates the manifest from the initial BLOCK_0 pre-check entry
+        (which only had factory defaults) to the complete production config.
+      expected_outputs:
+        - "device_key: spoke_{{ management_ip | replace('.', '_') }}"
+        - "role: spoke"
+        - "summary: Configuration summary with tunnel/BGP/SDWAN counts"
+      on_failure: |
+        Log warning but do not fail workflow.
+        User can manually run manifest-tracker absorb later.
+
+    - id: manifest_verify
+      name: "Verify manifest entry updated"
+      condition: "manifest_reabsorb.success == true"
+      tool:
+        id: org.ulysses.noc.fortigate-sdwan-manifest-tracker/1.0.0
+        action: list
+        parameters:
+          action: "list"
+      note: "Filter output for device_key 'spoke_{{ management_ip | replace('.', '_') }}'"
+      expected:
+        - "Device entry exists with updated config"
+        - "ipsec.phase1 count >= 2"
+        - "sdwan.members count >= 2"
+        - "bgp.neighbors count >= 1"
+
+# -----------------------------------------------------------------------------
+# FINAL WORKFLOW SUMMARY
+# -----------------------------------------------------------------------------
+final_summary:
+  include_in_report: true
+  format: |
+    ## Post-Deploy Actions
+
+    ### Manifest Tracking
+    | Action | Status | Details |
+    |--------|--------|---------|
+    | Re-absorb | {{ manifest_reabsorb_status }} | {{ manifest_reabsorb_message }} |
+    | Verify | {{ manifest_verify_status }} | {{ manifest_verify_message }} |
+
+    ### Next Steps (if SUCCESS)
+    1. Site is PRODUCTION READY
+    2. Device tracked in SD-WAN manifest
+    3. Monitor via: fortigate-health-check target_ip={{ management_ip }}
+    4. View manifest: fortigate-sdwan-manifest-tracker action=get

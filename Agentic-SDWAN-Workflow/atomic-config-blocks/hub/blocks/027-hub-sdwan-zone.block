@@ -1,0 +1,88 @@
+---
+block_id: 027
+name: hub-sdwan-zone
+display_name: "Hub SD-WAN Zone Configuration"
+version: 1.0.0
+category: core
+device_role: hub
+vendor: fortinet
+platform: fortigate
+min_fortios: "7.4.0"
+
+description: |
+  SD-WAN zone configuration for hub. Creates SDWAN_OVERLAY zone and binds
+  IPsec tunnel interfaces as members. Hub uses advpn-select to allow
+  spoke-to-spoke shortcuts.
+
+depends_on:
+  - block_id: 023
+    reason: "IPsec phase1 templates must exist"
+  - block_id: 024
+    reason: "IPsec phase2 templates must exist"
+
+provides:
+  - hub-sdwan-zone
+  - hub-sdwan-overlay
+
+parameters:
+  - name: ZONE_NAME
+    description: "SD-WAN zone name"
+    type: string
+    required: false
+    default: "SDWAN_OVERLAY"
+
+  - name: MEMBER_SEQ_VPN1
+    description: "SD-WAN member sequence number for VPN1"
+    type: integer
+    required: false
+    default: 100
+    note: "Hub typically uses high seq numbers (100+)"
+
+  - name: MEMBER_SEQ_VPN2
+    description: "SD-WAN member sequence number for VPN2"
+    type: integer
+    required: false
+    default: 2
+
+verification:
+  commands:
+    - "get system sdwan"
+  expected_patterns:
+    - "status: enable"
+    - "zone: {{ZONE_NAME}}"
+    - "advpn-select: enable"
+
+rollback:
+  commands:
+    - "config system sdwan"
+    - "set status disable"
+    - "end"
+
+notes: |
+  - advpn-select enables spoke-to-spoke shortcuts
+  - Hub members use tunnel interfaces (SPOKE_VPN1, SPOKE_VPN2)
+  - IMPORTANT: Hub member seq (100/2) is INDEPENDENT from spoke member seq
+  - Spokes use seq 3/4 per GAP-51, hub uses 100/2 - no conflict
+  - Zone is used in firewall policies instead of direct interfaces
+  - GPOT clarification: Hub seq ≠ spoke seq by design
+
+---
+
+config system sdwan
+    set status enable
+    config zone
+        edit "{{ZONE_NAME}}"
+            set advpn-select enable
+        next
+    end
+    config members
+        edit {{MEMBER_SEQ_VPN1}}
+            set interface "SPOKE_VPN1"
+            set zone "{{ZONE_NAME}}"
+        next
+        edit {{MEMBER_SEQ_VPN2}}
+            set interface "SPOKE_VPN2"
+            set zone "{{ZONE_NAME}}"
+        next
+    end
+end

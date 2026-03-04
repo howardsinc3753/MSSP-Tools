@@ -1,0 +1,2330 @@
+# Add SD-WAN Site - Agentic Workflow
+# Version: 1.5.0
+#
+# End-to-end autonomous workflow to provision and onboard a new SD-WAN spoke site
+# from bare metal/VM to full production IPsec/BGP connectivity with the hub.
+#
+# Updated: 2026-01-22
+#   - v1.5.0: Autonomy levels (GAP 2), partial success, error classification
+#   - v1.4.0: BLOCK_0 integration (GAP 1), entry_point section
+#   - v1.3.0: site_id derivation, BGP neighbor (GAP 7), SD-WAN health check (GAP 8)
+#   - v1.2.0: Latest-version tool policy, loopback interface, firewall policies
+#   - v1.1.0: human_interaction, critical_settings, lessons from sdwan-spoke-02
+
+workflow_id: org.ulysses.workflow.add-sdwan-site/1.5.0
+name: Add SD-WAN Site
+version: 1.5.0
+description: |
+  Autonomously provisions and onboards a new FortiGate SD-WAN spoke site.
+
+  From zero to production-ready in one workflow:
+  - Provisions FortiGate VM on KVM hypervisor (or onboards existing hardware)
+  - Handles first-login credential setup
+  - Applies FortiFlex license (VM) or validates hardware license
+  - Deploys SD-WAN blueprint (IPsec tunnels, BGP peering, health checks)
+  - Verifies hub connectivity and overlay reachability
+
+  Uses LLM decision-making to adapt to failures and choose remediation paths.
+
+metadata:
+  solution_pack: fortigate-ops
+  domain: sdwan
+  intent: provision
+  vendor: fortinet
+  tags:
+    - sdwan
+    - provisioning
+    - onboarding
+    - agentic
+    - autonomous
+
+# =============================================================================
+# GOAL DEFINITION (Outcome-Focused)
+# =============================================================================
+goal:
+  outcome: |
+    A new SD-WAN spoke site is fully operational with:
+    - FortiGate device running and accessible via management IP
+    - Valid license applied (FortiFlex token or hardware license)
+    - IPsec tunnels established to hub(s)
+    - BGP peering active with hub loopbacks
+    - SD-WAN health checks passing
+    - Bidirectional overlay reachability confirmed
+
+  success_criteria:
+    - device_reachable: "FortiGate responds to API/SSH on management IP"
+    - license_valid: "License status shows ACTIVE or hardware serial validated"
+    - ipsec_up: "All phase1/phase2 tunnels show status UP"
+    - bgp_established: "BGP neighbor state is Established with hub"
+    - health_check_pass: "SD-WAN health check to hub loopback is GREEN"
+    - overlay_reachable: "Ping from spoke loopback to hub loopback succeeds"
+
+  failure_criteria:
+    - vm_provision_failed: "VM creation failed after 3 retries"
+    - license_invalid: "FortiFlex token rejected or expired"
+    - ipsec_timeout: "IPsec tunnels not up after 5 minutes"
+    - bgp_stuck: "BGP stuck in Active/Connect state after 3 minutes"
+    - no_overlay_path: "No route to hub via overlay after config push"
+
+# =============================================================================
+# CRITICAL SETTINGS (Lessons Learned from sdwan-spoke-02)
+# =============================================================================
+# These settings are REQUIRED for proper SD-WAN spoke operation.
+# Missing any of these will cause specific failure modes.
+
+critical_settings:
+  # ---------------------------------------------------------------------------
+  # IPsec VPN Settings (BLOCK 3)
+  # ---------------------------------------------------------------------------
+  ipsec:
+    # CRITICAL: localid MUST be set for hub to authenticate spoke
+    localid:
+      required: true
+      purpose: "Hub uses localid to identify spoke and match PSK"
+      tool: "org.ulysses.noc.fortigate-ipsec"
+      symptom_if_missing: "AUTHENTICATION_FAILED on hub side"
+      example: "localid=spoke-02"
+
+    # CRITICAL: auto-discovery-sender enables shortcut path creation
+    auto_discovery_sender:
+      required: true
+      purpose: "Enables ADVPN shortcut path creation to other spokes"
+      tool: "org.ulysses.noc.fortigate-ipsec"
+      symptom_if_missing: "No direct spoke-to-spoke paths"
+      value: "enable"
+
+    # CRITICAL: transport must be UDP for SD-WAN
+    transport:
+      required: true
+      purpose: "IKE transport - UDP required for standard operation"
+      tool: "org.ulysses.noc.fortigate-ipsec"
+      symptom_if_missing: "Connection issues if TCP set"
+      value: "udp"
+
+  # ---------------------------------------------------------------------------
+  # System Global Settings (BLOCK 3)
+  # ---------------------------------------------------------------------------
+  system_global:
+    # CRITICAL: management-ip for central management identification
+    management_ip:
+      required: true
+      purpose: "Identifies device in management plane"
+      tool: "org.ulysses.noc.fortigate-system-global"
+      example: "192.168.209.35"
+
+    # IMPORTANT: Allow API key in URL query for some tools
+    rest_api_key_url_query:
+      required: false
+      purpose: "Enables API key in URL for compatibility"
+      tool: "org.ulysses.noc.fortigate-system-global"
+      value: "enable"
+
+  # ---------------------------------------------------------------------------
+  # System Settings (BLOCK 3)
+  # ---------------------------------------------------------------------------
+  system_settings:
+    # CRITICAL: location-id for ADVPN spoke identification
+    location_id:
+      required: true
+      purpose: "Unique identifier for ADVPN - typically loopback IP"
+      tool: "org.ulysses.noc.fortigate-system-settings"
+      symptom_if_missing: "ADVPN shortcuts fail"
+      example: "172.16.0.3"
+
+    # IMPORTANT: IKE TCP port for fallback
+    ike_tcp_port:
+      required: false
+      purpose: "TCP port for IKE fallback if UDP blocked"
+      tool: "org.ulysses.noc.fortigate-system-settings"
+      value: 11443
+
+  # ---------------------------------------------------------------------------
+  # BGP Settings (BLOCK 3)
+  # ---------------------------------------------------------------------------
+  bgp:
+    # CRITICAL: AS number must match hub
+    as_number:
+      required: true
+      purpose: "Autonomous System number - must match hub for iBGP"
+      tool: "org.ulysses.noc.fortigate-bgp-config"
+      example: 65000
+
+    # CRITICAL: router-id must be unique (use loopback)
+    router_id:
+      required: true
+      purpose: "Unique BGP router identifier"
+      tool: "org.ulysses.noc.fortigate-bgp-config"
+      symptom_if_missing: "BGP session flapping"
+      example: "172.16.0.3"
+
+    # IMPORTANT: scan-time for faster convergence
+    scan_time:
+      required: false
+      purpose: "Route scan interval - lower = faster convergence"
+      tool: "org.ulysses.noc.fortigate-bgp-config"
+      value: 5
+      note: "Default 60 is too slow for SD-WAN"
+
+    # CRITICAL: ibgp-multipath for ECMP
+    ibgp_multipath:
+      required: true
+      purpose: "Enables ECMP over multiple tunnels"
+      tool: "org.ulysses.noc.fortigate-bgp-config"
+      value: "enable"
+
+    # CRITICAL: recursive-next-hop for SD-WAN overlay routing
+    recursive_next_hop:
+      required: true
+      purpose: "Enables recursive lookup through overlay"
+      tool: "org.ulysses.noc.fortigate-bgp-config"
+      value: "enable"
+      symptom_if_missing: "BGP routes not installed in routing table"
+
+  # ---------------------------------------------------------------------------
+  # BGP Neighbor (BLOCK 3) - REQUIRED (GAP 7 FIX)
+  # ---------------------------------------------------------------------------
+  bgp_neighbor:
+    # CRITICAL: BGP neighbor statement required for peering
+    hub_neighbor:
+      required: true
+      purpose: "Establishes BGP peering with hub"
+      tool: "org.ulysses.noc.fortigate-bgp-neighbor"
+      symptom_if_missing: "BGP shows global config but no peering - neighbor IP unreachable"
+      example:
+        neighbor_ip: "172.16.255.252"
+        remote_as: 65000
+        update_source: "Spoke-Lo"
+
+  # ---------------------------------------------------------------------------
+  # SD-WAN Health Check (BLOCK 3) - REQUIRED (GAP 8 FIX)
+  # ---------------------------------------------------------------------------
+  sdwan_health_check:
+    # CRITICAL: Health check object must exist for SLA monitoring
+    hub_health:
+      required: true
+      purpose: "Monitors connectivity to hub for SLA-based routing"
+      tool: "org.ulysses.noc.fortigate-sdwan-health-check"
+      symptom_if_missing: "SD-WAN shows no health check, routing decisions blind"
+      example:
+        name: "HUB-Health"
+        server: "172.16.255.253"
+        protocol: "ping"
+        members: [1, 2]
+
+  # ---------------------------------------------------------------------------
+  # SD-WAN Member Settings (BLOCK 3)
+  # ---------------------------------------------------------------------------
+  sdwan_member:
+    # IMPORTANT: priority-in-sla for active path preference
+    priority_in_sla:
+      required: false
+      purpose: "Priority when SLA met - lower = preferred"
+      tool: "org.ulysses.noc.fortigate-sdwan-member"
+      example: 10
+
+    # IMPORTANT: priority-out-sla for failover behavior
+    priority_out_sla:
+      required: false
+      purpose: "Priority when SLA violated - higher = deprioritized"
+      tool: "org.ulysses.noc.fortigate-sdwan-member"
+      example: 20
+
+  # ---------------------------------------------------------------------------
+  # Static Routes (BLOCK 3) - OFTEN MISSED
+  # ---------------------------------------------------------------------------
+  static_routes:
+    # CRITICAL: Route to health check target via VPN tunnels
+    health_check_route:
+      required: true
+      purpose: "Route to hub health check loopback"
+      tool: "org.ulysses.noc.fortigate-static-route"
+      symptom_if_missing: "SD-WAN health check shows DEAD"
+      example:
+        destination: "172.16.255.253/32"
+        device: "HUB1-VPN1"
+
+    # CRITICAL: Route to BGP peer loopback via VPN tunnels
+    bgp_peer_route:
+      required: true
+      purpose: "Route to hub BGP loopback for peering"
+      tool: "org.ulysses.noc.fortigate-static-route"
+      symptom_if_missing: "BGP cannot establish - no route to peer"
+      example:
+        destination: "172.16.255.252/32"
+        device: "HUB1-VPN1"
+
+  # ---------------------------------------------------------------------------
+  # Loopback Interface (BLOCK 3) - REQUIRED
+  # ---------------------------------------------------------------------------
+  loopback_interface:
+    # CRITICAL: Loopback interface for BGP router-id and SD-WAN identification
+    Spoke-Lo:
+      required: true
+      purpose: "Provides unique identifier for BGP router-id and ADVPN location-id"
+      tool: "org.ulysses.noc.fortigate-interface"
+      symptom_if_missing: "BGP router-id wrong, overlay ping fails"
+      example:
+        name: "Spoke-Lo"
+        type: "loopback"
+        ip: "172.16.0.3/32"
+        allowaccess: "ping"
+
+  # ---------------------------------------------------------------------------
+  # Firewall Policies (BLOCK 3) - REQUIRED
+  # ---------------------------------------------------------------------------
+  firewall_policies:
+    # CRITICAL: Policy to allow LAN traffic to SD-WAN overlay
+    lan_to_overlay:
+      required: true
+      purpose: "Allows LAN users to reach remote sites via SD-WAN"
+      tool: "org.ulysses.noc.fortigate-firewall-policy"
+      symptom_if_missing: "LAN users cannot reach remote sites"
+      example:
+        srcintf: "port2"
+        dstintf: "virtual-wan-link"
+        action: "accept"
+
+    # CRITICAL: Policy to allow SD-WAN overlay traffic to LAN
+    overlay_to_lan:
+      required: true
+      purpose: "Allows remote sites to reach this site's LAN"
+      tool: "org.ulysses.noc.fortigate-firewall-policy"
+      symptom_if_missing: "Remote sites cannot reach this LAN"
+      example:
+        srcintf: "virtual-wan-link"
+        dstintf: "port2"
+        action: "accept"
+
+    # IMPORTANT: Policy for health check and BGP traffic
+    health_check_bgp:
+      required: true
+      purpose: "Allows SD-WAN health check probes and BGP peering"
+      tool: "org.ulysses.noc.fortigate-firewall-policy"
+      symptom_if_missing: "Health check dead, BGP won't establish"
+      example:
+        srcintf: "Spoke-Lo"
+        dstintf: "virtual-wan-link"
+        service: "PING"
+
+# =============================================================================
+# SITE_ID DERIVATION ENGINE (GAP 3 FIX)
+# =============================================================================
+# site_id is the PRIMARY SEED VALUE for all site-specific configuration.
+# A single integer (1-254) derives all other identifiers automatically.
+#
+# APPROVED DECISIONS (2026-01-21):
+#   - Q1: Loopback 172.16.0.{site_id}/32 with collision detection
+#   - Q2: LAN 10.{site_id}.1.0/24 (Option B - small, 254 hosts)
+#   - Q3: Multi-VLAN 10.{site_id}.{vlan_id}.0/24
+#   - Q4: Management IP kept as required input (future: could equal loopback)
+
+site_id_derivation:
+  description: |
+    Use site_id as the single input to derive all site-specific values.
+    This reduces configuration errors and ensures consistent IP addressing.
+
+  # IP Schema (APPROVED)
+  ip_schema:
+    loopback:
+      pattern: "172.16.{octet}.{site_id}/32"
+      default_octet: 0
+      range: "172.16.0.1 - 172.16.0.254 (site_id 1-254)"
+      overflow: "When 172.16.0.x exhausted, bump to 172.16.1.x"
+      collision_check: required
+
+    lan_default:
+      pattern: "10.{site_id}.1.0/24"
+      range: "10.1.1.0/24 - 10.254.1.0/24"
+      hosts: 254
+      note: "Default LAN subnet - single interface"
+
+    vlan:
+      pattern: "10.{site_id}.{vlan_id}.0/24"
+      example: "site_id=4, vlan_id=10 → 10.4.10.0/24"
+      note: "For multi-VLAN deployments"
+
+    management:
+      pattern: "user_input"
+      note: "Kept as required input; future could derive from loopback"
+
+  # Derivation Rules
+  derivation_rules:
+    spoke_loopback: "172.16.0.{site_id}"
+    location_id: "172.16.0.{site_id}"
+    router_id: "172.16.0.{site_id}"
+    lan_subnet: "10.{site_id}.1.0/24"
+    site_name: "spoke-{site_id:02d}"
+    hostname: "FG-Spoke-{site_id:02d}"
+    bgp_network: "10.{site_id}.0.0/16"
+
+  # Example: site_id=4
+  example:
+    input:
+      site_id: 4
+      management_ip: "192.168.209.40"  # Still required
+    derived:
+      spoke_loopback: "172.16.0.4"
+      location_id: "172.16.0.4"
+      router_id: "172.16.0.4"
+      lan_subnet: "10.4.1.0/24"
+      site_name: "spoke-04"
+      hostname: "FG-Spoke-04"
+      bgp_network: "10.4.0.0/16"
+
+  # Collision Detection Requirements
+  collision_detection:
+    required: true
+    checks:
+      - "Loopback IP not already assigned to another site"
+      - "LAN subnet doesn't overlap with existing sites"
+      - "site_id is unique in manifest"
+    implementation: |
+      Before assigning site_id, query manifest-tracker for existing sites.
+      If collision detected, suggest next available site_id.
+
+  # Range Overflow Handling
+  range_overflow:
+    loopback:
+      primary_range: "172.16.0.1 - 172.16.0.254"
+      secondary_range: "172.16.1.1 - 172.16.1.254"
+      tertiary_range: "172.16.2.1 - 172.16.2.254"
+      max_sites: 762  # 254 * 3
+
+# =============================================================================
+# DEVICE BASELINE STRATEGY (GREENFIELD ONLY)
+# =============================================================================
+# Purge scripts are ONLY for NEW/GREENFIELD devices being added to SD-WAN.
+# Never run purge on existing production devices.
+
+device_baseline:
+  scope: "greenfield_only"
+  description: |
+    New FortiGate devices come with default configurations that interfere
+    with SD-WAN standardization. Purge scripts clean the device state
+    before applying the standard SD-WAN configuration.
+
+    CRITICAL: Only apply to GREENFIELD (new) devices, NEVER to production.
+
+  supported_models:
+    - "40F"
+    - "50G"
+    - "70G"
+    - "200G"
+    - "400F"
+    - "600F"
+    - "900G"
+    - "VM"
+
+  interface_types:
+    lan_interface:
+      description: "Hardware models with 'lan' virtual-switch"
+      models: ["40F", "50G", "70G"]
+    internal_interface:
+      description: "Hardware models with 'internal' virtual-switch"
+      models: ["200G", "400F", "600F", "900G"]
+    port_interface:
+      description: "VM models use port1, port2, etc."
+      models: ["VM"]
+
+  # FortiManager ZTP Purge Scripts
+  purge_scripts:
+    # Script 1: For devices with "lan" interface (40F, 50G, 70G)
+    lan_interface_purge: |
+      config firewall policy
+      purge
+      end
+      config system interface
+      edit lan
+      unset role
+      next
+      end
+      config firewall address
+      delete lan
+      end
+      config system dhcp server
+      delete 1
+      end
+      config system virtual-switch
+      delete lan
+      end
+
+    # Script 2: For devices with "internal" interface (200G, 400F, 600F, 900G)
+    internal_interface_purge: |
+      config firewall policy
+      purge
+      end
+      config system interface
+      edit internal
+      unset role
+      next
+      end
+      config firewall address
+      delete internal
+      end
+      config system dhcp server
+      delete 1
+      end
+      config system virtual-switch
+      delete internal
+      end
+
+  # Baseline Show Commands (capture after purge)
+  baseline_capture:
+    description: "Run these commands after purge to capture clean baseline"
+    commands:
+      - "show system global"
+      - "show system settings"
+      - "show system interface"
+      - "show router static"
+      - "show system sdwan"
+      - "show router bgp"
+      - "show firewall policy"
+
+  # When to Apply
+  application_phase: "BLOCK_0 or early BLOCK_1 (before configuration)"
+  fortimanager_ztp: true
+  note: "Can be automated via FortiManager Zero Touch Provisioning"
+
+# =============================================================================
+# WORKFLOW ENTRY POINT (GAP 1 FIX)
+# =============================================================================
+# BLOCK_0 is the official entry point for parameter gathering.
+# Replaces the simpler pre_workflow section with a full wizard.
+
+entry_point:
+  block: "blocks/BLOCK_0_BLUEPRINT_WIZARD.yaml"
+  description: |
+    BLOCK_0 handles all input gathering through an interactive wizard.
+    It validates inputs, derives values from site_id, and checks for collisions.
+
+  mode_default: "interactive"
+  available_modes:
+    - interactive: "Full Q&A wizard with all questions"
+    - express: "Minimal questions (site_id, lan_subnets) - management_ip derived from site_id"
+    - full_manual: "All questions including optional ones"
+
+  skippable_if: |
+    All required parameters are provided upfront:
+      - site_id
+      - management_ip
+      - deployment_type
+      - license_type
+    Plus wan_gateway if deployment_type == 'vm'
+
+  outputs_to_phases:
+    # These outputs from BLOCK_0 feed into subsequent phases
+    # CRITICAL: All values MUST be passed - missing handoffs break workflow
+    - site_id          # Derivation seed
+    - site_name        # Phase 1-4: {{ site_name }}
+    - hostname         # Phase 3: system global hostname
+    - management_ip    # Phase 1-4: {{ management_ip }}
+    - spoke_loopback   # Phase 3-4: derived from site_id
+    - deployment_type  # Phase 1: vm/hardware decision
+    - license_type     # Phase 2: fortiflex/standard decision
+    - wan_ip           # Phase 1: VM provisioning (CIDR format: 192.168.209.45/24)
+    - wan_gateway      # Phase 1: VM provisioning
+    - lan_subnets      # Tracked for collision detection
+    - lan_interface    # Phase 3: firewall policies
+    - vlans            # Phase 3: fortigate-interface calls (optional)
+    # CRITICAL ADDITIONS (Gap Analysis 2026-01-24):
+    - admin_password   # Phase 1: bootstrap ISO, Phase 2: SSH login (SENSITIVE)
+    - hypervisor       # Phase 1: VM provisioning target
+    - ipsec_psk        # Phase 3: Maps to vpn_psk in BLOCK_3 (SENSITIVE)
+    - lan_ip           # Phase 1: FortiGate LAN gateway IP (e.g., 10.7.1.1/24)
+
+# =============================================================================
+# AUTONOMY LEVELS (GAP 2 FIX)
+# =============================================================================
+# Defines WHAT the AI can decide autonomously vs. what requires human approval.
+# This is distinct from WHEN to pause (human_interaction below) - this is about WHAT.
+#
+# APPROVED: 2026-01-22
+
+autonomy_levels:
+  # ---------------------------------------------------------------------------
+  # LEVEL 1: FULLY AUTONOMOUS (AI decides without asking)
+  # ---------------------------------------------------------------------------
+  ai_autonomous:
+    # Transient error handling
+    - retry_on_timeout          # API timeout -> retry up to 3x
+    - retry_on_transient_error  # 5xx errors -> retry with backoff
+    - wait_for_device_ready     # Device rebooting -> poll until ready
+    - wait_for_tunnel_up        # IPsec negotiating -> poll up to 5 min
+    - wait_for_bgp_converge     # BGP in Active -> wait up to 3 min
+
+    # Standard config decisions
+    - derive_from_site_id       # Auto-calculate loopback, LAN from site_id
+    - select_default_values     # Use defaults when optional params missing
+    - order_tool_execution      # Decide sequence within a phase
+    - skip_already_configured   # Don't reconfigure if already matches
+
+    # Health checks
+    - run_verification_tests    # Ping, route check, API health
+    - compare_with_baseline     # Diff against expected config
+    - log_all_actions           # Audit trail without asking
+
+  # ---------------------------------------------------------------------------
+  # LEVEL 2: AI RECOMMENDS, HUMAN CONFIRMS (Quick approval)
+  # ---------------------------------------------------------------------------
+  ai_recommends:
+    # Remediation paths
+    - alternative_remediation   # "IPsec down - suggest: restart tunnel daemon"
+    - config_adjustment         # "BGP stuck - suggest: clear BGP session"
+    - skip_optional_step        # "VLAN creation failed - suggest: skip (optional)"
+
+    # Non-destructive changes
+    - modify_timeout_values     # "Increase wait time from 5 to 10 min?"
+    - retry_with_params         # "Retry with different PSK?"
+    - rollback_single_config    # "Revert last change?"
+    - rollback_phase            # "Rollback all Phase 3 changes?"
+
+  # ---------------------------------------------------------------------------
+  # LEVEL 3: HUMAN REQUIRED (Must have explicit approval)
+  # ---------------------------------------------------------------------------
+  human_required:
+    # Financial impact
+    - license_provision         # FortiFlex points cost money
+    - license_transfer          # Moving license between devices
+
+    # Destructive actions
+    - delete_interface          # Could break connectivity
+    - delete_tunnel             # Could break SD-WAN
+    - delete_policy             # Could block traffic
+    - purge_config              # Factory reset portions
+    - factory_reset             # Complete device reset
+
+    # Hub modifications
+    - modify_hub_config         # Hub affects all spokes
+    - add_bgp_neighbor_on_hub   # Hub-side change
+    - modify_hub_policy         # Hub firewall rules
+
+    # Skip critical steps
+    - skip_verification         # Skipping health checks is risky
+    - skip_license              # Operating unlicensed
+    - skip_bgp                  # No dynamic routing
+
+    # Credential handling
+    - change_admin_password     # Security sensitive
+    - generate_api_token        # Access control
+    - store_credentials         # Where to save
+
+    # WAN protection (could orphan device)
+    - modify_wan_ip             # Could lose management access
+    - modify_wan_gateway        # Could lose management access
+    - modify_wan_interface      # Could lose management access
+
+    # Cross-phase rollback
+    - rollback_cross_phase      # Undo changes across multiple phases
+
+  # ---------------------------------------------------------------------------
+  # LEVEL 4: NEVER AUTONOMOUS (Explicit safety rails)
+  # ---------------------------------------------------------------------------
+  never_autonomous:
+    - modify_hub_without_approval     # Hub is production
+    - delete_production_config        # No implicit deletions
+    - expose_credentials_in_logs      # Security
+    - skip_all_verification           # Must verify something
+    - continue_after_auth_failure     # Security issue
+    - ignore_license_errors           # Legal/compliance
+    - proceed_after_ip_collision      # Would break network - use collision tool
+    - modify_wan_after_deployment     # Could orphan device from management
+    - continue_after_partial_phase    # Must review incomplete state
+    - deploy_to_multiple_sites_batch  # Each site should be confirmed
+    - ignore_verification_failures    # Must review what failed
+
+# =============================================================================
+# AUTONOMY CONFIGURATION
+# =============================================================================
+# User can tune autonomy mode based on environment and trust level.
+
+autonomy_config:
+  # Default mode for this workflow
+  mode: semi_autonomous  # Options: fully_autonomous, semi_autonomous, supervised
+
+  # Mode definitions
+  modes:
+    fully_autonomous:
+      description: "AI makes all Level 1+2 decisions, only pauses for Level 3+"
+      use_case: "Trusted environment, batch deployments"
+      phase_gates: false
+      ai_recommends_auto_approve: true
+
+    semi_autonomous:  # RECOMMENDED
+      description: "AI makes Level 1 decisions, asks for Level 2+"
+      use_case: "Standard operations, balance of speed and oversight"
+      phase_gates: true
+      ai_recommends_auto_approve: false
+
+    supervised:
+      description: "AI pauses before every phase and major action"
+      use_case: "New workflow, learning, high-value deployments"
+      phase_gates: true
+      ai_recommends_auto_approve: false
+      extra_confirmations: true
+
+  # Timeout for human response (semi/supervised modes)
+  human_response_timeout: 30m
+  timeout_action: pause_workflow  # Don't proceed without human
+
+  # Audit requirements
+  audit:
+    log_all_decisions: true
+    log_human_overrides: true
+    require_justification_for_skip: true
+
+# =============================================================================
+# PARTIAL SUCCESS HANDLING
+# =============================================================================
+# Policy for when a phase completes partially (some steps succeed, some fail).
+# Critical for Phase 3 which has 13 steps.
+
+partial_success:
+  policy: pause_and_report          # Don't auto-continue
+  rollback_on_failure: false        # Don't auto-rollback (human decides)
+  capture_state: true               # Record what completed
+
+  thresholds:
+    # If >= 80% steps complete, mark as "mostly_complete"
+    mostly_complete: 0.8
+    # If < 50% steps complete, mark as "mostly_failed"
+    mostly_failed: 0.5
+
+  actions:
+    mostly_complete:
+      - "Report completed steps"
+      - "List remaining steps"
+      - "Ask human: continue, retry failed, or rollback"
+    mostly_failed:
+      - "Report failed steps"
+      - "Suggest rollback or manual intervention"
+      - "Do NOT auto-continue"
+
+# =============================================================================
+# ERROR CLASSIFICATION
+# =============================================================================
+# Deterministic criteria for classifying errors as transient vs persistent.
+# AI uses these rules instead of guessing.
+
+error_classification:
+  transient:
+    http_codes: [500, 502, 503, 504]
+    messages:
+      - "connection timeout"
+      - "connection reset"
+      - "device busy"
+      - "temporary failure"
+      - "try again"
+    max_retries: 3
+    backoff_strategy: exponential  # 2s, 4s, 8s
+
+  persistent:
+    http_codes: [400, 401, 403, 404, 405, 422]
+    messages:
+      - "authentication failed"
+      - "invalid syntax"
+      - "permission denied"
+      - "not found"
+      - "license invalid"
+      - "already exists"
+    action: escalate_immediately  # Don't retry, ask human
+
+  unknown:
+    action: treat_as_transient_once  # Try once more, then escalate
+    max_retries: 1
+
+# =============================================================================
+# HUMAN INTERACTION POINTS
+# =============================================================================
+# Defines WHEN AI should ask human for input vs. proceed autonomously.
+# Works with autonomy_levels above: autonomy = WHAT, interaction = WHEN.
+# NOTE: pre_workflow removed - handled by BLOCK_0 entry_point above
+
+human_interaction:
+  # ---------------------------------------------------------------------------
+  # 1. PHASE GATES: Approval before major actions
+  # ---------------------------------------------------------------------------
+  phase_gates:
+    - before_phase: "provision"
+      when: "deployment_type == 'vm'"
+      prompt: "Ready to provision FortiGate VM?"
+      show_summary:
+        - "Hypervisor: {{ hypervisor_name }}"
+        - "VM Name: {{ site_name }}"
+        - "WAN IP: {{ wan_ip }}"
+        - "vCPUs: {{ vcpus }}, RAM: {{ memory_mb }}MB"
+      options:
+        - "Proceed"
+        - "Modify parameters"
+        - "Cancel"
+
+    - before_phase: "license"
+      when: "license_type == 'fortiflex'"
+      prompt: "Ready to provision FortiFlex license?"
+      show_summary:
+        - "Site: {{ site_name }}"
+        - "Config ID: {{ fortiflex_config_id }}"
+        - "Will consume FortiFlex points"
+      options:
+        - "Proceed"
+        - "Skip (use existing token)"
+        - "Cancel"
+
+    - before_phase: "configure"
+      prompt: "Ready to push SD-WAN configuration?"
+      show_summary:
+        - "Target: {{ management_ip }}"
+        - "Tunnels: HUB1-VPN1, HUB1-VPN2"
+        - "BGP AS: 65000"
+        - "Loopback: {{ spoke_loopback }}"
+      options:
+        - "Proceed"
+        - "Review config first"
+        - "Cancel"
+
+  # ---------------------------------------------------------------------------
+  # 3. DURING EXECUTION: When to pause for human decision
+  # ---------------------------------------------------------------------------
+  during_execution:
+    # Pause when automated remediation fails
+    - condition: "remediation_failed"
+      prompt: "Automated fix failed. How to proceed?"
+      context: "{{ error_description }}"
+      options:
+        - "Retry with different approach"
+        - "Skip this step"
+        - "Escalate to manual intervention"
+        - "Abort workflow"
+
+    # Pause when destructive action needed
+    - condition: "destructive_action_required"
+      prompt: "This action may cause disruption"
+      context: "{{ action_description }}"
+      options:
+        - "Proceed (I understand the risk)"
+        - "Skip"
+        - "Abort"
+
+    # Pause when hub admin needed
+    - condition: "requires_hub_admin"
+      prompt: "Hub-side change required"
+      context: "{{ hub_action_needed }}"
+      options:
+        - "Hub admin has made the change - continue"
+        - "Pause workflow (I'll notify hub admin)"
+        - "Skip this check"
+
+    # Pause on max retries
+    - condition: "max_retries_exceeded"
+      prompt: "Max retries reached for {{ failed_step }}"
+      context: "{{ retry_history }}"
+      options:
+        - "Retry again"
+        - "Skip and continue"
+        - "Abort workflow"
+
+  # ---------------------------------------------------------------------------
+  # 4. ESCALATION: When AI cannot proceed autonomously
+  # ---------------------------------------------------------------------------
+  escalation_triggers:
+    - condition: "ipsec_auth_failed_after_localid_set"
+      prompt: "IPsec authentication still failing after setting localid"
+      action: "pause_for_human"
+      suggested_actions:
+        - "Verify hub-side PSK configuration"
+        - "Check hub dial-up user settings"
+        - "Compare with working spoke"
+
+    - condition: "bgp_not_establishing_after_routes"
+      prompt: "BGP won't establish even with static routes"
+      action: "pause_for_human"
+      suggested_actions:
+        - "Verify hub has route back to spoke"
+        - "Check BGP neighbor config on hub"
+        - "Verify AS numbers match"
+
+    - condition: "tool_not_found"
+      prompt: "Required tool not available: {{ tool_id }}"
+      action: "pause_for_human"
+      suggested_actions:
+        - "Install missing tool"
+        - "Use alternative approach"
+
+  # ---------------------------------------------------------------------------
+  # 5. POST-WORKFLOW: Final report and handoff
+  # ---------------------------------------------------------------------------
+  post_workflow:
+    always:
+      - show: "summary_report"
+        content: |
+          ## SD-WAN Site Onboarding Complete
+
+          **Site**: {{ site_name }}
+          **Management IP**: {{ management_ip }}
+          **Status**: {{ final_status }}
+
+          ### Configuration Applied
+          - IPsec Tunnels: {{ tunnel_status }}
+          - BGP Peering: {{ bgp_status }}
+          - SD-WAN Health: {{ health_status }}
+
+          ### Credentials
+          - Admin Password: {{ admin_password }}
+          - API Token: {{ api_token }}
+
+          ### Next Steps
+          {{ next_steps }}
+
+    on_partial_success:
+      - show: "incomplete_items"
+        content: |
+          ## Workflow Incomplete
+
+          **Completed**: {{ completed_phases }}
+          **Failed**: {{ failed_phases }}
+
+          ### Manual Steps Required
+          {{ manual_steps }}
+
+          ### Error Details
+          {{ error_details }}
+
+    on_failure:
+      - show: "failure_report"
+        prompt: "Workflow failed. Review and retry?"
+        options:
+          - "Retry from failed phase"
+          - "Retry from beginning"
+          - "Export diagnostics"
+          - "Close"
+
+# =============================================================================
+# EXECUTION STRATEGIES
+# =============================================================================
+strategies:
+  default: adaptive
+
+  available:
+    - name: adaptive
+      description: |
+        LLM evaluates each step result and decides next action.
+        Can skip steps, retry with different parameters, or escalate.
+      decision_points:
+        - after_provision
+        - after_license
+        - after_config_push
+        - after_verification
+
+    - name: sequential
+      description: |
+        Linear execution through all phases.
+        Used when environment is known-good and predictable.
+      phases: [provision, license, configure, verify]
+
+    - name: goal_seeking
+      description: |
+        LLM picks tools freely until success criteria met.
+        Maximum flexibility for complex/unknown situations.
+      max_iterations: 20
+
+# =============================================================================
+# WORKFLOW PHASES
+# =============================================================================
+phases:
+  # ---------------------------------------------------------------------------
+  # PHASE 1: PROVISION
+  # ---------------------------------------------------------------------------
+  - id: provision
+    name: Provision FortiGate
+    description: Create VM on KVM or validate existing hardware device
+
+    decision_point:
+      question: "Is this a new VM deployment or existing hardware onboarding?"
+      options:
+        - condition: "deployment_type == 'vm'"
+          action: provision_kvm_vm
+        - condition: "deployment_type == 'hardware'"
+          action: validate_hardware_device
+
+    tools:
+      - id: org.ulysses.sdwan.kvm-fortios-provision
+        when: "deployment_type == 'vm'"
+        parameters:
+          hypervisor: "{{ hypervisor_name }}"
+          vm_name: "{{ site_name }}"
+          wan_ip: "{{ wan_ip }}"
+          wan_gateway: "{{ wan_gateway }}"
+          admin_password: "{{ admin_password }}"
+          vcpus: "{{ vcpus | default(2) }}"
+          memory_mb: "{{ memory_mb | default(4096) }}"
+
+      - id: org.ulysses.noc.fortigate-health-check
+        when: "deployment_type == 'hardware'"
+        parameters:
+          target_ip: "{{ management_ip }}"
+
+    success: "Device accessible at {{ management_ip }}"
+
+    # -------------------------------------------------------------------------
+    # BLOCK 1 ERROR HANDLING (What-If Scenarios)
+    # -------------------------------------------------------------------------
+    error_handling:
+      # Scenario 1: No DHCP available (VM boots but no IP assigned)
+      - condition: "vm_running and no_dhcp_lease"
+        description: "VM booted but did not receive DHCP address"
+        detection:
+          - "virsh domifaddr returns no IP after 120 seconds"
+          - "Console shows 'port1 link up' but no IP configured"
+        remediation:
+          - action: "Use virsh console to manually configure static IP"
+            steps:
+              - "virsh console {{ vm_name }}"
+              - "Login: admin / (blank)"
+              - "config system interface"
+              - "edit port1"
+              - "set ip {{ fallback_wan_ip }} 255.255.255.0"
+              - "set allowaccess ping https ssh http"
+              - "end"
+              - "config router static"
+              - "edit 1"
+              - "set gateway {{ wan_gateway }}"
+              - "set device port1"
+              - "end"
+          - action: "After manual config, continue workflow with static IP"
+        escalation: "If console automation fails, provide VNC coordinates for operator"
+
+      # Scenario 2: Wrong base image path
+      - condition: "base_image_not_found"
+        description: "FortiOS base qcow2 image not at expected path"
+        detection:
+          - "File not found: {{ base_image_path }}"
+          - "SSH ls -la returns error"
+        remediation:
+          - action: "Search for FortiOS images on hypervisor"
+            command: "find /home -name 'fortios*.qcow2' -o -name 'FGT*.qcow2' 2>/dev/null"
+          - action: "If found at different path, update hypervisor_credentials.yaml"
+          - action: "If not found, prompt operator to upload base image"
+        escalation: "Cannot proceed without base image - escalate with download instructions"
+
+      # Scenario 3: Disk full on hypervisor
+      - condition: "insufficient_disk_space"
+        description: "Not enough free space for new VM disk"
+        detection:
+          - "df -h {{ vm_image_path }} shows <5GB free"
+          - "qemu-img create fails with 'No space left'"
+        remediation:
+          - action: "Check for orphaned/old VM images"
+            command: "ls -lah {{ vm_image_path }}/*.qcow2"
+          - action: "Identify VMs not in virsh list"
+          - action: "Suggest cleanup of unused images"
+        escalation: "Cannot provision - disk full. Cleanup required: {{ disk_usage }}"
+
+      # Scenario 4: VM name already exists
+      - condition: "vm_name_conflict"
+        description: "A VM with this name already exists in libvirt"
+        detection:
+          - "virsh list --all | grep {{ vm_name }}"
+          - "virt-install returns 'domain already exists'"
+        remediation:
+          - action: "Check if existing VM is the target device"
+            steps:
+              - "virsh domifaddr {{ vm_name }} to get IP"
+              - "If IP matches management_ip, skip provision phase"
+          - action: "If different site, suggest unique name"
+            suggestion: "{{ site_name }}-{{ timestamp }}"
+          - action: "If orphaned, offer to destroy and recreate"
+            requires_approval: true
+        escalation: "VM name conflict - operator decision required"
+
+      # Scenario 5: Network bridge missing
+      - condition: "bridge_not_found"
+        description: "WAN bridge (br0) not configured on hypervisor"
+        detection:
+          - "brctl show | grep -v br0"
+          - "ip link show br0 returns 'not found'"
+        remediation:
+          - action: "List available bridges"
+            command: "brctl show && virsh net-list --all"
+          - action: "If virbr0 exists, use as fallback (NAT mode)"
+            note: "NAT mode limits inbound connectivity"
+          - action: "Create br0 bridge"
+            requires_approval: true
+            steps:
+              - "nmcli con add type bridge ifname br0"
+              - "nmcli con add type bridge-slave ifname eth0 master br0"
+        escalation: "No suitable bridge - network config required"
+
+      # Scenario 6: libvirt not running
+      - condition: "libvirt_unavailable"
+        description: "libvirtd service not running or not responding"
+        detection:
+          - "systemctl is-active libvirtd returns inactive"
+          - "virsh list returns 'failed to connect'"
+        remediation:
+          - action: "Start libvirtd service"
+            command: "systemctl start libvirtd"
+          - action: "Check for socket issues"
+            command: "ls -la /var/run/libvirt/libvirt-sock"
+          - action: "Verify libvirt installation"
+            command: "rpm -qa | grep libvirt"
+        escalation: "libvirt unavailable - system admin required"
+
+      # Scenario 7: SSH authentication failure to hypervisor
+      - condition: "hypervisor_ssh_failed"
+        description: "Cannot establish SSH connection to KVM host"
+        detection:
+          - "SSH connection timeout"
+          - "Permission denied (publickey,password)"
+          - "Host key verification failed"
+        remediation:
+          - action: "If key auth failed, verify key exists"
+            command: "Test-Path {{ ssh_key_path }}"
+          - action: "If key missing, regenerate and deploy"
+            steps:
+              - "ssh-keygen -t rsa -b 4096 -f {{ ssh_key_path }} -N ''"
+              - "Manual: copy public key to hypervisor authorized_keys"
+          - action: "If password auth, verify credentials in hypervisor_credentials.yaml"
+          - action: "Test connectivity with explicit params"
+            command: "ssh -i {{ ssh_key_path }} -o StrictHostKeyChecking=no {{ username }}@{{ host }}"
+        escalation: "Cannot reach hypervisor - verify network path and credentials"
+
+      # Scenario 8: FortiOS boot failure
+      - condition: "vm_boot_failure"
+        description: "VM created but FortiOS does not boot properly"
+        detection:
+          - "virsh console shows no output after 180 seconds"
+          - "VNC shows black screen or kernel panic"
+        remediation:
+          - action: "Check VM config"
+            command: "virsh dumpxml {{ vm_name }}"
+          - action: "Verify SCSI disk controller is present"
+            note: "FortiOS requires bus=scsi, not virtio for boot disk"
+          - action: "Check base image integrity"
+            command: "qemu-img check {{ vm_disk_path }}"
+          - action: "Recreate VM with correct virt-install params"
+        escalation: "Boot failure - verify base image and VM config"
+
+    failure_actions:
+      - retry_with_different_ip
+      - check_hypervisor_resources
+      - escalate_to_operator
+
+  # ---------------------------------------------------------------------------
+  # PHASE 2: LICENSE
+  # ---------------------------------------------------------------------------
+  - id: license
+    name: Apply License
+    description: Apply FortiFlex token (VM) or validate hardware license
+
+    decision_point:
+      question: "What license type does this device need?"
+      options:
+        - condition: "license_type == 'fortiflex'"
+          action: apply_fortiflex_token
+        - condition: "license_type == 'standard'"
+          action: validate_hardware_license
+
+    tools:
+      - id: org.ulysses.licensing.fortiflex-token-create
+        when: "license_type == 'fortiflex' and not token_provided"
+        parameters:
+          config_id: "{{ fortiflex_config_id }}"
+          description: "{{ site_name }} - SD-WAN Spoke"
+
+      # NOTE: fortigate-ssh has provisioning_mode for write commands
+      # Use provisioning_mode=true for execute commands
+      - id: org.ulysses.noc.fortigate-ssh
+        when: "license_type == 'fortiflex'"
+        parameters:
+          target_ip: "{{ management_ip }}"
+          provisioning_mode: true
+          commands:
+            # FortiOS syntax: "execute vm-license <token>" (no "install" keyword)
+            # Verified against FortiOS 7.4/7.6 CLI reference
+            - "execute vm-license {{ fortiflex_token }}"
+
+      - id: org.ulysses.noc.fortigate-health-check
+        alias: verify_license
+        parameters:
+          target_ip: "{{ management_ip }}"
+
+    success: "License status ACTIVE, serial number assigned"
+
+    # -------------------------------------------------------------------------
+    # BLOCK 2 ERROR HANDLING (What-If Scenarios)
+    # -------------------------------------------------------------------------
+    error_handling:
+      # Scenario 1: FortiFlex token invalid or expired
+      - condition: "token_rejected"
+        description: "FortiGate rejected the FortiFlex license token"
+        detection:
+          - "execute vm-license returns 'Invalid token'"
+          - "execute vm-license returns 'Token expired'"
+          - "execute vm-license returns 'Token already used'"
+        remediation:
+          - action: "Verify token was generated correctly"
+            steps:
+              - "Check token length (should be 20 chars)"
+              - "Verify no whitespace or special chars"
+          - action: "Generate new token if expired"
+            tool: "org.ulysses.licensing.fortiflex-token-create"
+          - action: "Check FortiFlex portal for token status"
+        escalation: "Token issue - verify FortiFlex account has available points"
+
+      # Scenario 2: Device doesn't reboot after license
+      - condition: "license_no_reboot"
+        description: "License applied but device shut off instead of rebooting"
+        detection:
+          - "virsh list shows VM state 'shut off'"
+          - "No ping response after 180 seconds"
+        remediation:
+          - action: "Manually start the VM"
+            command: "virsh start {{ vm_name }}"
+          - action: "Wait for boot completion (120 seconds)"
+          - action: "Verify serial changed to FortiFlex serial"
+        escalation: "VM may have hardware issue - check console for errors"
+
+      # Scenario 3: SSH tool is read-only (current gap)
+      - condition: "ssh_tool_readonly"
+        description: "fortigate-ssh tool doesn't allow write commands"
+        detection:
+          - "Tool returns 'command not in allowed list'"
+          - "'execute' commands blocked"
+        remediation:
+          - action: "Use direct SSH via plink or paramiko"
+            workaround: |
+              plink -ssh admin@{{ management_ip }} -pw {{ password }} "execute vm-license {{ token }}"
+          - action: "Use fortigate-onboard tool which has SSH write capability"
+        escalation: "Tool gap - fortigate-ssh needs provisioning_mode enhancement"
+
+      # Scenario 4: API token creation fails
+      - condition: "api_token_failed"
+        description: "Cannot create REST API token for device registration"
+        detection:
+          - "REST endpoint returns HTML redirect"
+          - "401 Unauthorized"
+          - "CSRF token mismatch"
+        remediation:
+          - action: "Use fortigate-onboard tool instead"
+            note: "Handles session-based auth correctly"
+          - action: "Verify admin credentials are correct"
+          - action: "Check if API feature is licensed"
+        escalation: "API access issue - may need FortiOS version-specific handling"
+
+      # Scenario 5: Device IP changed after license reboot
+      - condition: "ip_changed_after_reboot"
+        description: "Device came back on different IP after license reboot"
+        detection:
+          - "Original management_ip not responding"
+          - "DHCP may have assigned new lease"
+        remediation:
+          - action: "Scan network for new FortiGate"
+            command: "nmap -sP {{ subnet }}/24 | grep -i forti"
+          - action: "Check DHCP server for new lease"
+          - action: "Use virsh domifaddr if VM"
+            command: "virsh domifaddr {{ vm_name }}"
+          - action: "Update workflow with new IP"
+        escalation: "Device relocated - update management_ip parameter"
+
+      # Scenario 6: Wrong password after license
+      - condition: "password_changed"
+        description: "Cannot authenticate after license application"
+        detection:
+          - "SSH returns 'Permission denied'"
+          - "API returns 401"
+        remediation:
+          - action: "Try known default passwords"
+            attempts:
+              - "admin / (blank)"
+              - "{{ admin_password }}"
+          - action: "Use console to reset password if needed"
+        escalation: "Cannot authenticate - console access required"
+
+    failure_actions:
+      - check_token_validity
+      - regenerate_token
+      - escalate_license_issue
+
+  # ---------------------------------------------------------------------------
+  # PHASE 3: CONFIGURE
+  # ---------------------------------------------------------------------------
+  - id: configure
+    name: Deploy SD-WAN Configuration
+    description: |
+      Push IPsec, BGP, SD-WAN configuration from manifest.
+      Includes critical settings learned from sdwan-spoke-02 deployment.
+
+    tools:
+      # Step 1: Generate blueprint from manifest
+      - id: org.ulysses.noc.fortigate-sdwan-blueprint-planner
+        alias: generate_blueprint
+        parameters:
+          manifest_path: "C:/ProgramData/Ulysses/config/sdwan-manifest.yaml"
+          role: spoke
+          site_name: "{{ site_name }}"
+          loopback_ip: "{{ spoke_loopback }}"
+          hub_targets:
+            - ip: "{{ hub_wan_ip }}"
+              loopback: "{{ hub_loopback }}"
+
+      # Step 2: Configure system global settings
+      - id: org.ulysses.noc.fortigate-system-global
+        alias: configure_system_global
+        parameters:
+          target_ip: "{{ management_ip }}"
+          action: set
+          management_ip: "{{ management_ip }}"
+          rest_api_key_url_query: enable
+
+      # Step 3: Configure system settings (ADVPN location-id)
+      - id: org.ulysses.noc.fortigate-system-settings
+        alias: configure_system_settings
+        parameters:
+          target_ip: "{{ management_ip }}"
+          action: set
+          location_id: "{{ spoke_loopback }}"
+          ike_tcp_port: 11443
+
+      # Step 4: Create loopback interface (REQUIRED for BGP router-id and SD-WAN)
+      - id: org.ulysses.noc.fortigate-interface
+        alias: create_loopback_interface
+        parameters:
+          target_ip: "{{ management_ip }}"
+          action: create
+          name: "Spoke-Lo"
+          type: loopback
+          ip: "{{ spoke_loopback }}/32"
+          allowaccess: "ping"
+          description: "SD-WAN BGP loopback"
+        note: "Loopback is used for router-id, location-id, and overlay reachability"
+
+      # Step 5: Configure IPsec tunnels (CRITICAL: localid and auto-discovery-sender)
+      - id: org.ulysses.noc.fortigate-ipsec
+        alias: configure_ipsec_vpn1
+        parameters:
+          target_ip: "{{ management_ip }}"
+          action: set
+          tunnel_name: "HUB1-VPN1"
+          localid: "spoke-HUB1-VPN1"
+          auto_discovery_sender: enable
+          transport: udp
+
+      - id: org.ulysses.noc.fortigate-ipsec
+        alias: configure_ipsec_vpn2
+        parameters:
+          target_ip: "{{ management_ip }}"
+          action: set
+          tunnel_name: "HUB1-VPN2"
+          localid: "spoke-HUB1-VPN2"
+          auto_discovery_sender: enable
+          transport: udp
+
+      # Step 6: Configure static routes (CRITICAL: health check and BGP peer routes)
+      - id: org.ulysses.noc.fortigate-static-route
+        alias: configure_health_check_route_vpn1
+        parameters:
+          target_ip: "{{ management_ip }}"
+          action: create
+          destination: "172.16.255.253/32"
+          device: "HUB1-VPN1"
+          priority: 10
+
+      - id: org.ulysses.noc.fortigate-static-route
+        alias: configure_health_check_route_vpn2
+        parameters:
+          target_ip: "{{ management_ip }}"
+          action: create
+          destination: "172.16.255.253/32"
+          device: "HUB1-VPN2"
+          priority: 20
+
+      - id: org.ulysses.noc.fortigate-static-route
+        alias: configure_bgp_peer_route_vpn1
+        parameters:
+          target_ip: "{{ management_ip }}"
+          action: create
+          destination: "172.16.255.252/32"
+          device: "HUB1-VPN1"
+          priority: 10
+
+      - id: org.ulysses.noc.fortigate-static-route
+        alias: configure_bgp_peer_route_vpn2
+        parameters:
+          target_ip: "{{ management_ip }}"
+          action: create
+          destination: "172.16.255.252/32"
+          device: "HUB1-VPN2"
+          priority: 20
+
+      # Step 7: Configure BGP global settings
+      - id: org.ulysses.noc.fortigate-bgp-config
+        alias: configure_bgp_global
+        parameters:
+          target_ip: "{{ management_ip }}"
+          action: set
+          as: 65000
+          router_id: "{{ spoke_loopback }}"
+          ibgp_multipath: enable
+          recursive_next_hop: enable
+          scan_time: 5
+
+      # Step 8: Configure BGP neighbor (GAP 7 FIX - required for peering!)
+      - id: org.ulysses.noc.fortigate-bgp-neighbor
+        alias: configure_bgp_neighbor_hub
+        parameters:
+          target_ip: "{{ management_ip }}"
+          action: add
+          neighbor_ip: "{{ hub_bgp_loopback | default('172.16.255.252') }}"
+          remote_as: 65000
+          update_source: "Spoke-Lo"
+          route_reflector_client: disable
+          soft_reconfiguration: enable
+          next_hop_self: enable
+        note: "BGP neighbor required for peering - without this, BGP never establishes"
+
+      # Step 9: Create SD-WAN health check (GAP 8 FIX - required for SLA!)
+      - id: org.ulysses.noc.fortigate-sdwan-health-check
+        alias: create_sdwan_health_check
+        parameters:
+          target_ip: "{{ management_ip }}"
+          action: create
+          name: "HUB-Health"
+          server: "{{ hub_health_loopback | default('172.16.255.253') }}"
+          protocol: ping
+          members:
+            - 1  # HUB1-VPN1 seq_num
+            - 2  # HUB1-VPN2 seq_num
+          threshold_alert_packetloss: 5
+          threshold_warning_latency: 100
+          update_static_route: disable
+        note: "SD-WAN health check required - routes to target, but check must exist"
+
+      # Step 10: Configure SD-WAN member priorities
+      - id: org.ulysses.noc.fortigate-sdwan-member
+        alias: configure_sdwan_member_vpn1
+        parameters:
+          target_ip: "{{ management_ip }}"
+          interface: "HUB1-VPN1"
+          priority_in_sla: 10
+          priority_out_sla: 20
+
+      - id: org.ulysses.noc.fortigate-sdwan-member
+        alias: configure_sdwan_member_vpn2
+        parameters:
+          target_ip: "{{ management_ip }}"
+          interface: "HUB1-VPN2"
+          priority_in_sla: 10
+          priority_out_sla: 20
+
+      # Step 11: Configure firewall policies for SD-WAN overlay traffic
+      - id: org.ulysses.noc.fortigate-firewall-policy
+        alias: create_lan_to_overlay_policy
+        parameters:
+          target_ip: "{{ management_ip }}"
+          action: create
+          name: "LAN-to-SD-WAN-Overlay"
+          srcintf: "{{ lan_interface | default('port2') }}"
+          dstintf: "virtual-wan-link"
+          srcaddr: "all"
+          dstaddr: "all"
+          service: "ALL"
+          nat: "enable"
+          logtraffic: "all"
+          comments: "Allow LAN to SD-WAN overlay"
+
+      - id: org.ulysses.noc.fortigate-firewall-policy
+        alias: create_overlay_to_lan_policy
+        parameters:
+          target_ip: "{{ management_ip }}"
+          action: create
+          name: "SD-WAN-Overlay-to-LAN"
+          srcintf: "virtual-wan-link"
+          dstintf: "{{ lan_interface | default('port2') }}"
+          srcaddr: "all"
+          dstaddr: "all"
+          service: "ALL"
+          nat: "disable"
+          logtraffic: "all"
+          comments: "Allow SD-WAN overlay to LAN"
+
+      - id: org.ulysses.noc.fortigate-firewall-policy
+        alias: create_health_check_policy
+        parameters:
+          target_ip: "{{ management_ip }}"
+          action: create
+          name: "SD-WAN-Health-Check"
+          srcintf: "Spoke-Lo"
+          dstintf: "virtual-wan-link"
+          srcaddr: "all"
+          dstaddr: "all"
+          service: "PING"
+          nat: "disable"
+          logtraffic: "utm"
+          comments: "SD-WAN health check and BGP traffic"
+
+      # Step 12: Push atomic CLI config via SSH
+      - id: org.ulysses.noc.fortigate-config-push/2.0.0
+        alias: push_config
+        when: "blueprint_generated AND api_onboarded"
+        parameters:
+          target_ip: "{{ management_ip }}"
+          config_path: "C:/ProgramData/Ulysses/config/blueprints/site-{{ site_id:02d }}/atomic-config-spoke-{{ site_id:02d }}.conf"
+        note: "v2.0.0 uses SSH CLI push. Requires fortigate-onboard to have run first."
+
+      # Step 13: Absorb device into manifest
+      - id: org.ulysses.noc.fortigate-sdwan-manifest-tracker
+        alias: absorb_new_device
+        parameters:
+          action: absorb
+          target_ip: "{{ management_ip }}"
+
+    success: "Configuration applied, device absorbed into manifest"
+
+    # -------------------------------------------------------------------------
+    # BLOCK 3 ERROR HANDLING (What-If Scenarios)
+    # -------------------------------------------------------------------------
+    error_handling:
+      # Scenario 1: Config-push fails (RESOLVED - tool v2.0.0 certified 2026-01-26)
+      - condition: "config_push_failed"
+        description: "fortigate-config-push/2.0.0 fails during atomic config push"
+        detection:
+          - "Tool returns error or partial section failures"
+          - "SSH connection dropped during push"
+        remediation:
+          - action: "Check if API token exists (fortigate-onboard must run first)"
+          - action: "Use fortigate-config-ssh/1.0.0 as fallback (array of CLI commands)"
+            parameters:
+              target_ip: "{{ management_ip }}"
+              commands: ["<cli_lines_as_array>"]
+              admin_password: "{{ admin_password }}"
+          - action: "Manual SSH push if all tools fail"
+            workaround: "Bash SSH to FortiGate and paste CLI config directly"
+        escalation: "Config push failed - check SSH connectivity and device state"
+
+      # Scenario 2: Spoke template argument parsing broken
+      - condition: "template_args_failed"
+        description: "fortigate-sdwan-spoke-template doesn't parse CLI arguments"
+        detection:
+          - "Tool ignores positional arguments"
+          - "Config applied to wrong device"
+        remediation:
+          - action: "Use blueprint file directly"
+            path: "C:/ProgramData/Ulysses/config/blueprints/{{ site_name }}_config.txt"
+          - action: "Manually invoke with JSON parameters"
+          - action: "Use REST API alternative"
+        escalation: "Fix fortigate-sdwan-spoke-template argument parser"
+
+      # Scenario 3: Config syntax error
+      - condition: "config_syntax_error"
+        description: "FortiOS rejected configuration due to syntax error"
+        detection:
+          - "Command fail. Return code -651"
+          - "Unknown attribute"
+          - "Entry not found"
+        remediation:
+          - action: "Identify failing line in config"
+          - action: "Check FortiOS version compatibility"
+            note: "Some commands changed between 7.2/7.4/7.6"
+          - action: "Push config section by section"
+          - action: "Validate against FortiOS CLI reference"
+        escalation: "Config incompatible - review generated blueprint"
+
+      # Scenario 4: Object already exists
+      - condition: "object_exists"
+        description: "Configuration object already exists on device"
+        detection:
+          - "Object already exists"
+          - "Duplicate entry"
+        remediation:
+          - action: "Check if existing config is compatible"
+            command: "show vpn ipsec phase1-interface {{ tunnel_name }}"
+          - action: "If identical, skip that section"
+          - action: "If different, delete and recreate"
+            requires_approval: true
+        escalation: "Config conflict - manual review required"
+
+      # Scenario 5: IPsec PSK mismatch
+      - condition: "psk_mismatch"
+        description: "IPsec tunnel won't establish due to PSK mismatch with hub"
+        detection:
+          - "diagnose vpn ike log shows 'pre-shared key mismatch'"
+          - "Phase1 stuck in negotiating"
+        remediation:
+          - action: "Verify PSK matches hub configuration"
+            note: "PSK in blueprint must match hub's dynamic tunnel"
+          - action: "Simplify PSK for testing"
+            suggestion: "Use 'password' for initial test"
+          - action: "Update PSK on both ends"
+        escalation: "Contact hub administrator to verify PSK"
+
+      # Scenario 6: Wrong network-id
+      - condition: "network_id_mismatch"
+        description: "SD-WAN overlay network-id doesn't match hub"
+        detection:
+          - "Tunnel up but no SD-WAN shortcut paths"
+          - "diagnose sys sdwan member shows wrong overlay"
+        remediation:
+          - action: "Verify network-id matches hub tunnel"
+            note: "Hub VPN1 network-id=1 → Spoke VPN1 network-id=1"
+          - action: "Check manifest for correct values"
+          - action: "Update phase1 with correct network-id"
+        escalation: "Network-id mismatch - coordinate with hub config"
+
+      # Scenario 7: Blueprint generation failed
+      - condition: "blueprint_failed"
+        description: "Blueprint planner could not generate configuration"
+        detection:
+          - "Missing required parameters"
+          - "Template rendering error"
+          - "Manifest lookup failed"
+        remediation:
+          - action: "Verify device is absorbed into manifest"
+            tool: "fortigate-sdwan-manifest-tracker action=list"
+          - action: "Check manifest has hub information"
+          - action: "Regenerate blueprint with explicit parameters"
+        escalation: "Blueprint generation issue - check manifest completeness"
+
+      # Scenario 8: Credential path wrong (fortigate-onboard writes to relative path)
+      - condition: "wrong_creds_path"
+        description: "fortigate-onboard wrote credentials to wrong location"
+        detection:
+          - "Credentials at ./config/fortigate_credentials.yaml"
+          - "Expected at ~/.config/mcp/fortigate_credentials.yaml (PRIMARY)"
+          - "API tools return 401 even after onboard completed"
+          - "api_token shows 'none' or old token in PRIMARY file"
+        remediation:
+          - action: "Check PRIMARY credentials file has correct token"
+            file: "~/.config/mcp/fortigate_credentials.yaml"
+            checks:
+              - "api_token is NOT 'none' or empty"
+              - "default_lookup maps IP to device key"
+          - action: "Copy credentials to PRIMARY path if needed"
+            command: |
+              copy ~/config/fortigate_credentials.yaml ~/.config/mcp/fortigate_credentials.yaml
+          - action: "Verify device registered correctly"
+            tool: "fortigate-health-check/1.0.4 (should return 200, not 401)"
+        note: |
+          PRIMARY credential path: ~/.config/mcp/fortigate_credentials.yaml
+          All 42 FortiGate tools check this path FIRST (priority 1).
+          The fortigate-onboard tool writes to ~/config/ (NOT ~/.config/mcp/).
+          After onboard, verify new token appears in PRIMARY file.
+          If PRIMARY has a stale token, tools will use THAT and return 401.
+        escalation: "Ensure onboard writes to PRIMARY path or manually copy"
+
+      # Scenario 9: IPsec AUTHENTICATION_FAILED (learned from sdwan-spoke-02)
+      - condition: "ipsec_auth_failed"
+        description: "IPsec tunnel shows AUTHENTICATION_FAILED on hub side"
+        detection:
+          - "Hub diagnose vpn ike log shows: peer X pre-shared key mismatch"
+          - "Hub shows: AUTHENTICATION_FAILED"
+          - "Spoke tunnel shows up but hub shows down"
+        root_cause: "Hub cannot identify spoke without localid"
+        remediation:
+          - action: "Verify localid is set on spoke tunnels"
+            tool: "org.ulysses.noc.fortigate-ipsec/1.0.3"
+            check: "localid parameter must match hub's peer-id or dial-up user"
+          - action: "Set localid on both VPN tunnels"
+            commands:
+              - "config vpn ipsec phase1-interface"
+              - "edit HUB1-VPN1"
+              - 'set localid "spoke-HUB1-VPN1"'
+              - "next"
+              - "edit HUB1-VPN2"
+              - 'set localid "spoke-HUB1-VPN2"'
+              - "end"
+          - action: "Verify hub-side PSK matches"
+            note: "May need hub admin to verify PSK configuration"
+        escalation: "Contact hub administrator to verify spoke identity and PSK"
+
+      # Scenario 10: Missing static routes (learned from sdwan-spoke-02)
+      - condition: "missing_static_routes"
+        description: "BGP cannot establish or health check dead due to missing routes"
+        detection:
+          - "BGP neighbor stuck in Active/Connect state"
+          - "SD-WAN health check shows DEAD"
+          - "No route to BGP peer IP (172.16.255.252)"
+          - "No route to health check target (172.16.255.253)"
+        root_cause: "Static routes via VPN tunnels not configured"
+        remediation:
+          - action: "Create static routes for BGP peer via VPN tunnels"
+            tool: "org.ulysses.noc.fortigate-static-route/1.0.0"
+            commands:
+              - "config router static"
+              - "edit 0"
+              - "set dst 172.16.255.252/32"
+              - "set device HUB1-VPN1"
+              - "set priority 10"
+              - "end"
+          - action: "Create static routes for health check via VPN tunnels"
+            tool: "org.ulysses.noc.fortigate-static-route/1.0.0"
+          - action: "Verify routes with routing-table tool"
+            tool: "org.ulysses.noc.fortigate-routing-table/1.0.2"
+        escalation: "Static routes must be added before BGP/health-check will work"
+
+      # Scenario 11: BGP not establishing (learned from sdwan-spoke-02)
+      - condition: "bgp_not_establishing"
+        description: "BGP neighbor stuck in Active/Connect state"
+        detection:
+          - "get router info bgp summary shows state != Established"
+          - "No BGP routes learned"
+          - "BGP stuck for more than 3 minutes"
+        root_cause: "Missing routes, wrong AS, or misconfigured settings"
+        remediation:
+          - action: "Check static routes to BGP peer exist"
+            tool: "org.ulysses.noc.fortigate-routing-table/1.0.2"
+          - action: "Verify AS number matches hub (65000)"
+            tool: "org.ulysses.noc.fortigate-bgp-config/1.0.0"
+          - action: "Check router-id is unique (use loopback IP)"
+          - action: "Verify recursive-next-hop is enabled"
+          - action: "Set scan-time to 5 for faster convergence"
+        escalation: "BGP configuration issue - review all BGP settings"
+
+      # Scenario 12: SD-WAN health check DEAD (learned from sdwan-spoke-02)
+      - condition: "sdwan_health_dead"
+        description: "SD-WAN health check shows DEAD status"
+        detection:
+          - "diagnose sys sdwan health-check status shows alive=0"
+          - "packet_sent > 0 but packet_recv = 0"
+          - "Health check target unreachable"
+        root_cause: "Missing static routes to health check target or tunnel down"
+        remediation:
+          - action: "Verify IPsec tunnels are UP first"
+            tool: "org.ulysses.noc.fortigate-ipsec/1.0.3"
+          - action: "Check static routes to health check target"
+            check: "Route to 172.16.255.253 via HUB1-VPN1/HUB1-VPN2"
+          - action: "Verify health check server is responding on hub"
+          - action: "Check health check protocol/port matches hub config"
+        escalation: "SD-WAN health check requires working overlay path"
+
+      # Scenario 13: Tool version stale (learned from sdwan-spoke-02)
+      - condition: "tool_version_stale"
+        description: "Tool returns 401 Unauthorized or credential errors"
+        detection:
+          - "HTTP 401 Unauthorized from FortiGate API"
+          - "No credentials found for device"
+          - "Tool works for some devices but not others"
+        root_cause: "Older tool versions have hardcoded or wrong credential paths"
+        remediation:
+          - action: "Use updated tool versions"
+            versions:
+              fortigate-health-check: "1.2.0"
+              fortigate-ssh: "1.0.7"
+              fortigate-routing-table: "1.0.2"
+              fortigate-ipsec: "1.0.3"
+          - action: "Verify credential file exists at PRIMARY path"
+            path: "~/.config/mcp/fortigate_credentials.yaml"
+          - action: "Re-sign tool if needed"
+            tool: "trust-anchor sign"
+        escalation: "Use latest tool versions - older versions may have bugs"
+
+    failure_actions:
+      - rollback_config
+      - check_config_syntax
+      - push_partial_config
+
+  # ---------------------------------------------------------------------------
+  # PHASE 4: VERIFY
+  # ---------------------------------------------------------------------------
+  - id: verify
+    name: Verify Connectivity
+    description: |
+      Confirm IPsec, BGP, SD-WAN health, and overlay reachability.
+      Updated with lessons learned from sdwan-spoke-02 deployment.
+
+    tools:
+      # Step 1: Full device health check
+      - id: org.ulysses.noc.fortigate-health-check
+        alias: full_health_check
+        parameters:
+          target_ip: "{{ management_ip }}"
+
+      # Step 2: Verify IPsec tunnel status
+      - id: org.ulysses.noc.fortigate-ipsec
+        alias: verify_ipsec_status
+        parameters:
+          target_ip: "{{ management_ip }}"
+          action: get
+        critical_checks:
+          - "All tunnels show status=up"
+          - "Both HUB1-VPN1 and HUB1-VPN2 are UP"
+          - "localid is configured on each tunnel"
+          - "auto-discovery-sender is enabled"
+
+      # Step 3: Verify IPsec with troubleshooter for detailed analysis
+      - id: org.ulysses.noc.fortigate-ipsec-troubleshooter
+        alias: ipsec_deep_check
+        parameters:
+          target_ip: "{{ management_ip }}"
+          action: diagnose
+        critical_checks:
+          - "No AUTHENTICATION_FAILED errors"
+          - "Phase1 and Phase2 established"
+
+      # Step 4: Verify routing table for BGP learned routes
+      - id: org.ulysses.noc.fortigate-routing-table
+        alias: verify_routing_table
+        parameters:
+          target_ip: "{{ management_ip }}"
+        critical_checks:
+          - "BGP routes learned from hub (10.250.250.0/24, etc.)"
+          - "Routes via HUB1-VPN1 and/or HUB1-VPN2"
+          - "Static routes for health check target exist"
+
+      # Step 5: Verify BGP configuration
+      - id: org.ulysses.noc.fortigate-bgp-config
+        alias: verify_bgp_config
+        parameters:
+          target_ip: "{{ management_ip }}"
+          action: get
+        critical_checks:
+          - "AS number is 65000"
+          - "router-id is set to loopback IP"
+          - "ibgp-multipath is enabled"
+          - "recursive-next-hop is enabled"
+          - "scan-time is 5 (not default 60)"
+
+      # Step 6: Verify loopback interface exists
+      - id: org.ulysses.noc.fortigate-interface
+        alias: verify_loopback_interface
+        parameters:
+          target_ip: "{{ management_ip }}"
+          action: get
+          name: "Spoke-Lo"
+        critical_checks:
+          - "Interface exists with correct IP"
+          - "Interface is UP"
+
+      # Step 7: Detailed IPsec and BGP verification via SSH
+      - id: org.ulysses.noc.fortigate-ssh
+        alias: verify_ipsec_bgp_ssh
+        parameters:
+          target_ip: "{{ management_ip }}"
+          commands:
+            - "get vpn ipsec tunnel summary"
+            - "get router info bgp summary"
+
+      # Step 8: Verify SD-WAN health check status
+      - id: org.ulysses.noc.fortigate-ssh
+        alias: verify_sdwan_health
+        parameters:
+          target_ip: "{{ management_ip }}"
+          commands:
+            - "diagnose sys sdwan health-check status"
+            - "diagnose sys sdwan member"
+        critical_checks:
+          - "Health check shows packet_sent > 0"
+          - "Health check shows packet_recv > 0"
+          - "Status is alive (not dead)"
+
+      # Step 9: Verify overlay reachability (ping from loopback to hub loopback)
+      - id: org.ulysses.noc.fortigate-ssh
+        alias: verify_overlay_reachability
+        parameters:
+          target_ip: "{{ management_ip }}"
+          commands:
+            - "execute ping-options source {{ spoke_loopback }}"
+            - "execute ping {{ hub_loopback }}"
+        critical_checks:
+          - "Ping responses received (not 100% loss)"
+          - "RTT is reasonable (<100ms for SD-WAN)"
+
+      # Step 10: Verify firewall policies exist
+      - id: org.ulysses.noc.fortigate-firewall-policy
+        alias: verify_firewall_policies
+        parameters:
+          target_ip: "{{ management_ip }}"
+          action: list
+        critical_checks:
+          - "LAN-to-SD-WAN-Overlay policy exists"
+          - "SD-WAN-Overlay-to-LAN policy exists"
+          - "Policies are enabled"
+
+    success: "All verification checks passed - site is production ready"
+
+    # Block 4 verification success criteria
+    success_criteria:
+      ipsec:
+        - "All phase1 tunnels: status=up"
+        - "All phase2 selectors: status=up"
+        - "localid configured on all tunnels"
+        - "No AUTHENTICATION_FAILED in logs"
+      bgp:
+        - "BGP neighbor state: Established"
+        - "Routes learned from hub"
+        - "AS number matches hub (65000)"
+      sdwan:
+        - "Health check: alive"
+        - "Members: active"
+      connectivity:
+        - "Ping from spoke loopback to hub loopback: success"
+        - "BGP routes installed in routing table"
+
+    failure_actions:
+      - diagnose_ipsec_failure
+      - diagnose_bgp_failure
+      - diagnose_routing_issue
+      - escalate_connectivity_issue
+
+    # -------------------------------------------------------------------------
+    # BLOCK 4 ERROR HANDLING (What-If Scenarios)
+    # -------------------------------------------------------------------------
+    error_handling:
+      # Scenario 1: Asymmetric tunnel state (learned from sdwan-spoke-02)
+      - condition: "asymmetric_tunnel_state"
+        description: "One VPN tunnel up, the other down"
+        detection:
+          - "HUB1-VPN1 shows status=up but HUB1-VPN2 shows status=down"
+          - "Or vice versa"
+          - "diagnose vpn ike gateway list shows one tunnel established"
+        root_cause: "Configuration difference between tunnels or hub-side issue"
+        remediation:
+          - action: "Compare tunnel configurations"
+            tool: "org.ulysses.noc.fortigate-ipsec/1.0.3 action=get"
+          - action: "Verify both tunnels have localid set"
+          - action: "Check hub has both dynamic tunnels configured"
+          - action: "Verify PSK matches for both tunnels"
+          - action: "If VPN2 issue, check IKE TCP port (11443) if UDP blocked"
+        escalation: "May indicate hub-side configuration issue"
+
+      # Scenario 2: BGP routes not learned despite Established state
+      - condition: "bgp_established_no_routes"
+        description: "BGP shows Established but no routes learned"
+        detection:
+          - "get router info bgp summary shows State=Established"
+          - "But PfxRcd shows 0"
+          - "Routing table has no BGP routes"
+        root_cause: "Route redistribution not enabled on hub or filtering"
+        remediation:
+          - action: "Verify redistribution on spoke"
+            tool: "org.ulysses.noc.fortigate-bgp-config/1.0.0"
+          - action: "Check hub is advertising routes"
+          - action: "Verify no route-map filtering"
+          - action: "Check ibgp-multipath and recursive-next-hop enabled"
+        escalation: "Hub may not be advertising routes - contact hub admin"
+
+      # Scenario 3: localid missing on tunnels (learned from sdwan-spoke-02)
+      - condition: "localid_missing"
+        description: "Tunnels configured but localid not set"
+        detection:
+          - "fortigate-ipsec get shows localid is empty or null"
+          - "Hub shows AUTHENTICATION_FAILED"
+        root_cause: "localid required for hub to identify dial-up spoke"
+        remediation:
+          - action: "Set localid on all spoke tunnels"
+            tool: "org.ulysses.noc.fortigate-ipsec/1.0.3"
+            note: "localid is fixed per-tunnel, NOT derived from site_name"
+            parameters_vpn1:
+              localid: "spoke-HUB1-VPN1"
+            parameters_vpn2:
+              localid: "spoke-HUB1-VPN2"
+          - action: "Verify with get action"
+          - action: "Clear IPsec SA to force renegotiation"
+            command: "diagnose vpn ike gateway clear name HUB1-VPN1"
+        escalation: "Critical setting - must be set for hub authentication"
+
+      # Scenario 4: Tool authentication failure (learned from sdwan-spoke-02)
+      - condition: "tool_auth_failure"
+        description: "Tool returns 401 Unauthorized or connection refused"
+        detection:
+          - "HTTP 401 Unauthorized"
+          - "No credentials found for device"
+          - "Connection refused or timeout"
+        root_cause: "Credential path mismatch or stale tool version"
+        remediation:
+          - action: "Verify credential file exists"
+            path: "~/.config/mcp/fortigate_credentials.yaml"
+          - action: "Check device IP is in default_lookup"
+          - action: "Use latest tool version"
+            versions:
+              fortigate-health-check: "1.2.0"
+              fortigate-ssh: "1.0.7"
+              fortigate-routing-table: "1.0.2"
+          - action: "Verify API token is valid on FortiGate"
+        escalation: "Tool version issue - update to latest versions"
+
+      # Scenario 5: Ping fails despite all checks passing
+      - condition: "ping_fails_all_up"
+        description: "All tunnels/BGP show up but overlay ping fails"
+        detection:
+          - "IPsec tunnels: UP"
+          - "BGP: Established"
+          - "But ping from loopback to hub loopback fails"
+        root_cause: "Missing interface or route configuration"
+        remediation:
+          - action: "Verify loopback interface exists on spoke"
+          - action: "Verify loopback is in BGP network statement"
+          - action: "Check firewall policies allow overlay traffic"
+          - action: "Verify source IP for ping"
+            note: "Must use 'execute ping-options source <loopback>' first"
+          - action: "Check hub firewall policies"
+        escalation: "Firewall policy may be blocking overlay traffic"
+
+      # Scenario 6: Health check alive but low packet ratio
+      - condition: "health_check_degraded"
+        description: "Health check shows alive but high packet loss"
+        detection:
+          - "diagnose sys sdwan health-check status shows alive"
+          - "But packet_loss > 20%"
+          - "Latency higher than expected"
+        root_cause: "Network congestion or misconfigured priorities"
+        remediation:
+          - action: "Check SD-WAN member priorities"
+            tool: "org.ulysses.noc.fortigate-sdwan-member/1.0.0"
+          - action: "Verify both tunnels have equal priority when in SLA"
+          - action: "Check WAN interface for errors"
+          - action: "Review health check threshold settings"
+        escalation: "Network performance issue - may need WAN investigation"
+
+# =============================================================================
+# INPUT PARAMETERS
+# =============================================================================
+parameters:
+  required:
+    # PRIMARY SEED VALUE (GAP 3 FIX)
+    - name: site_id
+      type: integer
+      minimum: 1
+      maximum: 254
+      description: |
+        PRIMARY SEED VALUE - unique integer for this site.
+        Derives: spoke_loopback, location_id, router_id, lan_subnet, site_name, hostname.
+        See site_id_derivation section for full IP schema.
+      example: 4
+
+    - name: management_ip
+      type: string
+      format: ipv4
+      description: "Target management IP for the FortiGate (cannot be derived yet)"
+      note: "Future: may derive from loopback or use loopback directly"
+
+    - name: deployment_type
+      type: string
+      enum: [vm, hardware]
+      description: "New VM deployment or existing hardware onboarding"
+
+    - name: license_type
+      type: string
+      enum: [fortiflex, standard]
+      description: "FortiFlex (VM) or Standard (hardware) license"
+
+  # Values that CAN be derived from site_id but CAN be overridden
+  derived_with_override:
+    - name: site_name
+      type: string
+      derived_from: "spoke-{site_id:02d}"
+      description: "Auto-derived from site_id, can override for custom names"
+      example: "spoke-04 (derived from site_id=4)"
+
+    - name: spoke_loopback
+      type: string
+      derived_from: "172.16.0.{site_id}"
+      description: "Loopback IP - derived from site_id unless overridden"
+      collision_check: true
+
+    - name: lan_subnet
+      type: string
+      derived_from: "10.{site_id}.1.0/24"
+      description: "Default LAN subnet - derived from site_id"
+
+    - name: hostname
+      type: string
+      derived_from: "FG-Spoke-{site_id:02d}"
+      description: "FortiGate hostname - derived from site_id"
+
+  optional:
+    # VM Provisioning
+    - name: hypervisor_name
+      type: string
+      default: rocky-kvm-lab
+      description: "Hypervisor from credential manager"
+
+    - name: wan_ip
+      type: string
+      description: "WAN interface IP (for VM provisioning)"
+
+    - name: wan_gateway
+      type: string
+      description: "WAN gateway IP"
+
+    - name: vcpus
+      type: integer
+      default: 2
+
+    - name: memory_mb
+      type: integer
+      default: 4096
+
+    # Licensing
+    - name: fortiflex_config_id
+      type: string
+      description: "FortiFlex config ID for token generation"
+
+    - name: fortiflex_token
+      type: string
+      description: "Pre-generated FortiFlex token (if available)"
+
+    # SD-WAN Hub Configuration
+    - name: hub_wan_ip
+      type: string
+      default: "192.168.215.15"
+      description: "Hub WAN IP for IPsec"
+
+    - name: hub_loopback
+      type: string
+      default: "172.16.255.253"
+      description: "Hub loopback for BGP/health check"
+
+    - name: hub_bgp_loopback
+      type: string
+      default: "172.16.255.252"
+      description: "Hub BGP peer loopback"
+
+    - name: admin_password
+      type: string
+      sensitive: true
+      description: "Admin password to set on new device"
+
+    # Multi-VLAN Support (future)
+    - name: vlan_list
+      type: array
+      items:
+        type: object
+        properties:
+          vlan_id: { type: integer, minimum: 1, maximum: 4094 }
+          name: { type: string }
+      description: |
+        Optional VLAN list for multi-VLAN deployments.
+        Each VLAN gets subnet 10.{site_id}.{vlan_id}.0/24
+      example:
+        - vlan_id: 10
+          name: "DATA"
+        - vlan_id: 20
+          name: "VOICE"
+
+    # LAN Interface Configuration
+    - name: lan_interface
+      type: string
+      default: "port2"
+      description: "LAN interface name (port2 for VM, 'lan' or 'internal' for hardware)"
+
+# =============================================================================
+# GUARDRAILS
+# =============================================================================
+guardrails:
+  max_tool_calls: 50
+  max_duration_minutes: 30
+
+  forbidden_actions:
+    - "Delete existing production devices"
+    - "Modify hub configuration"
+    - "Change AS number"
+    - "Disable existing IPsec tunnels"
+
+  require_approval:
+    - "Provision VM with more than 8 vCPUs"
+    - "Provision VM with more than 16GB RAM"
+    - "Override existing device in manifest"
+
+# =============================================================================
+# TOOL ACCESS
+# =============================================================================
+tool_access:
+  local_pack:
+    - "org.ulysses.noc.fortigate-*"
+    - "org.ulysses.sdwan.*"
+    - "org.ulysses.licensing.*"
+
+  external_packs:
+    - pack: provisioning
+      tools:
+        - "org.ulysses.provisioning.hypervisor-credential-manager"
+
+  global_registry: false
+
+# =============================================================================
+# TOOL VERSION POLICY
+# =============================================================================
+# This workflow uses the LATEST CERTIFIED VERSION of each tool by default.
+#
+# Tool IDs are specified WITHOUT version numbers (e.g., "org.ulysses.noc.fortigate-ssh")
+# Trust Anchor automatically resolves to the latest signed version.
+#
+# Benefits:
+#   - No need to update manifest when tools are patched
+#   - Always get latest bug fixes and features
+#   - Reduces maintenance burden
+#
+# When a specific version is required (rare), use full ID:
+#   - "org.ulysses.noc.fortigate-ssh/1.0.9" (pins to exact version)
+#
+# Trust Anchor SOP (SOP-TOOL-SIGNING-WORKFLOW v1.7) still applies:
+#   - All tools must be signed before use
+#   - Version bumps require re-signing
+#   - Unsigned tools are rejected at runtime
+#
+# Tool Feature Requirements (for AI reference):
+tool_feature_requirements:
+  fortigate-ssh:
+    - "provisioning_mode parameter for write commands"
+    - "Correct credential path (~/.config/mcp/ PRIMARY, C:/ProgramData/mcp/ backup)"
+  fortigate-ipsec:
+    - "localid parameter support"
+    - "auto_discovery_sender parameter"
+    - "transport parameter (udp/tcp/auto)"
+  fortigate-health-check:
+    - "Correct credential path"
+  fortigate-routing-table:
+    - "Correct credential path"
+  fortigate-interface:
+    - "Loopback interface creation support"
+  fortigate-firewall-policy:
+    - "SD-WAN overlay policy support"
+
+# =============================================================================
+# OUTPUT
+# =============================================================================
+output:
+  on_success:
+    - summary: "Site {{ site_name }} successfully onboarded"
+    - device_key: "spoke_{{ management_ip | replace('.', '_') }}"
+    - management_ip: "{{ management_ip }}"
+    - serial_number: "{{ discovered_serial }}"
+    - loopback_ip: "{{ spoke_loopback }}"
+    - ipsec_status: "{{ ipsec_tunnel_count }} tunnels UP"
+    - bgp_status: "Established with {{ hub_loopback }}"
+    - health_status: "All checks GREEN"
+
+  on_failure:
+    - summary: "Site {{ site_name }} onboarding failed"
+    - failed_phase: "{{ failed_phase }}"
+    - error: "{{ error_message }}"
+    - remediation_attempted: "{{ remediation_actions }}"
+    - escalation_required: true
+
+status: draft
+skills_ref: Skills.md
+
+# =============================================================================
+# CHANGE LOG
+# =============================================================================
+changelog:
+  - version: 1.5.0
+    date: 2026-01-22
+    changes:
+      - "MAJOR: GAP 2 FIX - Autonomy levels define WHAT AI can decide"
+      - "  - Level 1 (ai_autonomous): transient retries, derivation, verification"
+      - "  - Level 2 (ai_recommends): remediation paths, rollback suggestions"
+      - "  - Level 3 (human_required): financial, destructive, hub, WAN changes"
+      - "  - Level 4 (never_autonomous): safety rails, IP collision blocking"
+      - "Added autonomy_config section with 3 modes"
+      - "  - fully_autonomous: Level 1+2 auto, only Level 3+ pauses"
+      - "  - semi_autonomous: Level 1 auto, Level 2+ asks (RECOMMENDED)"
+      - "  - supervised: pauses before every phase and major action"
+      - "Added partial_success handling for multi-step phases"
+      - "  - Phase 3 has 13 steps - policy for partial completion"
+      - "  - Default: pause_and_report (human decides rollback)"
+      - "Added error_classification with deterministic criteria"
+      - "  - Transient: 5xx, timeout, 'device busy' - retry with backoff"
+      - "  - Persistent: 4xx, auth failed, syntax error - escalate immediately"
+      - "Added WAN protection to Level 3 (could orphan device)"
+      - "  - modify_wan_ip, modify_wan_gateway, modify_wan_interface"
+      - "Added IP collision to Level 4 never_autonomous"
+      - "  - proceed_after_ip_collision now blocked by safety rail"
+
+  - version: 1.4.0
+    date: 2026-01-21
+    changes:
+      - "MAJOR: GAP 1 FIX - BLOCK_0 integrated as workflow entry point"
+      - "  - Added entry_point section referencing BLOCK_0_BLUEPRINT_WIZARD"
+      - "  - Removed human_interaction.pre_workflow (replaced by BLOCK_0)"
+      - "  - BLOCK_0 handles all input gathering via wizard"
+      - "  - Supports 3 modes: interactive, express, full_manual"
+      - "  - Express mode: 2 questions only (site_id, lan_subnets) - management_ip derived"
+      - "  - Skippable if all required params provided upfront"
+      - "  - Output-to-phase mapping documented in entry_point section"
+      - "BLOCK_0 status changed: PROPOSED → ACTIVE"
+
+  - version: 1.3.0
+    date: 2026-01-21
+    changes:
+      - "MAJOR: GAP 3 FIX - site_id as primary seed value"
+      - "  - site_id (integer 1-254) is now THE seed for all derivations"
+      - "  - Added site_id_derivation section with full IP schema"
+      - "  - Loopback: 172.16.0.{site_id}/32 with collision detection"
+      - "  - LAN: 10.{site_id}.1.0/24 (Option B approved)"
+      - "  - Multi-VLAN: 10.{site_id}.{vlan_id}.0/24 schema"
+      - "  - Range overflow: 172.16.0.x → 172.16.1.x when full"
+      - "  - Added derived_with_override parameter category"
+      - "MAJOR: GAP 7 FIX - BGP neighbor configuration"
+      - "  - Added fortigate-bgp-neighbor tool call (Phase 3, Step 8)"
+      - "  - Required for BGP peering to establish"
+      - "  - Parameters: neighbor_ip, remote_as, update_source, next_hop_self"
+      - "MAJOR: GAP 8 FIX - SD-WAN health check creation"
+      - "  - Added fortigate-sdwan-health-check tool call (Phase 3, Step 9)"
+      - "  - Creates HUB-Health check object"
+      - "  - Required for SD-WAN SLA-based routing"
+      - "MAJOR: Device baseline strategy for greenfield"
+      - "  - Added device_baseline section"
+      - "  - Purge scripts ONLY for greenfield devices (never production)"
+      - "  - Scripts for lan/internal interface types"
+      - "  - FortiManager ZTP compatible"
+      - "  - Supported models: 40F, 50G, 70G, 200G, 400F, 600F, 900G, VM"
+      - "Phase 3 now has 13 steps (was 11)"
+      - "Added hub_bgp_loopback and vlan_list parameters"
+
+  - version: 1.2.0
+    date: 2026-01-21
+    changes:
+      - "MAJOR: Switched to 'latest version' tool policy - no hardcoded versions"
+      - "  - Tool IDs now specified without version (e.g., 'org.ulysses.noc.fortigate-ssh')"
+      - "  - Trust Anchor resolves to latest signed version automatically"
+      - "  - Added tool_feature_requirements section for AI reference"
+      - "MAJOR: Added loopback interface creation (Step 4 in Phase 3)"
+      - "  - org.ulysses.noc.fortigate-interface creates Spoke-Lo"
+      - "  - Required for BGP router-id, location-id, and overlay ping"
+      - "  - Added to critical_settings.loopback_interface section"
+      - "MAJOR: Added firewall policy configuration (Step 9 in Phase 3)"
+      - "  - org.ulysses.noc.fortigate-firewall-policy creates 3 policies"
+      - "  - LAN-to-overlay, overlay-to-LAN, health-check/BGP"
+      - "  - Added to critical_settings.firewall_policies section"
+      - "Fixed vm-license command syntax (verified: no 'install' keyword)"
+      - "Phase 3 now has 11 steps (was 9)"
+      - "Phase 4 now has 10 steps (was 8), including loopback and policy verification"
+
+  - version: 1.1.0
+    date: 2026-01-21
+    changes:
+      - "MAJOR: Added human_interaction section defining AI/human touchpoints"
+      - "  - pre_workflow: Required/optional inputs before starting"
+      - "  - phase_gates: Approval prompts before major phases"
+      - "  - during_execution: Pause conditions (remediation_failed, destructive_action)"
+      - "  - escalation_triggers: When to hand off to human"
+      - "  - post_workflow: Final report format"
+      - "MAJOR: Added critical_settings section documenting required configuration"
+      - "Added tools discovered during sdwan-spoke-02 deployment:"
+      - "  - fortigate-system-global (management-ip, rest-api-key-url-query)"
+      - "  - fortigate-system-settings (location-id, ike-tcp-port)"
+      - "  - fortigate-bgp-config (AS, router-id, ibgp-multipath, scan-time)"
+      - "  - fortigate-ipsec (localid, auto-discovery-sender support)"
+      - "  - fortigate-static-route (health check and BGP peer routes)"
+      - "  - fortigate-sdwan-member (priority-in-sla, priority-out-sla)"
+      - "  - fortigate-ipsec-troubleshooter (detailed IPsec diagnostics)"
+      - "Added Block 3 error scenarios 9-13 (ipsec_auth_failed, missing_static_routes, etc.)"
+      - "Added Block 4 error scenarios 1-6 (asymmetric_tunnel_state, localid_missing, etc.)"
+      - "Documented IPsec AUTHENTICATION_FAILED root cause: missing localid"
+      - "Documented static routes requirement for health check and BGP peer"
+
+  - version: 1.0.1
+    date: 2026-01-20
+    changes:
+      - "Added Block 1 error_handling with 8 what-if scenarios"
+      - "Added Block 2 error_handling with 6 what-if scenarios"
+      - "Added Block 3 error_handling with 8 what-if scenarios"
+      - "Fixed vm-license command syntax (removed 'install' keyword)"
+      - "Documented fortigate-ssh read-only limitation workaround"
+
+  - version: 1.0.0
+    date: 2026-01-18
+    changes:
+      - "Initial workflow definition"
+      - "4 phases: provision, license, configure, verify"
+      - "Basic error handling for common scenarios"

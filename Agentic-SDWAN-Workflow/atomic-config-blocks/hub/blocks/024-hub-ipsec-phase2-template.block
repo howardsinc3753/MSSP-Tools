@@ -1,0 +1,78 @@
+---
+block_id: 024
+name: hub-ipsec-phase2-template
+display_name: "Hub IPsec Phase2 Templates"
+version: 1.0.0
+category: core
+device_role: hub
+vendor: fortinet
+platform: fortigate
+min_fortios: "7.4.0"
+
+description: |
+  IPsec phase2-interface templates for SD-WAN hub. Creates phase2 selectors
+  for dynamic spoke connections. Uses 0.0.0.0/0 to 0.0.0.0/0 to allow any
+  traffic through the tunnel.
+
+depends_on:
+  - block_id: 023
+    reason: "Phase1 templates must exist before phase2"
+
+provides:
+  - hub-ipsec-phase2
+  - hub-vpn-phase2-templates
+
+parameters:
+  - name: PROPOSAL
+    description: "IPsec proposal encryption-hash"
+    type: string
+    required: false
+    default: "aes256-sha256"
+
+  - name: DHGRP
+    description: "Diffie-Hellman groups"
+    type: string
+    required: false
+    default: "20 21"
+    note: "Use group 20 (ECDH 384-bit) and 21 (ECDH 521-bit) for strong crypto"
+
+verification:
+  commands:
+    - "get vpn ipsec phase2-interface SPOKE_VPN1"
+    - "get vpn ipsec phase2-interface SPOKE_VPN2"
+  expected_patterns:
+    - "phase1name: SPOKE_VPN1"
+    - "phase1name: SPOKE_VPN2"
+    - "proposal: {{PROPOSAL}}"
+    - "dhgrp: {{DHGRP}}"
+
+rollback:
+  commands:
+    - "config vpn ipsec phase2-interface"
+    - "delete SPOKE_VPN1"
+    - "delete SPOKE_VPN2"
+    - "end"
+
+notes: |
+  - Phase2 uses 0.0.0.0/0 to 0.0.0.0/0 for full traffic
+  - dhgrp must match phase1 for proper key exchange
+  - Template names match phase1-interface names
+
+---
+
+config vpn ipsec phase2-interface
+    edit "SPOKE_VPN1"
+        set phase1name "SPOKE_VPN1"
+        set proposal {{PROPOSAL}}
+        set dhgrp {{DHGRP}}
+        set src-subnet 0.0.0.0 0.0.0.0
+        set dst-subnet 0.0.0.0 0.0.0.0
+    next
+    edit "SPOKE_VPN2"
+        set phase1name "SPOKE_VPN2"
+        set proposal {{PROPOSAL}}
+        set dhgrp {{DHGRP}}
+        set src-subnet 0.0.0.0 0.0.0.0
+        set dst-subnet 0.0.0.0 0.0.0.0
+    next
+end

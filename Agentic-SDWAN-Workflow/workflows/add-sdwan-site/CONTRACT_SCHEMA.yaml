@@ -1,0 +1,499 @@
+# ============================================================================
+# SD-WAN Spoke Configuration Contract Schema
+# ============================================================================
+# Version: 2.0.0
+# Purpose: SINGLE SOURCE OF TRUTH for SD-WAN workflow validation
+# Used by: blueprint-planner, dry-run mode, pre-deploy validation, CI gates
+#
+# This contract defines:
+# 1. Required CLI config sections and patterns
+# 2. Parameter handoffs between blocks (BLOCK_0 → BLOCK_4)
+# 3. Tool version requirements
+# 4. Naming conventions (authoritative)
+#
+# All generated configs MUST pass this contract before:
+# - Showing to user
+# - Saving to blueprints/
+# - Adding to manifest as "planned"
+#
+# GOVERNANCE: Any change to this file requires review of:
+# - manifest.yaml (outputs_to_phases)
+# - All BLOCK_*.yaml files (inputs/outputs)
+# - blueprint-planner.py (defaults)
+# - BLOCK_4_VERIFY.yaml (verification checks)
+# ============================================================================
+
+version: "2.0.0"
+description: "Single source of truth for SD-WAN spoke workflow validation"
+
+# ============================================================================
+# NAMING CONVENTIONS (AUTHORITATIVE)
+# ============================================================================
+# All tools and blocks MUST use these exact names. No exceptions.
+# Underscore vs hyphen matters!
+
+naming_conventions:
+  vpn_tunnels:
+    primary: "HUB1-VPN1"      # HYPHEN, not underscore
+    secondary: "HUB1-VPN2"    # HYPHEN, not underscore
+    note: "Tools use hyphen format. Block configs must match."
+
+  sdwan_zone: "SDWAN_OVERLAY"  # UNDERSCORE here is intentional
+  health_check: "HUB_Health"   # Mixed case, underscore
+  loopback: "Spoke-Lo"         # Hyphen
+
+  hostname_pattern: "sdwan-spoke-{site_id:02d}"  # Zero-padded 2-digit
+
+# ============================================================================
+# TOOL VERSION REQUIREMENTS
+# ============================================================================
+# Minimum versions required for contract compliance
+
+tool_versions:
+  kvm_fortios_provision:
+    canonical_id: "org.ulysses.sdwan.kvm-fortios-provision"
+    minimum_version: "1.0.11"
+    reason: "Trust Anchor certified. rest-api-key-url-query, admintimeout 480. start/stop: try tool first, Bash SSH fallback"
+
+  blueprint_planner:
+    canonical_id: "org.ulysses.noc.fortigate-sdwan-blueprint-planner"
+    minimum_version: "1.0.0"
+    reason: "Must generate ADVPN settings and static routes to hub loopbacks"
+
+  spoke_template:
+    canonical_id: "org.ulysses.noc.fortigate-sdwan-spoke-template"
+    minimum_version: "1.3.0"
+    reason: "v1.3.0 fixes hardcoded target_ip bug"
+    status: "DEPRECATED - use blueprint-planner + config-push instead"
+
+# ============================================================================
+# PARAMETER HANDOFFS (BLOCK-TO-BLOCK DATA FLOW)
+# ============================================================================
+# Canonical names for parameters passed between blocks.
+# If a block uses a different name, it MUST declare an alias.
+
+parameter_handoffs:
+
+  # BLOCK_0 → BLOCK_1 (Provisioning)
+  block_0_to_block_1:
+    - name: "site_id"
+      type: integer
+      required: true
+      description: "Unique site identifier (1-254)"
+      used_for: "VM naming, IP derivation, hostname"
+
+    - name: "site_name"
+      type: string
+      required: true
+      description: "Human-readable site name (e.g., 'NYC-Branch-01')"
+
+    - name: "hypervisor"
+      type: string
+      required: true
+      aliases: ["hypervisor_name"]  # BLOCK_0 may output as hypervisor_name
+      description: "KVM hypervisor hostname/IP from credentials"
+
+    - name: "management_ip"
+      type: string
+      required: true
+      description: "IP address for WAN interface (no CIDR)"
+
+    - name: "wan_ip"
+      type: string
+      required: true
+      derived_from: "{management_ip}/24"
+      description: "WAN interface IP with CIDR mask"
+
+    - name: "lan_ip"
+      type: string
+      required: true
+      derived_from: "10.{site_id}.1.1/24"
+      description: "LAN interface IP with CIDR mask (FortiGate's LAN gateway)"
+
+    - name: "admin_password"
+      type: string
+      required: true
+      sensitive: true
+      default: "FG@dm!n2026!"
+      description: "Admin password for bootstrap config"
+      flows_to: ["BLOCK_1", "BLOCK_2", "BLOCK_3"]
+
+  # BLOCK_1 → BLOCK_2 (Licensing)
+  block_1_to_block_2:
+    - name: "admin_password"
+      type: string
+      required: true
+      sensitive: true
+      description: "Required for SSH login to apply license"
+
+    - name: "device_ip"
+      type: string
+      required: true
+      description: "Discovered or assigned IP of provisioned FortiGate"
+      aliases: ["wan_ip", "management_ip"]
+
+  # BLOCK_0/1 → BLOCK_3 (Configuration)
+  to_block_3:
+    - name: "vpn_psk"
+      type: string
+      required: true
+      sensitive: true
+      default: "password"
+      aliases: ["ipsec_psk"]  # BLOCK_0 outputs as ipsec_psk
+      description: "Pre-shared key for IPsec tunnels (hub PSK = password)"
+
+    - name: "admin_password"
+      type: string
+      required: true
+      sensitive: true
+      description: "Required for SSH/API access to push config"
+
+    - name: "loopback_ip"
+      type: string
+      required: true
+      derived_from: "172.16.0.{site_id}"
+      description: "Spoke loopback IP for BGP and SD-WAN (172.16.0.X, NOT 172.16.255.X)"
+
+  # BLOCK_3 → BLOCK_4 (Verification)
+  to_block_4:
+    - name: "device_ip"
+      type: string
+      required: true
+      description: "Target device for verification"
+
+    - name: "expected_tunnels"
+      type: array
+      default: ["HUB1-VPN1", "HUB1-VPN2"]
+      description: "IPsec tunnels that must be UP"
+
+    - name: "expected_bgp_peers"
+      type: array
+      default: ["172.16.255.252"]
+      description: "BGP peers that must be Established (172.16.255.253 is health-check target, NOT a BGP peer)"
+
+# ============================================================================
+# REQUIRED SECTIONS
+# ============================================================================
+# Each section must exist in the generated CLI config
+
+required_sections:
+
+  # System Global Settings
+  - path: "config system global"
+    must_contain:
+      - pattern: 'set hostname "sdwan-spoke-'
+        description: "Hostname must follow pattern sdwan-spoke-{site_id}"
+        critical: true
+      - pattern: "set rest-api-key-url-query enable"
+        description: "API token URL query must be enabled for tooling"
+        critical: true
+    optional:
+      - pattern: "set timezone"
+      - pattern: "set admintimeout"
+
+  # System Settings
+  - path: "config system settings"
+    must_contain:
+      - pattern: "set location-id"
+        description: "Location ID required for SD-WAN"
+        critical: true
+      - pattern: "set ike-tcp-port 11443"
+        description: "IKE port must be 11443 to avoid HTTPS conflict"
+        critical: true
+
+  # Loopback Interface
+  - path: "config system interface"
+    entries_required:
+      - name: "Spoke-Lo"
+        description: "Loopback interface for BGP and SD-WAN source"
+        must_contain:
+          - "set type loopback"
+          - "set allowaccess ping"
+
+  # IPsec Phase 1 - Dual Tunnels Required
+  - path: "config vpn ipsec phase1-interface"
+    entries_required:
+      - name: "HUB1-VPN1"
+        description: "Primary VPN tunnel to hub"
+        must_contain:
+          - "set transport udp"
+          - "set ike-version 2"
+          - "set network-id 1"
+      - name: "HUB1-VPN2"
+        description: "Secondary VPN tunnel to hub"
+        must_contain:
+          - "set transport udp"
+          - "set ike-version 2"
+          - "set network-id 2"
+    each_must_contain:
+      - pattern: "set peertype any"
+      - pattern: "set net-device enable"
+      - pattern: "set auto-discovery-sender enable"
+      - pattern: "set auto-discovery-receiver enable"
+      - pattern: "set exchange-ip-addr4"
+        description: "Exchange IP must be set to loopback"
+
+  # IPsec Phase 2
+  - path: "config vpn ipsec phase2-interface"
+    entries_required:
+      - name: "HUB1-VPN1"
+      - name: "HUB1-VPN2"
+    each_must_contain:
+      - pattern: "set auto-negotiate enable"
+        description: "Auto-negotiate required for tunnel re-keying"
+
+  # BGP Configuration
+  - path: "config router bgp"
+    must_contain:
+      - pattern: "set as 65000"
+        description: "BGP AS must be 65000 to match hub"
+        critical: true
+      - pattern: "set router-id"
+        description: "Router ID must be set to loopback"
+      - pattern: "config neighbor"
+        description: "BGP neighbor configuration required"
+
+  # SD-WAN Configuration
+  - path: "config system sdwan"
+    must_contain:
+      - pattern: "set status enable"
+        description: "SD-WAN must be enabled"
+        critical: true
+      - pattern: "config zone"
+        description: "SD-WAN zone required"
+      - pattern: "config members"
+        description: "SD-WAN members required"
+      - pattern: "config health-check"
+        description: "Health check required for SLA monitoring"
+
+  # Static Routes (Bootstrap for BGP)
+  - path: "config router static"
+    must_contain:
+      - pattern: "172.16.255.252"
+        description: "Static route to hub primary loopback"
+      - pattern: "172.16.255.253"
+        description: "Static route to hub secondary loopback"
+
+# ============================================================================
+# VALIDATION RULES
+# ============================================================================
+# Advanced validation checks beyond simple pattern matching
+
+validation_rules:
+
+  - name: "hostname_pattern"
+    description: "Hostname must follow sdwan-spoke-{site_id} pattern"
+    check: 'contains(set hostname "sdwan-spoke-)'
+    error: "Hostname must start with 'sdwan-spoke-' followed by site ID (e.g., sdwan-spoke-05)"
+    severity: "error"
+
+  - name: "dual_vpn_tunnels"
+    description: "Must have exactly 2 VPN tunnels for redundancy"
+    check: "count(edit \"HUB1-VPN1\") == 1 AND count(edit \"HUB1-VPN2\") == 1"
+    error: "Missing VPN tunnel - both HUB1-VPN1 and HUB1-VPN2 required"
+    severity: "error"
+
+  - name: "transport_udp_not_tcp"
+    description: "Transport must be UDP for proper tunnel operation"
+    check: "all(set transport udp) AND none(set transport tcp)"
+    error: "Transport must be UDP, not TCP - TCP causes GUI/connectivity issues"
+    severity: "error"
+
+  - name: "bgp_as_65000"
+    description: "BGP AS number must match hub (65000)"
+    check: "contains(set as 65000)"
+    error: "BGP AS must be 65000 to peer with hub"
+    severity: "error"
+
+  - name: "ike_port_11443"
+    description: "IKE port must be 11443"
+    check: "contains(set ike-tcp-port 11443)"
+    error: "IKE port must be 11443 to avoid conflict with HTTPS on 443"
+    severity: "error"
+
+  - name: "loopback_interface_exists"
+    description: "Spoke-Lo loopback interface must exist"
+    check: "contains(edit \"Spoke-Lo\")"
+    error: "Missing Spoke-Lo loopback interface"
+    severity: "error"
+
+  - name: "sdwan_enabled"
+    description: "SD-WAN must be enabled"
+    check: "contains(set status enable) in config system sdwan"
+    error: "SD-WAN status must be 'enable'"
+    severity: "error"
+
+  - name: "add_route_disabled"
+    description: "IPsec add-route must be disabled (BGP handles routing)"
+    check: "all(set add-route disable) in vpn ipsec phase1"
+    error: "add-route must be 'disable' - routes are handled by BGP"
+    severity: "warning"
+
+  - name: "health_check_configured"
+    description: "SD-WAN health check must target hub loopback"
+    check: "contains(set server \"172.16.255.253\")"
+    error: "Health check should target hub secondary loopback 172.16.255.253"
+    severity: "warning"
+
+# ============================================================================
+# FORBIDDEN PATTERNS
+# ============================================================================
+# These patterns should NOT appear in generated configs
+
+forbidden_patterns:
+
+  - pattern: "set transport tcp"
+    reason: "TCP transport causes GUI connectivity issues"
+    severity: "error"
+
+  - pattern: "set ike-tcp-port 443"
+    reason: "Port 443 conflicts with HTTPS admin interface"
+    severity: "error"
+
+  - pattern: "set add-route enable"
+    reason: "Routes should be learned via BGP, not IPsec"
+    severity: "warning"
+
+  - pattern: "set as 64512"
+    reason: "Default private AS - should be 65000 for this network"
+    severity: "error"
+
+  - pattern: "set psksecret fortinet"
+    reason: "Hub PSK is 'password', not 'fortinet' (GAP-39)"
+    severity: "error"
+
+  - pattern: 'set localid "spoke-HUB1-VPN.*-\d+'
+    reason: "localid must NOT include site number suffix (GAP-42). Use spoke-HUB1-VPN1 / spoke-HUB1-VPN2"
+    severity: "warning"
+
+  - pattern: "set tunnel-search selectors"
+    reason: "Not supported in FortiOS 7.6.5 — parse error (GAP-45). ADVPN works without it."
+    severity: "error"
+
+  - pattern: "set sla-id"
+    reason: "SD-WAN neighbor sla-id causes parse error in FortiOS 7.6.5 (GAP-44). SLA binding works via sla-id-redistribute in health-check section."
+    severity: "error"
+    context: "Only in config system sdwan / config neighbor. sla-id-redistribute in health-check is OK."
+
+  - pattern: "set mode-cfg enable"
+    reason: "mode-cfg must be DISABLE on spokes (GAP-46). Hub has mode-cfg disable. Working spoke-07 has mode-cfg disable. exchange-ip-addr4 works WITHOUT mode-cfg enable. Enabling it causes hub/spoke mismatch and tunnel failures."
+    severity: "error"
+
+# ============================================================================
+# SECTION ORDERING (CRITICAL)
+# ============================================================================
+# BGP MUST come BEFORE SD-WAN neighbor. SD-WAN neighbor references a BGP peer
+# IP, and FortiOS 7.6.5 requires the BGP neighbor to exist first (GAP-38).
+#
+# Tunnel interfaces (HUB1-VPN1, HUB1-VPN2) are auto-created by phase1-interface.
+# Do NOT define them in config system interface before phase1 (GAP-40).
+# You CAN edit them AFTER phase1 to set allowaccess ping.
+
+section_ordering:
+  - before: "config router bgp"
+    after: "config vpn ipsec phase1-interface"
+    reason: "BGP references Spoke-Lo interface and tunnel interfaces must exist"
+
+  - before: "config system sdwan"
+    after: "config router bgp"
+    reason: "SD-WAN neighbor references BGP peer 172.16.255.252 which must exist first (GAP-38)"
+
+  - before: "config firewall policy"
+    after: "config system sdwan"
+    reason: "Firewall policies reference SD-WAN zone SDWAN_OVERLAY"
+
+# ============================================================================
+# OUTPUT REQUIREMENTS
+# ============================================================================
+# What the validation function should return
+
+output:
+  valid: boolean
+  errors: array        # Critical issues that block deployment
+  warnings: array      # Non-critical issues, deployment can proceed
+  checks_passed: integer
+  checks_total: integer
+  summary:
+    sections_found: array
+    sections_missing: array
+    critical_settings_ok: boolean
+
+# ============================================================================
+# EXAMPLE USAGE
+# ============================================================================
+#
+# In blueprint-planner:
+#   result = validate_against_contract(config_text)
+#   if result["valid"]:
+#       save_config()
+#       add_to_manifest(status="planned")
+#   else:
+#       show_errors(result["errors"])
+#       ask_user_to_fix()
+#
+# ============================================================================
+
+# ============================================================================
+# VALIDATION SCRIPT USAGE
+# ============================================================================
+# Run contract validation against workflow files:
+#
+#   python scripts/validate_sdwan_contract.py \
+#       --contract workflows/add-sdwan-site/CONTRACT_SCHEMA.yaml \
+#       --manifest workflows/add-sdwan-site/manifest.yaml \
+#       --blocks workflows/add-sdwan-site/blocks/
+#
+# Checks performed:
+# 1. Naming convention compliance (HUB1-VPN1, not HUB1_VPN1)
+# 2. Parameter handoffs (all required params flow through blocks)
+# 3. Tool version requirements (minimum versions met)
+# 4. Alias resolution (ipsec_psk → vpn_psk mapping exists)
+# ============================================================================
+
+# ============================================================================
+# CI/CD GATE INTEGRATION
+# ============================================================================
+# Add to .github/workflows/sdwan-contract-check.yml:
+#
+#   name: SD-WAN Contract Validation
+#   on:
+#     pull_request:
+#       paths:
+#         - 'solution_packs/fortigate-ops/workflows/add-sdwan-site/**'
+#         - 'tools/org.ulysses.noc.fortigate-sdwan-*/**'
+#         - 'tools/org.ulysses.sdwan.*/**'
+#
+#   jobs:
+#     validate-contract:
+#       runs-on: ubuntu-latest
+#       steps:
+#         - uses: actions/checkout@v4
+#         - name: Run contract validation
+#           run: python scripts/validate_sdwan_contract.py --strict
+#
+# ============================================================================
+
+# ============================================================================
+# DRIFT PREVENTION FOR AI ENGINEERS
+# ============================================================================
+# When adding new features to the SD-WAN workflow:
+#
+# 1. UPDATE THIS CONTRACT FIRST
+#    - Add new parameters to parameter_handoffs
+#    - Add new naming conventions if needed
+#    - Update tool_versions if minimum version changes
+#
+# 2. THEN UPDATE THE BLOCKS
+#    - BLOCK_*.yaml files must reference parameters exactly as named here
+#    - Use aliases only when absolutely necessary (legacy compatibility)
+#
+# 3. THEN UPDATE THE TOOLS
+#    - Blueprint-planner defaults must match naming_conventions
+#    - Tool outputs must match parameter_handoffs types
+#
+# 4. RUN VALIDATION
+#    - python scripts/validate_sdwan_contract.py
+#    - All checks must pass before committing
+#
+# The contract is the source of truth. When in doubt, check this file.
+# ============================================================================

@@ -1,0 +1,1111 @@
+# ============================================================================
+# BLOCK 0: BLUEPRINT WIZARD
+# ============================================================================
+# Purpose: Human-friendly Q/A to gather site parameters before provisioning
+# Version: 1.2.0 - Integrated as workflow entry_point (GAP 1 fix)
+# Status: ACTIVE (integrated into manifest.yaml v1.4.0)
+# ============================================================================
+
+block_id: blueprint_wizard
+block_number: 0
+name: "Blueprint Configuration Wizard"
+version: "1.2.2"
+
+# This block runs BEFORE Block 1 (Provision)
+# It can be skipped if all parameters are provided upfront
+
+depends_on: []  # No dependencies - this is the entry point
+
+# ============================================================================
+# AI EXECUTION INSTRUCTIONS (CRITICAL)
+# ============================================================================
+ai_instructions:
+  execution_model: |
+    SINGLE-AGENT EXECUTION: Do NOT spawn sub-agents or use Task tool.
+    Execute this block directly in the main conversation context.
+    Sub-agents lose MCP tool context and default to Bash commands.
+
+  tool_policy: |
+    MANDATORY: Use ONLY MCP certified tools via execute_certified_tool.
+    For IP collision checks: use sdwan-ip-collision-check tool
+    For manifest queries: use fortigate-sdwan-manifest-tracker tool
+    DO NOT use Bash commands to read/write manifest files directly.
+
+# ============================================================================
+# TOOLS (with canonical IDs)
+# ============================================================================
+
+tools:
+  # User interaction for gathering parameters
+  - name: "AskUserQuestion"
+    type: "builtin"
+    purpose: "Gather site parameters through Q/A wizard"
+
+  # Manifest operations (for collision checking)
+  - canonical_id: "org.ulysses.noc.fortigate-sdwan-manifest-tracker/1.0.0"
+    purpose: "Query existing sites, check uniqueness of IPs/loopbacks"
+    status: "CERTIFIED"
+    actions:
+      - list       # Show all tracked devices
+      - get        # Get specific device entry
+      - absorb     # Pull config from device into manifest
+    example: |
+      execute_certified_tool("org.ulysses.noc.fortigate-sdwan-manifest-tracker/1.0.0", {
+        "action": "list"
+      })
+
+  # Blueprint generation
+  - canonical_id: "org.ulysses.noc.fortigate-sdwan-blueprint-planner/1.0.6"
+    purpose: "Generate CSV template with recommended values for new site"
+    status: "CERTIFIED"
+    actions:
+      - generate-template  # Create CSV with auto-calculated values (site_id, loopback_ip, etc.)
+      - plan-site          # Read CSV and generate FortiOS CLI config
+    example: |
+      execute_certified_tool("org.ulysses.noc.fortigate-sdwan-blueprint-planner/1.0.6", {
+        "action": "generate-template",
+        "role": "spoke",
+        "site_name": "branch-chicago"
+      })
+
+# ============================================================================
+# SUB-AGENT BRIEFING
+# ============================================================================
+
+goal: |
+  Collect site configuration parameters from the operator through a simple
+  question-and-answer wizard. Derive all possible values from the site_id
+  to minimize user input. Track unique values for IP overlap prevention.
+  Output a complete parameter set for subsequent blocks.
+
+# ============================================================================
+# UNIQUE VALUES TRACKED (For Collision Prevention)
+# ============================================================================
+
+# These values MUST be unique across all sites in the manifest.
+# The wizard validates against existing_sites before accepting input.
+
+unique_values:
+  # Primary identifiers
+  - field: site_id
+    source: "user input"
+    used_for: "Seed for derived values"
+    example: 4
+
+  - field: site_name
+    source: "user input"
+    used_for: "Hostname prefix, VM name"
+    example: "branch-chicago"
+
+  # Network identifiers (derived from site_id unless overridden)
+  - field: spoke_loopback
+    source: "derived from site_id"
+    used_for: "BGP router-id, location-id, IPsec exchange-ip"
+    example: "172.16.0.4"
+
+  - field: management_ip
+    source: "user input"
+    used_for: "Device management, WAN IP"
+    example: "192.168.209.40"
+
+  # LAN subnet tracking (critical for IP overlap prevention)
+  - field: lan_subnets
+    source: "user input (array)"
+    used_for: "LAN networks behind this spoke"
+    validation: "Must not overlap with any other site's subnets"
+    examples:
+      - "10.4.1.0/24"      # Primary LAN
+      - "10.4.2.0/24"      # Guest network
+      - "10.4.10.0/24"     # VLAN 10
+
+  # VLAN IDs (must be unique per site, tracked globally for documentation)
+  - field: vlan_ids
+    source: "user input (array)"
+    used_for: "VLAN interfaces on LAN side"
+    example: [10, 20, 100]
+
+  # System identifiers
+  - field: hostname
+    source: "derived from site_name"
+    used_for: "config system global hostname"
+    example: "FG-branch-chicago"
+
+# ============================================================================
+# INPUTS
+# ============================================================================
+
+inputs:
+  required: []  # Wizard gathers everything
+
+  optional:
+    - name: site_id
+      description: "Pre-specified site ID (skips first question)"
+      type: integer
+      example: 4
+
+    - name: preset_mode
+      description: "Skip wizard, use all defaults"
+      type: string
+      enum: ["interactive", "express", "full_manual"]
+      default: "interactive"
+
+    - name: execution_mode
+      description: "Workflow execution mode"
+      type: string
+      enum: ["dry-run", "live-deploy"]
+      default: "dry-run"
+      help: |
+        dry-run: Generate and validate config only, save for later deployment
+        live-deploy: Execute full workflow (BLOCK_0 through BLOCK_4) with device
+
+  from_manifest:
+    - name: existing_sites
+      source: "sdwan-manifest.yaml → sites[]"
+      purpose: "Validate uniqueness of all tracked values"
+
+    - name: hub_registry
+      source: "sdwan-manifest.yaml → hubs[]"
+      purpose: "Show available hubs"
+
+    - name: global_subnet_pool
+      source: "sdwan-manifest.yaml → ip_plan.available_ranges[]"
+      purpose: "Suggest non-overlapping subnets"
+
+# ============================================================================
+# WIZARD QUESTIONS
+# ============================================================================
+
+wizard:
+  mode: "interactive"  # Can be: interactive, express, full_manual
+
+  questions:
+    # =========================================================================
+    # SECTION 0: EXECUTION MODE (FIRST QUESTION)
+    # =========================================================================
+
+    - id: execution_mode
+      sequence: 0
+      section: "Execution Mode"
+      question: "How would you like to proceed?"
+      type: choice
+      required: true
+      options:
+        - value: "dry-run"
+          label: "Dry Run - Generate config only (Recommended)"
+          description: "Creates validated config file. Deploy later with 'deploy site X'"
+        - value: "live-deploy"
+          label: "Live Deploy - Step-by-step with device"
+          description: "Full automation: provision, license, configure, verify"
+      default: "dry-run"
+      hint: |
+        RECOMMENDED: Start with Dry Run, then deploy after validation passes.
+
+        Dry Run (Best Practice):
+        - Generates complete CLI config
+        - Validates against 9 contract checks
+        - Saves to blueprints/ directory
+        - No device contact - safe to run multiple times
+        - Deploy later: "deploy site X"
+
+        Live Deploy (Experienced Operators):
+        - Full automation with device interaction
+        - If you select this, AI will recommend dry-run first
+        - Only proceed if you've done this workflow before
+
+      agent_behavior: |
+        IF user selects "live-deploy":
+          AI SHOULD say: "I recommend running dry-run first to validate the
+          configuration. This catches naming/IP conflicts and contract violations
+          before touching the device. Would you like to:
+            1. Run dry-run first (recommended)
+            2. Proceed directly to live deploy"
+
+        IF user insists on live-deploy:
+          Proceed, but run internal validation before BLOCK_1
+
+    # =========================================================================
+    # SECTION 1: CORE SITE IDENTITY
+    # =========================================================================
+
+    - id: site_id
+      sequence: 1
+      section: "Site Identity"
+      question: "Site ID number for this new spoke?"
+      type: integer
+      required: true
+      validation:
+        min: 2
+        max: 254
+        unique_in: "existing_sites[].site_id"
+      hint: |
+        This becomes the seed for derived values:
+        - Loopback IP: 172.16.0.{site_id}
+        - Default LAN: 10.{site_id}.1.0/24
+        Current used IDs: {existing_sites.site_ids}
+      derives:
+        spoke_loopback: "172.16.0.{site_id}"
+        location_id: "172.16.0.{site_id}"
+        exchange_ip_addr4: "172.16.0.{site_id}"
+        default_lan_subnet: "10.{site_id}.1.0/24"
+
+    - id: site_name
+      sequence: 2
+      section: "Site Identity"
+      question: "Human-readable site name?"
+      type: string
+      required: true
+      validation:
+        pattern: "^[a-z0-9-]+$"
+        max_length: 15
+        unique_in: "existing_sites[].site_name"
+      hint: "Examples: branch-chicago, dc-east, spoke-03"
+      derives:
+        hostname: "FG-{site_name}"
+        vm_name: "FortiGate-{site_name}"
+
+    - id: deployment_type
+      sequence: 3
+      section: "Site Identity"
+      question: "Deployment type?"
+      type: choice
+      required: true
+      options:
+        - value: "vm"
+          label: "Virtual Machine (KVM)"
+          followup_questions: [hypervisor_name, vm_resources]
+        - value: "hardware"
+          label: "Physical FortiGate"
+          followup_questions: [device_serial, device_model]
+
+    # =========================================================================
+    # SECTION 2: NETWORK ADDRESSING
+    # =========================================================================
+
+    - id: wan_interface
+      sequence: 4
+      section: "Network Addressing"
+      question: "WAN interface name on the device?"
+      type: string
+      required: true
+      default_by_type:
+        vm: "port1"
+        hardware: "wan"
+      hint: "Usually 'port1' for VM, 'wan' or 'wan1' for hardware"
+
+    - id: wan_mode
+      sequence: 5
+      section: "Network Addressing"
+      question: "WAN interface addressing mode?"
+      type: choice
+      required: true
+      options:
+        - value: "dhcp"
+          label: "DHCP Client (Recommended for lab)"
+          description: "FortiGate gets WAN IP from upstream router/DHCP server"
+        - value: "static"
+          label: "Static IP"
+          description: "Manually specify WAN IP and gateway"
+          followup_questions: [management_ip, wan_netmask, wan_gateway, wan_ip]
+      default: "dhcp"
+      hint: |
+        DHCP: FortiGate obtains IP automatically from upstream (common in labs)
+        Static: You specify the WAN IP and gateway (production deployments)
+
+    - id: management_ip
+      sequence: 6
+      section: "Network Addressing"
+      question: "Management/WAN IP (host IP only, no CIDR)?"
+      type: ip_address
+      required_if: "wan_mode == 'static'"
+      validation:
+        unique_in: "existing_sites[].management_ip"
+        reachable_from_hub: true
+      hint: "Must be unique and reachable from hub at 192.168.215.15"
+
+    - id: wan_netmask
+      sequence: 7
+      section: "Network Addressing"
+      question: "WAN netmask (dotted decimal)?"
+      type: ip_address
+      required_if: "wan_mode == 'static'"
+      hint: "Example: 255.255.255.0"
+
+    - id: wan_gateway
+      sequence: 8
+      section: "Network Addressing"
+      question: "WAN gateway IP?"
+      type: ip_address
+      required_if: "wan_mode == 'static'"
+      hint: "Default gateway for WAN interface"
+
+    - id: wan_ip
+      sequence: 9
+      section: "Network Addressing"
+      question: "WAN IP with CIDR (required for static bootstrap)?"
+      type: cidr
+      required_if: "wan_mode == 'static'"
+      hint: "Example: 192.168.209.46/24 (must match management_ip + wan_netmask)"
+
+    # =========================================================================
+    # SECTION 3: LAN NETWORKS
+    # =========================================================================
+
+    - id: lan_interface
+      sequence: 10
+      section: "LAN Networks"
+      question: "Primary LAN interface name?"
+      type: string
+      required: true
+      default_by_type:
+        vm: "port2"
+        hardware: "lan"
+      hint: "Usually 'port2' for VM, 'lan' or 'internal' for hardware"
+
+    - id: lan_subnets
+      sequence: 11
+      section: "LAN Networks"
+      question: "LAN subnet for this spoke?"
+      type: cidr
+      required: true
+      hint: |
+        The LAN network behind this spoke.
+        Example: 10.5.1.0/24
+        Default: 10.{site_id}.1.0/24
+      validation:
+        not_overlapping: "existing_sites[].lan_subnets"
+      default_formula: "10.{site_id}.1.0/24"
+
+    - id: lan_dhcp_server
+      sequence: 12
+      section: "LAN Networks"
+      question: "Enable DHCP server on LAN interface?"
+      type: choice
+      required: true
+      options:
+        - value: "yes"
+          label: "Yes - FortiGate provides DHCP to LAN devices (Recommended)"
+          description: "FortiGate assigns IPs to devices on the LAN"
+        - value: "no"
+          label: "No - Static addressing only"
+          description: "LAN devices have static IPs or another DHCP server exists"
+      default: "yes"
+      hint: |
+        If enabled, FortiGate will serve DHCP on the LAN interface.
+        DHCP pool is auto-derived from lan_subnet:
+        - Gateway: First IP (e.g., 10.5.1.1)
+        - Pool: .2 through .254
+
+    # =========================================================================
+    # SECTION 4: VLAN CONFIGURATION (Optional)
+    # =========================================================================
+
+    - id: vlans_needed
+      sequence: 13
+      section: "VLAN Configuration"
+      question: "Does this site need VLAN interfaces?"
+      type: boolean
+      required: false
+      default: false
+      hint: "Enable if you need network segmentation (guest wifi, IoT, etc.)"
+      followup_if_true: [vlan_definitions]
+
+    - id: vlan_definitions
+      sequence: 14
+      section: "VLAN Configuration"
+      question: "Define VLANs for this site"
+      type: vlan_array
+      required_if: "vlans_needed == true"
+      hint: |
+        Define each VLAN with: ID, name, parent interface, subnet
+        Example: VLAN 10 for guest network on port2 with 10.4.10.0/24
+      schema:
+        items:
+          - name: vlan_id
+            type: integer
+            range: [2, 4094]
+            required: true
+          - name: vlan_name
+            type: string
+            required: true
+            hint: "e.g., guest-wifi, iot-devices, servers"
+          - name: parent_interface
+            type: string
+            required: true
+            default: "{lan_interface}"
+          - name: subnet
+            type: cidr
+            required: true
+            validation:
+              not_overlapping_global: "existing_sites[].lan_subnets"
+              not_overlapping_local: "lan_subnets"  # Can't overlap primary LANs
+          - name: allowaccess
+            type: string
+            default: "ping"
+            hint: "ping https ssh http"
+          - name: role
+            type: string
+            enum: [lan, dmz, undefined]
+            default: "lan"
+      examples:
+        - vlan_id: 10
+          vlan_name: "guest-wifi"
+          parent_interface: "port2"
+          subnet: "10.4.10.0/24"
+          allowaccess: "ping"
+          role: "lan"
+        - vlan_id: 20
+          vlan_name: "iot-devices"
+          parent_interface: "port2"
+          subnet: "10.4.20.0/24"
+          allowaccess: "ping"
+          role: "lan"
+
+    # =========================================================================
+    # SECTION 5: SYSTEM GLOBAL SETTINGS
+    # =========================================================================
+
+    - id: hostname
+      sequence: 15
+      section: "System Settings"
+      question: "Device hostname?"
+      type: string
+      required: true
+      default_formula: "FG-{site_name}"
+      validation:
+        pattern: "^[A-Za-z0-9-]+$"
+        max_length: 35
+        unique_in: "existing_sites[].hostname"
+      hint: "Appears in CLI prompt and logs"
+
+    - id: timezone
+      sequence: 16
+      section: "System Settings"
+      question: "Timezone?"
+      type: choice
+      required: false
+      options:
+        - value: "America/Chicago"
+          label: "Central Time (Chicago)"
+        - value: "America/New_York"
+          label: "Eastern Time (New York)"
+        - value: "America/Los_Angeles"
+          label: "Pacific Time (Los Angeles)"
+        - value: "America/Denver"
+          label: "Mountain Time (Denver)"
+        - value: "UTC"
+          label: "UTC"
+      default: "America/Chicago"
+
+    - id: admin_https_port
+      sequence: 17
+      section: "System Settings"
+      question: "Admin HTTPS port?"
+      type: integer
+      required: false
+      default: 443
+      hint: "Change from 443 if needed for security"
+
+    - id: admin_ssh_port
+      sequence: 18
+      section: "System Settings"
+      question: "Admin SSH port?"
+      type: integer
+      required: false
+      default: 22
+
+    # =========================================================================
+    # SECTION 6: SYSTEM SETTINGS (IKE, LOCATION)
+    # =========================================================================
+
+    - id: ike_tcp_port
+      sequence: 19
+      section: "System Settings"
+      question: "IKE TCP port for NAT-T?"
+      type: integer
+      required: false
+      default: 11443
+      hint: "Must match hub configuration (typically 11443)"
+
+    # Note: location_id is derived from site_id, not asked
+
+    # =========================================================================
+    # SECTION 7: SD-WAN / VPN SETTINGS
+    # =========================================================================
+
+    - id: license_type
+      sequence: 20
+      section: "SD-WAN Settings"
+      question: "License type?"
+      type: choice
+      required: false
+      options:
+        - value: "fortiflex"
+          label: "FortiFlex (VM License)"
+        - value: "standard"
+          label: "Standard (Hardware License)"
+        - value: "payg"
+          label: "Pay-As-You-Go (Cloud)"
+      default_by_type:
+        vm: "fortiflex"
+        hardware: "standard"
+
+    - id: dual_hub
+      sequence: 21
+      section: "SD-WAN Settings"
+      question: "Connect to both VPN1 and VPN2?"
+      type: boolean
+      required: false
+      default: true
+      hint: "Recommended for redundancy"
+
+    - id: bgp_enabled
+      sequence: 22
+      section: "SD-WAN Settings"
+      question: "Enable BGP route exchange?"
+      type: boolean
+      required: false
+      default: true
+
+    - id: ipsec_psk
+      sequence: 23
+      section: "SD-WAN Settings"
+      question: "IPsec Pre-Shared Key (PSK)?"
+      type: string
+      required: true
+      default: "password"
+      hint: |
+        MUST match the hub's PSK configuration.
+        Default: 'password' (for lab environments)
+        Production: Use a strong, unique key
+      validation:
+        min_length: 6
+        max_length: 128
+      sensitive: true
+
+    - id: admin_password
+      sequence: 24
+      section: "SD-WAN Settings"
+      question: "Admin password for this FortiGate?"
+      type: string
+      required: true
+      default: "FG@dm!n2026!"
+      sensitive: true
+      hint: |
+        Password for the 'admin' account.
+        Default: FG@dm!n2026! (lab standard)
+        For production: Use a strong, unique password
+        This password is used for:
+        - Bootstrap ISO configuration
+        - SSH access in BLOCK_2 (license application)
+        - API access if no API key is generated
+
+    # =========================================================================
+    # SECTION 8: CONDITIONAL (Deployment-Specific)
+    # =========================================================================
+
+    - id: hypervisor
+      sequence: 25
+      section: "VM Deployment"
+      question: "Which hypervisor to deploy on?"
+      type: choice
+      required_if: "deployment_type == 'vm'"
+      options:
+        - value: "rocky-kvm-lab"
+          label: "Rocky KVM Lab (192.168.209.115)"
+      default: "rocky-kvm-lab"
+
+    - id: device_serial
+      sequence: 26
+      section: "Hardware Deployment"
+      question: "Device serial number?"
+      type: string
+      required_if: "deployment_type == 'hardware'"
+      hint: "Found on device label or 'get system status'"
+
+    - id: device_model
+      sequence: 27
+      section: "Hardware Deployment"
+      question: "Device model?"
+      type: choice
+      required_if: "deployment_type == 'hardware'"
+      options:
+        - value: "FortiGate-40F"
+          label: "FortiGate 40F"
+        - value: "FortiGate-60F"
+          label: "FortiGate 60F"
+        - value: "FortiGate-80F"
+          label: "FortiGate 80F"
+        - value: "FortiGate-100F"
+          label: "FortiGate 100F"
+        - value: "FortiGate-200F"
+          label: "FortiGate 200F"
+        - value: "other"
+          label: "Other (specify)"
+
+# ============================================================================
+# DERIVATION ENGINE
+# ============================================================================
+
+derivations:
+  from_site_id:
+    spoke_loopback:
+      formula: "172.16.0.{site_id}"
+      example: "site_id=4 → 172.16.0.4"
+      tracked: true
+
+    location_id:
+      formula: "172.16.0.{site_id}"
+      used_in: "config system settings / location-id"
+      tracked: true
+
+    exchange_ip_addr4:
+      formula: "172.16.0.{site_id}"
+      used_in: "config vpn ipsec phase1-interface / exchange-ip-addr4"
+
+    bgp_router_id:
+      formula: "172.16.0.{site_id}"
+      used_in: "config router bgp / router-id"
+
+    default_lan_subnet:
+      formula: "10.{site_id}.1.0/24"
+      used_in: "Default LAN if not specified"
+      tracked: true
+
+  from_management_ip:
+    # wan_ip derivation — ONLY for static mode
+    # In DHCP mode (default), wan_ip is NOT set — port1 uses "set mode dhcp"
+    wan_ip:
+      formula: "{management_ip}/24"
+      example: "management_ip=192.168.209.45 → wan_ip=192.168.209.45/24"
+      used_in: "BLOCK_1 kvm-fortios-provision static IP mode ONLY"
+      note: |
+        STATIC MODE ONLY: wan_ip must be CIDR format (e.g., 192.168.209.45/24).
+        DHCP MODE (default): wan_ip is NOT set. Port1 uses DHCP. Management IP
+        is discovered after boot via MAC-to-ARP correlation — not pre-calculated.
+        If wan_netmask is provided, compute CIDR from it.
+        Default /24 mask matches lab network (192.168.209.0/24).
+      tracked: true
+
+    lan_ip:
+      formula: "10.{site_id}.1.1/24"
+      example: "site_id=7 → lan_ip=10.7.1.1/24"
+      used_in: "BLOCK_1 kvm-fortios-provision port2 LAN gateway"
+      note: |
+        FortiGate's LAN interface IP (port2).
+        This is the gateway for devices on the LAN subnet.
+      tracked: true
+
+  from_site_name:
+    hostname:
+      formula: "FG-{site_name}"
+      example: "site_name=branch-chicago → FG-branch-chicago"
+      used_in: "config system global / hostname"
+      tracked: true
+
+    vm_name:
+      formula: "FortiGate-{site_name}"
+      used_in: "KVM VM name"
+
+    tunnel_names:
+      formula: "HUB1-VPN1, HUB1-VPN2"
+      used_in: "IPsec phase1 interface names"
+
+  constants:
+    hub_ip: "192.168.215.15"
+    hub_loopback_primary: "172.16.255.252"     # BGP router-id
+    hub_loopback_secondary: "172.16.255.253"   # Health-check target, BGP peer
+    bgp_as: 65000
+    network_id_vpn1: 1
+    network_id_vpn2: 2
+
+# ============================================================================
+# OUTPUT BLUEPRINT
+# ============================================================================
+
+outputs:
+  required:
+    - name: execution_mode
+      type: string
+      enum: ["dry-run", "live-deploy"]
+      description: "Selected execution mode - determines next steps"
+
+    - name: blueprint
+      type: object
+      description: "Complete parameter set for subsequent blocks"
+      schema:
+        # Execution
+        execution_mode: string  # dry-run or live-deploy
+        # Identity
+        site_id: integer
+        site_name: string
+        hostname: string
+        deployment_type: string
+
+        # Network - WAN
+        wan_mode: string       # "dhcp" (default) or "static"
+        management_ip: string  # DHCP: "discovered_after_boot" | Static: pre-assigned IP
+        wan_ip: string         # Static only: IP with CIDR (e.g., "192.168.209.45/24") | DHCP: null
+        wan_netmask: string    # Static only: "255.255.255.0" | DHCP: null
+        wan_gateway: string    # Static only: "192.168.209.62" | DHCP: provided by DHCP server
+        wan_interface: string
+
+        # Network - LAN (tracked for overlap prevention)
+        lan_subnets: array[cidr]
+        lan_interface: string
+        lan_ip: string           # FortiGate's LAN gateway IP (e.g., "10.7.1.1/24") - derived from site_id
+
+        # VLANs (optional)
+        vlans: array[vlan_definition]
+
+        # Derived overlay addresses
+        spoke_loopback: string
+        location_id: string
+        exchange_ip_addr4: string
+
+        # System settings
+        timezone: string
+        admin_https_port: integer
+        admin_ssh_port: integer
+        ike_tcp_port: integer
+        rest_api_key_url_query: string  # MUST be "enable" for REST API config push
+
+        # SD-WAN settings
+        license_type: string
+        dual_hub: boolean
+        bgp_enabled: boolean
+        ipsec_psk: string        # IPsec pre-shared key
+
+        # Authentication (CRITICAL - flows to BLOCK_1 and BLOCK_2)
+        admin_password: string   # REQUIRED - used for bootstrap ISO and SSH in BLOCK_2
+
+        # Deployment-specific
+        hypervisor: string       # if VM (renamed from hypervisor_name)
+        device_serial: string    # if hardware
+        device_model: string     # if hardware
+
+    - name: validation_passed
+      type: boolean
+      description: "All validations passed"
+
+    - name: tracked_values
+      type: object
+      description: "Values to add to manifest for future collision prevention"
+      schema:
+        site_id: integer
+        site_name: string
+        hostname: string
+        management_ip: string
+        spoke_loopback: string
+        lan_subnets: array[cidr]
+        vlan_ids: array[integer]
+
+  optional:
+    - name: warnings
+      type: array
+      description: "Non-blocking warnings (e.g., site_id gap)"
+
+# ============================================================================
+# SUCCESS CRITERIA
+# ============================================================================
+
+success_criteria:
+  - id: all_required_answered
+    description: "All required questions have valid answers"
+    critical: true
+
+  - id: site_id_unique
+    description: "site_id not already used in manifest"
+    verification:
+      check: "site_id not in existing_sites[].site_id"
+    critical: true
+
+  - id: hostname_unique
+    description: "hostname not already used"
+    verification:
+      check: "hostname not in existing_sites[].hostname"
+    critical: true
+
+  - id: management_ip_unique
+    description: "management_ip not already used"
+    verification:
+      check: "management_ip not in existing_sites[].management_ip"
+    critical: true
+    required_if: "wan_mode == 'static'"
+
+  - id: no_lan_subnet_overlap
+    description: "LAN subnets don't overlap any existing site"
+    verification:
+      check: "all(lan_subnets) not overlapping any(existing_sites[].lan_subnets)"
+    critical: true
+
+  - id: no_vlan_subnet_overlap
+    description: "VLAN subnets don't overlap any existing site"
+    verification:
+      check: "all(vlans[].subnet) not overlapping any(existing_sites[].lan_subnets)"
+    critical: true
+
+  - id: spoke_loopback_unique
+    description: "Derived spoke loopback is unique"
+    verification:
+      check: "spoke_loopback not in existing_sites[].spoke_loopback"
+    critical: true
+
+  - id: gateway_on_same_subnet
+    description: "WAN gateway must be on same subnet as management_ip"
+    verification:
+      check: "wan_gateway in same_subnet_as(management_ip)"
+      example: |
+        management_ip: 192.168.209.45/24 → subnet 192.168.209.0/24
+        wan_gateway: 192.168.209.62 → VALID (same subnet)
+        wan_gateway: 10.0.0.1 → INVALID (different subnet)
+    critical: true
+    required_if: "wan_mode == 'static'"
+
+  - id: rest_api_enabled
+    description: "rest-api-key-url-query must be enabled for REST API config push"
+    verification:
+      check: "rest_api_key_url_query == 'enable'"
+    critical: true
+    note: "Without this, BLOCK_1 fortigate-config-push will fail to authenticate"
+
+# ============================================================================
+# ERROR HANDLING
+# ============================================================================
+
+error_handling:
+  - condition: "site_id_conflict"
+    message: "Site ID {site_id} is already in use by {existing_site}"
+    remediation:
+      - action: "Show available site IDs"
+        query: "List unused IDs between 2-254"
+      - action: "Suggest next available"
+        formula: "max(existing_sites[].site_id) + 1"
+
+  - condition: "subnet_overlap"
+    message: "Subnet {subnet} overlaps with {conflicting_site}'s {conflicting_subnet}"
+    remediation:
+      - action: "Show used subnets"
+        query: "List all existing_sites[].lan_subnets"
+      - action: "Suggest from available pool"
+        formula: "next_available_from(global_subnet_pool)"
+
+  - condition: "hostname_conflict"
+    message: "Hostname '{hostname}' is already in use"
+    remediation:
+      - action: "Suggest alternative"
+        formula: "{site_name}-{site_id}"
+
+  - condition: "vlan_id_conflict_within_site"
+    message: "VLAN ID {vlan_id} is used multiple times in this site"
+    remediation:
+      - action: "Use unique VLAN IDs per site"
+
+  - condition: "gateway_not_on_subnet"
+    message: "Gateway {wan_gateway} is not on the same subnet as management_ip {management_ip}"
+    remediation:
+      - action: "Use gateway on same /24 subnet"
+        example: |
+          management_ip: 192.168.209.45/24
+          wan_gateway: 192.168.209.62 (CORRECT)
+          wan_gateway: 10.0.0.1 (WRONG - different subnet)
+
+  - condition: "rest_api_disabled"
+    message: "rest-api-key-url-query is not enabled - config push will fail"
+    remediation:
+      - action: "Enable rest-api-key-url-query in bootstrap"
+        required_line: "set rest-api-key-url-query enable"
+
+  - condition: "express_mode_ip_overflow"
+    message: "N/A — DHCP mode does not use a pre-calculated IP formula"
+    note: "This validation is only relevant if static mode is used with a formula. DHCP mode (default) discovers the IP after boot — no overflow possible."
+    status: "DEPRECATED — express mode now uses DHCP by default"
+
+# ============================================================================
+# EXPRESS MODE (Minimal Questions)
+# ============================================================================
+
+express_mode:
+  description: |
+    For rapid deployment when operator just wants "add site 4".
+    Only asks: site_id, lan_subnet. Everything else derived/defaulted.
+
+    WAN Mode: DHCP (default). Port1 gets IP + gateway from network DHCP server.
+    Management IP is discovered after boot via MAC-to-ARP correlation.
+    Static IP mode is available if the operator provides wan_ip and wan_gateway.
+
+    NOTE: Earlier versions claimed DHCP didn't create a default route.
+    This was incorrect — DHCP provides gateway automatically. Sites 07 and 08
+    both deployed successfully with use_dhcp=true.
+
+  questions_asked:
+    - site_id
+    - lan_subnets
+
+  defaults_applied:
+    site_name: "spoke-{site_id:02d}"
+    hostname: "sdwan-spoke-{site_id:02d}"
+    deployment_type: "vm"
+    hypervisor: "rocky-kvm-lab"                  # FIXED: Renamed from hypervisor_name for BLOCK_1 compatibility
+    wan_interface: "port1"
+    wan_mode: "dhcp"                             # Default — DHCP provides IP + gateway automatically
+    management_ip: "discovered_after_boot"       # NOT pre-calculated — DHCP assigns it
+    # For static mode (optional): operator provides wan_ip and wan_gateway
+    # wan_ip: "192.168.209.XX/24"
+    # wan_gateway: "192.168.209.62"
+    rest_api_key_url_query: "enable"             # Required for REST API config push
+    admin_password: "FG@dm!n2026!"               # CRITICAL - flows to BLOCK_1 bootstrap and BLOCK_2 SSH
+    lan_interface: "port2"
+    lan_subnets: "10.{site_id}.1.0/24"
+    lan_dhcp_server: "yes"  # FortiGate serves DHCP to LAN devices
+    vlans_needed: false
+    timezone: "America/Chicago"
+    admin_https_port: 443
+    admin_ssh_port: 22
+    ike_tcp_port: 11443
+    license_type: "fortiflex"
+    dual_hub: true
+    bgp_enabled: true
+    ipsec_psk: "password"  # Lab default - agent MUST confirm with user
+
+# ============================================================================
+# REPORT FORMAT
+# ============================================================================
+
+report_format: |
+  ## Block 0: Blueprint Wizard - {status}
+
+  ### Site Identity
+  | Parameter | Value | Source |
+  |-----------|-------|--------|
+  | Site ID | {site_id} | User input |
+  | Site Name | {site_name} | User input |
+  | Hostname | {hostname} | Derived |
+  | Deployment | {deployment_type} | User input |
+
+  ### Network Addressing
+  | Parameter | Value | Tracked |
+  |-----------|-------|---------|
+  | Management IP | {management_ip} | ✓ |
+  | WAN Mode | {wan_mode} | |
+  | WAN IP | {wan_ip} | |
+  | WAN Netmask | {wan_netmask} | |
+  | WAN Gateway | {wan_gateway} | |
+  | WAN Interface | {wan_interface} | |
+  | Spoke Loopback | {spoke_loopback} | ✓ |
+
+  ### LAN Networks (Tracked for Overlap Prevention)
+  | Subnet | Interface | Purpose |
+  |--------|-----------|---------|
+  {for subnet in lan_subnets}
+  | {subnet} | {lan_interface} | Primary LAN |
+  {endfor}
+  {for vlan in vlans}
+  | {vlan.subnet} | VLAN {vlan.vlan_id} | {vlan.vlan_name} |
+  {endfor}
+
+  ### System Settings
+  | Setting | Value |
+  |---------|-------|
+  | Timezone | {timezone} |
+  | HTTPS Port | {admin_https_port} |
+  | SSH Port | {admin_ssh_port} |
+  | IKE TCP Port | {ike_tcp_port} |
+
+  ### Validations
+  - ✓ Site ID unique: {site_id_unique_status}
+  - ✓ Hostname unique: {hostname_unique_status}
+  - ✓ Management IP unique: {mgmt_ip_unique_status}
+  - ✓ LAN subnets no overlap: {lan_overlap_status}
+  - ✓ Spoke loopback unique: {loopback_unique_status}
+
+  ### Ready for Block 1
+  Blueprint generated and validated. Proceed to BLOCK_1_PROVISION.
+
+# ============================================================================
+# MANIFEST UPDATE (After Successful Deployment)
+# ============================================================================
+
+manifest_update:
+  description: |
+    After successful deployment, these values should be added to sdwan-manifest.yaml
+    to prevent future collisions.
+
+  fields_to_track:
+    - site_id
+    - site_name
+    - hostname
+    - management_ip
+    - spoke_loopback
+    - lan_subnets        # Array of all LAN CIDRs
+    - vlan_ids           # Array of VLAN IDs used
+    - deployment_date
+    - deployment_type
+
+  example_manifest_entry: |
+    sites:
+      - site_id: 4
+        site_name: "branch-chicago"
+        hostname: "FG-branch-chicago"
+        management_ip: "192.168.209.40"
+        spoke_loopback: "172.16.0.4"
+        lan_subnets:
+          - "10.4.1.0/24"
+          - "10.4.10.0/24"   # VLAN 10
+          - "10.4.20.0/24"   # VLAN 20
+        vlan_ids: [10, 20]
+        deployment_type: "vm"
+        deployment_date: "2026-01-21"
+        status: "active"
+
+# ============================================================================
+# CHANGELOG
+# ============================================================================
+
+changelog:
+  - version: "1.2.2"
+    date: "2026-01-26"
+    changes:
+      - "Added WAN mode with static requires wan_ip + wan_netmask"
+      - "Included wan_netmask and wan_mode in blueprint outputs"
+      - "Made management_ip uniqueness check conditional on static WAN mode"
+
+  - version: "1.2.1"
+    date: "2026-01-24"
+    changes:
+      - "REVERTED (2026-01-26): Express mode back to DHCP default — static was wrong assumption"
+      - "DHCP provides default route automatically via DHCP lease (Sites 07/08 confirmed)"
+      - "Removed management_ip formula — IP is DHCP-assigned, discovered after boot"
+      - "Static mode remains available as optional override (operator provides wan_ip + wan_gateway)"
+      - "Added rest_api_key_url_query: enable to express defaults"
+      - "Added gateway_on_same_subnet validation (Error 4 fix)"
+      - "Added rest_api_enabled validation (Error 5 fix)"
+      - "Added gateway_not_on_subnet error handling"
+      - "Added rest_api_disabled error handling"
+      - "Updated outputs schema with rest_api_key_url_query field"
+
+  - version: "1.2.0"
+    date: "2026-01-21"
+    changes:
+      - "MAJOR: Integrated as official workflow entry point (GAP 1 fix)"
+      - "Status changed: PROPOSED → ACTIVE"
+      - "Referenced by manifest.yaml v1.4.0 entry_point section"
+      - "Replaces human_interaction.pre_workflow"
+
+  - version: "1.1.0"
+    date: "2026-01-21"
+    changes:
+      - "Added LAN subnet tracking with IP overlap validation"
+      - "Added VLAN interface support (optional per site)"
+      - "Added hostname uniqueness tracking"
+      - "Added system global settings (timezone, admin ports)"
+      - "Added system settings (ike-tcp-port)"
+      - "Added manifest_update section for tracking deployed values"
+      - "Enhanced error handling for subnet conflicts"
+      - "Added device_model for hardware deployments"
+
+  - version: "1.0.0"
+    date: "2026-01-21"
+    changes:
+      - "Initial blueprint wizard with site_id derivation"
+      - "Basic LAN subnet question"
+      - "Express mode for rapid deployment"

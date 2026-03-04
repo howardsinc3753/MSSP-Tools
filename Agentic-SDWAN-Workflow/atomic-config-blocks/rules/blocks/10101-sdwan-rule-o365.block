@@ -1,0 +1,55 @@
+---
+block_id: 10101
+name: sdwan-rule-o365
+display_name: "SD-WAN Rule - Microsoft 365"
+version: 1.0.0
+category: sdwan-rules
+vendor: fortinet
+platform: fortigate
+min_fortios: "7.4.0"
+
+depends_on:
+  - range: "1-12"
+    reason: "SD-WAN base, members, and health-checks must exist"
+
+provides:
+  - "sdwan-rule-microsoft365"
+
+parameters:
+  - name: RULE_ID
+    description: "SD-WAN service rule ID (1-4000, 0=auto)"
+    type: integer
+    default: 0
+  - name: RULE_NAME
+    description: "Rule display name"
+    type: string
+    default: "O365-Steering"
+  - name: HEALTH_CHECK
+    description: "SLA health-check name"
+    type: string
+    default: "HUB_Health"
+  - name: PRIORITY_MEMBERS
+    description: "Preferred SD-WAN member sequence numbers"
+    type: string
+    default: "1 2"
+
+tags:
+  - sdwan
+  - microsoft365
+  - saas
+  - application-steering
+---
+
+config system sdwan
+    config service
+        edit {{RULE_ID}}
+            set name "{{RULE_NAME}}"
+            set mode priority
+            set internet-service enable
+            set internet-service-name "Microsoft-Office365" "Microsoft-Office365.Published" "Microsoft-Office365.Published.Optimize" "Microsoft-Office365.Published.Allow"
+            set health-check "{{HEALTH_CHECK}}"
+            set link-cost-factor packet-loss
+            set priority-members {{PRIORITY_MEMBERS}}
+        next
+    end
+end

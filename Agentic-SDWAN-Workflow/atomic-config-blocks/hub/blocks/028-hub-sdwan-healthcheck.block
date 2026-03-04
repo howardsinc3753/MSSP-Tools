@@ -1,0 +1,103 @@
+---
+block_id: 028
+name: hub-sdwan-healthcheck
+display_name: "Hub SD-WAN Health Check Configuration"
+version: 1.0.0
+category: core
+device_role: hub
+vendor: fortinet
+platform: fortigate
+min_fortios: "7.4.0"
+
+description: |
+  SD-WAN health-check configuration for hub. Monitors spoke tunnel quality
+  using ping to hub's BGP loopback. Spokes send health-check probes, hub
+  responds.
+
+depends_on:
+  - block_id: 027
+    reason: "SD-WAN zone must exist"
+  - block_id: 022
+    reason: "BGP loopback must exist as health-check target"
+
+provides:
+  - hub-sdwan-healthcheck
+  - hub-sla-monitoring
+
+parameters:
+  - name: HEALTH_CHECK_NAME
+    description: "Health-check name"
+    type: string
+    required: false
+    default: "From_Edge"
+
+  - name: HEALTH_CHECK_TARGET
+    description: "IP address to ping (typically hub BGP loopback)"
+    type: ip_address
+    required: true
+    example: "172.16.255.252"
+
+  - name: INTERVAL_MS
+    description: "Ping interval in milliseconds"
+    type: integer
+    required: false
+    default: 1000
+
+  - name: FAILTIME_SECONDS
+    description: "Time before marking link down"
+    type: integer
+    required: false
+    default: 5
+
+  - name: RECOVERYTIME_SECONDS
+    description: "Time before marking link up"
+    type: integer
+    required: false
+    default: 5
+
+verification:
+  commands:
+    - "get system sdwan health-check"
+  expected_patterns:
+    - "name: {{HEALTH_CHECK_NAME}}"
+    - "server: {{HEALTH_CHECK_TARGET}}"
+    - "protocol: ping"
+
+rollback:
+  commands:
+    - "config system sdwan"
+    - "config health-check"
+    - "delete {{HEALTH_CHECK_NAME}}"
+    - "end"
+    - "end"
+
+notes: |
+  - Hub responds to spoke health-check probes
+  - Health-check target is hub's BGP loopback
+  - SLA metrics: latency, jitter, packet-loss
+  - update-cascade-interface and update-static-route enable dynamic routing
+
+---
+
+config system sdwan
+    config health-check
+        edit "{{HEALTH_CHECK_NAME}}"
+            set server "{{HEALTH_CHECK_TARGET}}"
+            set protocol ping
+            set interval {{INTERVAL_MS}}
+            set failtime {{FAILTIME_SECONDS}}
+            set recoverytime {{RECOVERYTIME_SECONDS}}
+            set update-cascade-interface enable
+            set update-static-route enable
+            set sla-id-redistribute 1
+            config sla
+                edit 1
+                    set link-cost-factor latency jitter packet-loss
+                    set latency-threshold 200
+                    set jitter-threshold 50
+                    set packetloss-threshold 5
+                next
+            end
+        next
+    end
+end
