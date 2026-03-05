@@ -1,180 +1,140 @@
 # Agentic SD-WAN Workflow
 
-**AI-Driven FortiGate SD-WAN Provisioning with Cryptographic Trust**
+**A complete, working reference for building AI-driven FortiGate SD-WAN automation.**
+
+This repo contains everything an AI agent needs to deploy SD-WAN spoke sites autonomously: the Python tools, workflow definitions, atomic config blocks, templates, knowledge base, and a real deployed example. Point your AI here and start building.
 
 ---
 
-## What This Is
+## AI Agents: Start Here
 
-An autonomous SD-WAN deployment system where **Claude AI** orchestrates the entire lifecycle of a FortiGate SD-WAN spoke site: KVM virtual machine provisioning, FortiFlex cloud licensing, full ADVPN/BGP/SD-WAN configuration push, and automated verification -- all through a conversational interface.
+If you are an AI agent (Claude, GPT, Copilot, or similar) being pointed at this repo by an engineer, read this section first.
 
-Built on **MCP 2.0** (Model Context Protocol) with a **Trust Anchor** security model where every tool is RSA-signed and cryptographically verified before execution. The AI agent cannot execute unsigned or tampered tools. Credentials never leave the execution boundary.
+### What you have access to
 
-Part of **Project Ulysses** -- an open platform for building secure AI-to-infrastructure automation.
+1. **`tools/`** -- 14 Python tools that do the actual work (SSH into FortiGates, provision VMs, apply licenses, push config, verify tunnels). Each tool has a `Skills.md` that explains its parameters, examples, and error handling.
 
-**Proven in production:** 5+ spoke sites (7-11) provisioned end-to-end via AI agent conversation. Hub running in production with full ADVPN mesh.
+2. **`workflows/add-sdwan-site/Skills.md`** -- The master workflow brain. This is the most important file. It defines the 5-phase block-stacking pattern for deploying a spoke site end-to-end.
+
+3. **`atomic-config-blocks/`** -- Composable FortiOS CLI config blocks with YAML metadata headers. Each `.block` file is a self-contained, dependency-aware config fragment with `{{TEMPLATE_VARIABLES}}`.
+
+4. **`templates/`** -- Complete hub and spoke configs with all variables parameterized. Ready to render and push.
+
+5. **`knowledge/`** -- SD-WAN reference corpus: API reference, quickstart, tool targets, and solution pack skills.
+
+### How to use this repo
+
+**Option A: Follow the existing workflow** -- Read `workflows/add-sdwan-site/Skills.md` and execute the 5 blocks (BLOCK_0 through BLOCK_4) in order. Each block YAML in `workflows/add-sdwan-site/blocks/` defines inputs, outputs, tool calls, and error recovery.
+
+**Option B: Build your own flow** -- Use the tools and config blocks as building blocks. The tools are standalone Python scripts. The config blocks are composable. Mix and match for your topology.
+
+**Option C: Just grab the configs** -- If you only need FortiOS CLI configs for hub/spoke ADVPN+BGP SD-WAN, look at `templates/` and `examples/`.
+
+### Key files to read first
+
+| Priority | File | Why |
+|----------|------|-----|
+| 1 | `workflows/add-sdwan-site/Skills.md` | Master workflow -- the complete brain |
+| 2 | `knowledge/SDWAN-QUICKSTART.md` | Network design decisions and topology |
+| 3 | `templates/ATOMIC_SPOKE_TEMPLATE.conf` | What a complete spoke config looks like |
+| 4 | `templates/ATOMIC_HUB_TEMPLATE.conf` | What a complete hub config looks like |
+| 5 | `tools/` (browse Skills.md in each) | What each tool does and how to call it |
 
 ---
 
-## Architecture
+## What This Does
+
+An AI agent deploys a FortiGate SD-WAN spoke site in 5 phases:
 
 ```
-Operator               Claude AI                MCP Trust Anchor          Infrastructure
-(Human)                (Agent)                  (Crypto Verified)         (Devices)
-  |                       |                          |                        |
-  |  "Deploy site 12"     |                          |                        |
-  |---------------------->|                          |                        |
-  |                       |  list_certified_tools()  |                        |
-  |                       |------------------------->|                        |
-  |                       |  [15 signed tools]       |                        |
-  |                       |<-------------------------|                        |
-  |                       |                          |                        |
-  |                       |  BLOCK 0: Blueprint      |                        |
-  |  "Site ID? LAN?"      |  Wizard (Q&A)            |                        |
-  |<----------------------|                          |                        |
-  |  "12, 10.12.1.0/24"   |                          |                        |
-  |---------------------->|                          |                        |
-  |                       |                          |                        |
-  |                       |  BLOCK 1: Provision VM   |                        |
-  |                       |  execute_certified_tool  |                        |
-  |                       |  (kvm-fortios-provision) |                        |
-  |                       |------------------------->|  verify RSA sig        |
-  |                       |                          |----> SSH to KVM ------>|
-  |                       |                          |                   [VM Created]
-  |                       |                          |                        |
-  |                       |  BLOCK 2: License        |                        |
-  |                       |  (fortiflex-token)       |                        |
-  |                       |------------------------->|  FortiFlex API ------->|
-  |                       |                          |                   [Licensed]
-  |                       |                          |                        |
-  |                       |  BLOCK 3: Config Push    |                        |
-  |                       |  (13 atomic sections)    |                        |
-  |                       |------------------------->|  verify RSA sig        |
-  |                       |                          |----> SSH CLI push ---->|
-  |                       |                          |                   [Configured]
-  |                       |                          |                        |
-  |                       |  BLOCK 4: Verify         |                        |
-  |                       |  (sdwan-status, bgp)     |                        |
-  |                       |------------------------->|  API + SSH checks ---->|
-  |                       |                          |                        |
-  |  "Site 12: IPsec UP,  |                          |                        |
-  |   BGP Established,    |                          |                        |
-  |   Health GREEN"       |                          |                        |
-  |<----------------------|                          |                        |
+Phase 0: BLUEPRINT    ->  Wizard collects site params, derives all IPs
+Phase 1: PROVISION    ->  Create FortiGate VM on KVM hypervisor
+Phase 2: LICENSE      ->  Apply FortiFlex cloud license, onboard device
+Phase 3: CONFIGURE    ->  Push full ADVPN/BGP/SD-WAN config (13 sections, ~8 sec)
+Phase 4: VERIFY       ->  Confirm IPsec UP, BGP Established, SD-WAN health GREEN
 ```
+
+Each phase is defined in a BLOCK YAML file with explicit inputs, outputs, tool dependencies, error scenarios, and recovery steps. The AI follows the blocks sequentially -- if a block fails, it uses the error recovery tree before moving on.
+
+**Proven in lab:** 5+ spoke sites provisioned end-to-end via AI conversation.
 
 ---
 
-## Workflow Phases
+## Tools (14 Python Scripts)
 
-| Phase | Block | What Happens | Key MCP Tools |
-|-------|-------|-------------|---------------|
-| **Planning** | BLOCK_0 | Blueprint wizard collects site params, derives IPs, validates uniqueness | `manifest-tracker`, `blueprint-planner` |
-| **Provision** | BLOCK_1 | FortiGate VM created on KVM with bootstrap ISO (zero-touch) | `kvm-fortios-provision` |
-| **License** | BLOCK_2 | FortiFlex token generated and applied via SSH | `fortiflex-token-create`, `fortigate-cli-execute` |
-| **Configure** | BLOCK_3 | Full SD-WAN config pushed (13 atomic sections, ~8 seconds) | `fortigate-config-push` |
-| **Verify** | BLOCK_4 | IPsec tunnels UP, BGP Established, SD-WAN health GREEN | `fortigate-sdwan-status`, `fortigate-ssh` |
+These are the tools the AI calls to interact with infrastructure. Each tool directory contains the Python implementation, a `manifest.yaml` with metadata, and a `Skills.md` with usage documentation.
 
-### Execution Modes
-
-| Mode | Description |
+| Tool | What It Does |
 |------|-------------|
-| **Live Deploy** | Full automation: BLOCK_0 through BLOCK_4 with real device interaction |
-| **Dry Run** | Generate and validate config only, save for later deployment |
+| `kvm-fortios-provision` | Provision/manage FortiGate VMs on KVM (libvirt) |
+| `fortigate-cli-execute` | Execute arbitrary FortiOS CLI commands via SSH |
+| `fortigate-config-push` | Push multi-line config blocks via SSH |
+| `fortigate-ssh` | Read-only FortiOS commands via SSH |
+| `fortigate-health-check` | Verify device reachability (ping, SSH, HTTPS) |
+| `fortigate-license-apply` | Apply FortiFlex license token via SSH |
+| `fortigate-onboard` | Register device credentials + create API user |
+| `fortigate-sdwan-spoke-template` | Render and push complete spoke config |
+| `fortigate-sdwan-status` | Query SD-WAN member/health/zone state |
+| `fortigate-bgp-troubleshoot` | Diagnose BGP neighbor/route issues |
+| `fortigate-sdwan-blueprint-planner` | Generate config from site parameters |
+| `fortigate-sdwan-manifest-tracker` | Track deployed sites and topology |
+| `fortiflex-token-create` | Generate FortiFlex VM license tokens |
+| `fortiflex-entitlements-list` | List available FortiFlex entitlements |
+
+**Shared libraries** in `tools/shared/`: credential provider, FortiGate credential helper, constants.
+
+### How to adapt tools for your environment
+
+The tools were built to run inside an MCP (Model Context Protocol) server, but the Python logic is standalone. To use them directly:
+
+1. Install dependencies: `paramiko` (SSH), `requests` (REST API)
+2. Set up a credentials file (see `tools/shared/fortigate_creds.py` for the expected format)
+3. Call the tool main function with the parameters documented in its Skills.md
+4. Or wrap them in your own MCP server, LangChain tool, or function-calling framework
 
 ---
 
-## Atomic Configuration System
+## Atomic Config Blocks
 
-Each FortiOS feature is a composable `.block` file with YAML metadata header + raw CLI body. This enables:
+FortiOS configuration is broken into composable `.block` files. Each has a YAML header (block_id, name, dependencies) followed by raw FortiOS CLI.
 
-- **Dependency-aware ordering** -- BGP base before neighbor-range, phase1 before tunnel settings
-- **Template variables** -- `{{SITE_ID}}`, `{{HUB_IP}}`, `{{PSK}}` -- no hardcoded values
-- **Single-push deployment** -- ~8 seconds for a complete 300-line spoke config
-- **Reusable across sites** -- same blocks, different parameters
+### Hub Blocks (020-029)
 
-### Block Inventory
+| Block | Name | What It Configures |
+|-------|------|-------------------|
+| 020 | system-global | Hostname, timezone, admin settings |
+| 021 | system-settings | Location-id, allow-subnet-overlap |
+| 022 | interfaces | WAN, loopbacks (BGP + health-check) |
+| 023 | ipsec-phase1-template | Dynamic ADVPN phase1 (type=dynamic, sender) |
+| 024 | ipsec-phase2-template | Dynamic ADVPN phase2 |
+| 025 | bgp-base | Router BGP, AS 65000, networks |
+| 026 | bgp-neighbor-range | Accept spokes from 172.16.0.0/16 |
+| 027 | sdwan-zone | SD-WAN zones (OVERLAY, UNDERLAY) |
+| 028 | sdwan-healthcheck | Health check to spoke loopbacks |
+| 029 | firewall-policies | Inter-zone traffic policies |
 
-| Role | Blocks | Range |
-|------|--------|-------|
-| **Hub** | 10 atomic blocks | 020-029 (system, interfaces, IPsec, BGP, SD-WAN, firewall) |
-| **Spoke** | 13 config sections | System, interfaces, DHCP, IPsec, BGP, SD-WAN, firewall |
-| **Rules** | Expandable | 10000+ (SD-WAN app steering rules like O365) |
+### Spoke Config (13 sections in template)
 
-### Block Numbering Convention
+System global, settings, interfaces, DHCP server, IPsec phase1 (x2 tunnels), IPsec phase2 (x2), static routes, SD-WAN zones/members/health-check, BGP, firewall policies.
 
-| Range | Domain |
-|-------|--------|
-| 1-19 | Core spoke infrastructure |
-| 20-39 | Core hub infrastructure |
-| 40-49 | Dual-hub extensions |
-| 100-199 | SD-WAN advanced (app steering) |
-| 10000+ | SD-WAN rules (O365, Zoom, etc.) |
+### SD-WAN Rules
 
-### Example: Hub IPsec Phase1 Block
-
-```yaml
----
-block_id: 023
-name: hub-ipsec-phase1-template
-device_role: hub
-depends_on:
-  - block_id: 022
-    reason: "Interfaces must exist (needs BGP_Lo for exchange-ip-addr4)"
----
-
-config vpn ipsec phase1-interface
-    edit "SPOKE_VPN1"
-        set type dynamic
-        set interface "{{WAN_INTERFACE}}"
-        set ike-version 2
-        set psksecret {{PSK}}
-        set auto-discovery-sender enable
-        set network-overlay enable
-        set network-id 1
-        set exchange-ip-addr4 {{BGP_LOOPBACK_IP}}
-        set transport udp
-    next
-end
-```
+Block IDs 10000+ for application steering (e.g., `10101-sdwan-rule-o365.block`).
 
 ---
 
-## MCP Trust Anchor Security
+## Network Design
 
-The system enforces a cryptographic chain of trust:
-
-1. **Tool Signing** -- Every tool is RSA-4096 signed by the Publisher Node
-2. **Signature Verification** -- Trust Anchor verifies signatures before allowing execution
-3. **Credential Isolation** -- Credentials never embedded in tools; resolved at runtime via secure credential provider (Windows DPAPI or YAML fallback)
-4. **Audit Trail** -- Every tool execution is logged with caller, parameters, and result
-5. **No Bash Escape** -- AI agent is instructed to use ONLY certified tools, never raw SSH/curl
-
----
-
-## Prerequisites
-
-| Requirement | Details |
-|-------------|---------|
-| **Claude Code** | Anthropic Claude Code CLI with MCP tool support |
-| **MCP Server** | Trust Anchor server (Python, default port 8000) |
-| **KVM Hypervisor** | Rocky Linux 9 with libvirt, for VM provisioning |
-| **FortiOS Base Image** | `fortios-7.6.5-base.qcow2` on hypervisor |
-| **FortiFlex Account** | Fortinet cloud licensing for FortiGate VMs |
-| **FortiGate Hub** | At least one hub with ADVPN/BGP configured |
-| **Network** | Management VLAN connectivity to hub and hypervisor |
-
----
-
-## Quick Start
-
-1. **Install Claude Code** and configure the MCP secure-tools server connection
-2. **Verify Trust Anchor** is running: `list_certified_tools(vendor="fortinet")`
-3. **Configure credentials** in `~/.config/mcp/fortigate_credentials.yaml` and `hypervisor_credentials.yaml`
-4. **Deploy your hub** using `templates/ATOMIC_HUB_TEMPLATE.conf` (substitute variables)
-5. **Invoke the workflow**: Tell the AI *"Add a new SD-WAN site"*
-6. **Answer the wizard** -- site ID, WAN mode, LAN subnet, PSK
-7. **Watch the AI** provision, license, configure, and verify automatically
+| Parameter | Value |
+|-----------|-------|
+| **FortiOS** | 7.6.5 |
+| **BGP AS** | 65000 (iBGP, all sites same AS) |
+| **Loopback scheme** | 172.16.0.{site_id}/32 per spoke |
+| **Hub loopbacks** | 172.16.255.252 (BGP RID), 172.16.255.253 (health-check) |
+| **IPsec** | IKEv2, ADVPN, dual overlays (VPN1 + VPN2) |
+| **LAN scheme** | 10.{site_id}.1.0/24 |
+| **Transport** | UDP |
+| **Config push** | SSH CLI, 13 sections, ~8 seconds total |
 
 ---
 
@@ -182,82 +142,97 @@ The system enforces a cryptographic chain of trust:
 
 ```
 Agentic-SDWAN-Workflow/
-├── README.md                              # This file
-├── docs/
-│   ├── architecture-overview.md           # MCP 2.0 architecture deep-dive
-│   ├── pilot-guide.html                   # Fortinet-branded pilot guide
-│   ├── train-your-human.md               # Operator onboarding
-│   └── SDWAN-PROVISIONING-TRACKER.md     # Development progress tracker
-├── solution-pack/
-│   ├── solution-pack.yaml                 # Pack definition (tools, domains)
-│   ├── SKILLS.md                          # Top-level AI skills
-│   └── DEVELOPER_ONBOARDING.md            # Developer extension guide
-├── workflows/
-│   ├── add-sdwan-site/                    # Main workflow
-│   │   ├── Skills.md                      # AI routing guide (the brain)
-│   │   ├── manifest.yaml                  # Orchestration definition
-│   │   ├── FRAMEWORK.md                   # Block stacking pattern
-│   │   ├── CONTRACT_SCHEMA.yaml           # Config validation rules
-│   │   ├── BASELINE_TEMPLATE.yaml         # Naming conventions
-│   │   ├── TOOLS_INDEX.md                 # Tool catalog per phase
-│   │   ├── blocks/BLOCK_0-4*.yaml         # 5 workflow phase definitions
-│   │   └── hooks/validate_prerequisites.py
-│   └── add-sdwan-rule/                    # SD-WAN rule workflow
-├── atomic-config-blocks/
-│   ├── hub/blocks/020-029*.block          # 10 hub atomic blocks
-│   ├── spoke/workflows/                   # Spoke Skills.md
-│   └── rules/blocks/                      # SD-WAN rule blocks
-├── templates/
-│   ├── ATOMIC_HUB_TEMPLATE.conf           # Full hub config ({{variables}})
-│   └── ATOMIC_SPOKE_TEMPLATE.conf         # Full spoke config ({{variables}})
-├── examples/
-│   └── site-11/atomic-config-spoke-11.conf # Real deployed config
-├── knowledge/                             # SD-WAN reference corpus (5 docs)
-├── nfrs/                                  # Architecture vision docs (3 NFRs)
-└── tests/
-    └── qa_fortigate_ops_tests.py          # QA test suite
++-- README.md                              <- You are here
+|
++-- tools/                                 <- 14 Python tool implementations
+|   +-- org.ulysses.sdwan.kvm-fortios-provision/
+|   |   +-- *.py, manifest.yaml, Skills.md
+|   +-- org.ulysses.noc.fortigate-cli-execute/
+|   +-- org.ulysses.noc.fortigate-config-push/
+|   +-- org.ulysses.noc.fortigate-ssh/
+|   +-- org.ulysses.noc.fortigate-health-check/
+|   +-- org.ulysses.noc.fortigate-sdwan-status/
+|   +-- org.ulysses.noc.fortigate-bgp-troubleshoot/
+|   +-- org.ulysses.noc.fortigate-sdwan-blueprint-planner/
+|   +-- org.ulysses.noc.fortigate-sdwan-manifest-tracker/
+|   +-- org.ulysses.provisioning.fortigate-license-apply/
+|   +-- org.ulysses.provisioning.fortigate-onboard/
+|   +-- org.ulysses.provisioning.fortigate-sdwan-spoke-template/
+|   +-- org.ulysses.cloud.fortiflex-token-create/
+|   +-- org.ulysses.cloud.fortiflex-entitlements-list/
+|   +-- shared/                            # Credential provider, constants
+|
++-- workflows/
+|   +-- add-sdwan-site/                    <- Main workflow
+|   |   +-- Skills.md                      # THE BRAIN - read this first
+|   |   +-- manifest.yaml                  # Orchestration definition
+|   |   +-- blocks/BLOCK_0-4*.yaml         # 5 workflow phase definitions
+|   |   +-- CONTRACT_SCHEMA.yaml           # Config validation rules
+|   |   +-- BASELINE_TEMPLATE.yaml         # Naming conventions
+|   |   +-- FRAMEWORK.md                   # Block stacking pattern
+|   |   +-- TOOLS_INDEX.md                 # Tool catalog per phase
+|   |   +-- hooks/validate_prerequisites.py
+|   +-- add-sdwan-rule/                    # SD-WAN app steering rules
+|
++-- atomic-config-blocks/
+|   +-- hub/blocks/020-029*.block          # 10 hub config blocks
+|   +-- hub/workflows/add-sdwan-hub-Skills.md
+|   +-- spoke/workflows/add-sdwan-site-Skills.md
+|   +-- rules/blocks/10101*.block          # SD-WAN rule blocks
+|
++-- templates/
+|   +-- ATOMIC_HUB_TEMPLATE.conf           # Complete hub - all {{variables}}
+|   +-- ATOMIC_SPOKE_TEMPLATE.conf         # Complete spoke - all {{variables}}
+|
++-- examples/
+|   +-- site-11/atomic-config-spoke-11.conf  # Real deployed spoke config
+|
++-- knowledge/                             # SD-WAN reference corpus
+|   +-- SDWAN-QUICKSTART.md, SDWAN-API-REFERENCE.md, SDWAN-CORPUS.md
+|   +-- SDWAN-SOLUTION-PACK-SKILLS.md, SDWAN-TOOL-TARGETS.md
+|
++-- solution-pack/                         # Solution pack metadata
+|   +-- solution-pack.yaml, SKILLS.md, DEVELOPER_ONBOARDING.md
+|
++-- docs/SDWAN-PROVISIONING-TRACKER.md     # Development history + lessons
++-- tests/qa_fortigate_ops_tests.py
 ```
 
 ---
 
-## Key Technical Details
+## Getting Started for Partners
 
-| Parameter | Value |
-|-----------|-------|
-| **FortiOS Version** | 7.6.5 |
-| **BGP AS Number** | 65000 (iBGP, all sites) |
-| **Loopback Scheme** | 172.16.0.{site_id}/32 |
-| **Hub Loopbacks** | 172.16.255.252 (BGP), 172.16.255.253 (Health) |
-| **IPsec** | IKEv2, ADVPN, dual tunnels (HUB1-VPN1, HUB1-VPN2) |
-| **Transport** | UDP (port 11443 for IKE-TCP fallback) |
-| **LAN Scheme** | 10.{site_id}.1.0/24 |
-| **Config Push** | SSH CLI, 13 sections, ~8 seconds |
+### What you need
 
----
+- **An AI agent** -- Claude Code, Cursor, Windsurf, GPT with function calling, or any LLM that can read files and execute Python
+- **A KVM hypervisor** -- Rocky Linux 9 with libvirt (for VM provisioning)
+- **FortiOS base image** -- `fortios-7.6.5-base.qcow2`
+- **FortiFlex account** -- For VM licensing (or use eval licenses)
+- **A FortiGate hub** -- Use `templates/ATOMIC_HUB_TEMPLATE.conf` to set one up
+- **SSH access** -- Key-based auth to hypervisor; password or key auth to FortiGates
 
-## Lab Network Topology (Reference)
+### Quickstart
 
-| Device | IP | Role |
-|--------|-----|------|
-| sdwan-hub-1 | 10.0.1.1 | SD-WAN Hub (ADVPN + BGP) |
-| sdwan-spoke-07 | DHCP | Spoke (site_id=7) |
-| sdwan-spoke-08 | DHCP | Spoke (site_id=8) |
-| sdwan-spoke-09 | DHCP | Spoke (site_id=9) |
-| sdwan-spoke-10 | DHCP | Spoke (site_id=10) |
-| sdwan-spoke-11 | DHCP | Spoke (site_id=11) |
+1. Clone this repo
+2. Point your AI at this README (or at `workflows/add-sdwan-site/Skills.md` directly)
+3. Tell it: *"Read the Skills.md and deploy a new SD-WAN spoke site"*
+4. The AI will walk through the 5-phase workflow, calling tools as needed
+5. Adapt the tools to your execution framework (MCP, LangChain, direct Python, etc.)
+
+### Adapting for your environment
+
+- **Different hypervisor?** -- Replace `kvm-fortios-provision` with your own provisioning logic
+- **Hardware FortiGates?** -- Skip BLOCK_1 (provision) and BLOCK_2 (license), start at BLOCK_3
+- **Different AI?** -- The Skills.md files are LLM-agnostic; they work as system prompts for any model
+- **No FortiFlex?** -- Use eval licenses or skip the licensing block entirely
 
 ---
 
 ## Disclaimer
 
-This is **NOT** an official Fortinet product. This is a personal project by Daniel Howard (MSSP Solutions Engineer) for demonstrating AI-driven network automation capabilities. Use at your own risk. Always test in a lab environment before any production deployment. Fortinet, FortiGate, FortiOS, and FortiFlex are trademarks of Fortinet, Inc.
+This is **NOT** an official Fortinet product. This is a personal project by Daniel Howard (MSSP Solutions Engineer) for demonstrating AI-driven network automation capabilities. Use at your own risk. Always test in a lab environment before production. Fortinet, FortiGate, FortiOS, and FortiFlex are trademarks of Fortinet, Inc.
 
 ---
 
-## About
-
-**Author:** Daniel Howard
-**Role:** MSSP Solutions Engineer, Fortinet
-**Platform:** Project Ulysses -- Open AI-to-Infrastructure Automation
-**AI Engine:** Claude (Anthropic) via Claude Code CLI
-**Status:** Active Development -- 5+ spoke sites deployed, hub operational
+**Author:** Daniel Howard | **Role:** MSSP Solutions Engineer, Fortinet
+**AI Engine:** Claude (Anthropic) via Claude Code CLI | **Status:** Active Development
