@@ -1,0 +1,12 @@
+# FortiGate Device Configuration
+# Format: IP_ADDRESS, API_TOKEN, NAME (optional)
+#
+# API Token Setup:
+#   1. Log into FortiGate GUI
+#   2. System > Administrators > Create New > REST API Admin
+#   3. Set admin profile (at minimum: read-only for show/get commands)
+#   4. Copy the generated API token
+#
+# 192.168.1.1, fmtXXXXXXXXXXXXXXXXXXXXXXXXXXXX, HQ-FortiGate
+# 192.168.2.1, fmtYYYYYYYYYYYYYYYYYYYYYYYYYYYY, Branch-1
+# 10.0.0.1, fmtZZZZZZZZZZZZZZZZZZZZZZZZZZZZ, DC-Primary
