@@ -1,0 +1,58 @@
+config system global
+  set hostname "${hostname}"
+  set admin-sport 443
+  set timezone 12
+end
+
+config system admin
+  edit "admin"
+    set password "${admin_password}"
+  next
+end
+
+config system interface
+  edit "port1"
+    set alias "WAN"
+    set mode static
+    set ip ${wan_ip} ${wan_mask}
+    set allowaccess ping https ssh fgfm
+  next
+  edit "port2"
+    set alias "LAN"
+    set mode static
+    set ip ${lan_ip} ${lan_mask}
+    set allowaccess ping https ssh
+  next
+end
+
+config router static
+  edit 1
+    set gateway ${wan_gw}
+    set device "port1"
+  next
+end
+
+config system dns
+  set primary 8.8.8.8
+  set secondary 8.8.4.4
+end
+
+config firewall policy
+  edit 1
+    set name "LAN-to-WAN"
+    set srcintf "port2"
+    set dstintf "port1"
+    set srcaddr "all"
+    set dstaddr "all"
+    set action accept
+    set schedule "always"
+    set service "ALL"
+    set nat enable
+  next
+end
+
+config system central-management
+  set type fortimanager
+  set fmg "forticloud"
+  set include-default-servers enable
+end

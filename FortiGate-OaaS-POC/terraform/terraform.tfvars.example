@@ -1,0 +1,26 @@
+# =============================================================================
+# FortiGate OaaS POC - Your Configuration
+# =============================================================================
+# Copy this file to terraform.tfvars and fill in your values.
+#
+#   cp terraform.tfvars.example terraform.tfvars
+#
+# =============================================================================
+
+# REQUIRED: Your existing EC2 key pair name (for SSH access)
+key_pair_name = "CHANGE-ME"
+
+# REQUIRED: FortiGate admin password (use something strong)
+admin_password = "CHANGE-ME"
+
+# RECOMMENDED: Restrict admin access to your public IP
+# Run: curl ifconfig.me    to find your IP, then set it here
+# admin_cidr = "203.0.113.50/32"
+
+# OPTIONAL: Change region (default: us-east-1)
+# If you change region, you MUST also update fortios_ami (see README)
+# aws_region        = "us-east-1"
+# availability_zone = "us-east-1a"
+
+# OPTIONAL: Change instance size (t4g.small is cheapest for FortiGate)
+# instance_type = "t4g.small"
