@@ -53,10 +53,11 @@ HOW IT WORKS:
 
 SAFETY:
   - NEVER disables interfaces that are in use (even if link is down)
-  - NEVER disables management interfaces (wan, mgmt)
-  - NEVER disables loopback interfaces
+  - NEVER disables management ports (mgmt), HA heartbeat ports, or loopbacks
+  - WAN/LAN ports are protected by config evidence, not by name guessing
   - Generates a rollback script alongside the hardening script
   - Dry-run mode by default — you must explicitly opt in to deploy
+  - Deploy requires interactive confirmation
 
 Requirements:
     - Python 3.8+
@@ -192,6 +193,7 @@ class InterfaceAnalyzer:
             "filename": ("harden_interfaces.txt", io.BytesIO(script.encode("utf-8")), "text/plain"),
         }
         resp = self._session.post(url, files=files, timeout=self.timeout)
+        resp.raise_for_status()
         return resp.json()
 
     # ------------------------------------------------------------------
@@ -212,10 +214,11 @@ class InterfaceAnalyzer:
             # Skip virtual/tunnel/software interfaces
             if itype not in PHYSICAL_TYPES:
                 continue
-            if name.lower() in PROTECTED_INTERFACES:
-                continue
             if any(name.lower().startswith(p) for p in VIRTUAL_PREFIXES):
                 continue
+            # Note: PROTECTED_INTERFACES are NOT filtered here — they flow
+            # through to classification so they appear in the report as
+            # "protected" ports. This gives partners visibility.
 
             physical.append({
                 "name": name,
@@ -229,7 +232,7 @@ class InterfaceAnalyzer:
             })
         return physical
 
-    def get_referenced_interfaces(self) -> Dict[str, Set[str]]:
+    def get_referenced_interfaces(self, *, progress: bool = False) -> Dict[str, Set[str]]:
         """Collect all interfaces referenced in the running configuration.
 
         Returns:
@@ -241,7 +244,12 @@ class InterfaceAnalyzer:
             if name:
                 refs.setdefault(name, set()).add(section)
 
+        def _progress(msg: str):
+            if progress:
+                print(f"    Checking {msg}...", flush=True)
+
         # 1. SD-WAN members
+        _progress("SD-WAN config")
         sdwan = self._get_safe("/cmdb/system/sdwan")
         if isinstance(sdwan, dict):
             for m in sdwan.get("members", []):
@@ -251,12 +259,14 @@ class InterfaceAnalyzer:
                 add_ref(m.get("interface", ""), "sdwan-member")
 
         # 2. VPN phase1 interface bindings
+        _progress("VPN tunnel bindings")
         vpn_p1 = self._get_safe("/cmdb/vpn.ipsec/phase1-interface", [])
         if isinstance(vpn_p1, list):
             for p1 in vpn_p1:
                 add_ref(p1.get("interface", ""), f"vpn:{p1.get('name', '?')}")
 
         # 3. Firewall policies (source and destination interfaces)
+        _progress("firewall policies")
         policies = self._get_safe("/cmdb/firewall/policy", [])
         if isinstance(policies, list):
             for pol in policies:
@@ -267,12 +277,14 @@ class InterfaceAnalyzer:
                     add_ref(dst.get("name", ""), f"policy:{pol_id}:dst")
 
         # 4. DHCP servers
+        _progress("DHCP servers")
         dhcp = self._get_safe("/cmdb/system.dhcp/server", [])
         if isinstance(dhcp, list):
             for srv in dhcp:
                 add_ref(srv.get("interface", ""), "dhcp-server")
 
         # 5. HA heartbeat interfaces
+        _progress("HA config")
         ha = self._get_safe("/cmdb/system/ha")
         if isinstance(ha, dict):
             for hb in ha.get("hbdev", []):
@@ -287,6 +299,7 @@ class InterfaceAnalyzer:
                 add_ref(mi.get("name", ""), "ha-monitor")
 
         # 6. Hardware switch membership (parent switches reference members)
+        _progress("hardware switches and interfaces")
         ifaces = self._get_safe("/cmdb/system/interface", [])
         if isinstance(ifaces, list):
             for iface in ifaces:
@@ -302,6 +315,7 @@ class InterfaceAnalyzer:
                     add_ref(iface.get("name", ""), f"aggregate:{parent}")
 
         # 7. Zones (interfaces assigned to zones)
+        _progress("zones")
         zones = self._get_safe("/cmdb/system/zone", [])
         if isinstance(zones, list):
             for zone in zones:
@@ -310,12 +324,14 @@ class InterfaceAnalyzer:
                     add_ref(member.get("interface-name", ""), f"zone:{zone_name}")
 
         # 8. Static routes (interfaces used as gateway)
+        _progress("static routes")
         routes = self._get_safe("/cmdb/router/static", [])
         if isinstance(routes, list):
             for route in routes:
                 add_ref(route.get("device", ""), "static-route")
 
         # 9. DNS settings
+        _progress("DNS config")
         dns = self._get_safe("/cmdb/system/dns")
         if isinstance(dns, dict):
             add_ref(dns.get("source-ip-interface", ""), "dns-source")
@@ -333,7 +349,7 @@ class InterfaceAnalyzer:
     # Analysis
     # ------------------------------------------------------------------
 
-    def audit(self) -> "HardeningReport":
+    def audit(self, *, progress: bool = False) -> "HardeningReport":
         """Analyze all interfaces and generate a hardening report.
 
         Returns:
@@ -346,9 +362,21 @@ class InterfaceAnalyzer:
         self._query_failures: List[Dict[str, str]] = []
 
         # Collect data
+        if progress:
+            print(f"\n  Connecting to {self.host}...", flush=True)
         system_info = self.get_system_info()
+        if progress:
+            hostname = system_info.get("hostname", self.host)
+            model = f"{system_info.get('model_name', '')} {system_info.get('model_number', '')}".strip()
+            print(f"  Connected: {hostname} ({model})", flush=True)
+            print(f"  Discovering physical interfaces...", flush=True)
         physical_ifaces = self.get_physical_interfaces()
-        config_refs = self.get_referenced_interfaces()
+        if progress:
+            print(f"  Found {len(physical_ifaces)} physical interface(s)", flush=True)
+            print(f"  Cross-referencing config sections:", flush=True)
+        config_refs = self.get_referenced_interfaces(progress=progress)
+        if progress:
+            print(f"  Analyzing interface usage...\n", flush=True)
 
         # Categorize each interface
         active = []         # Link up, in use — leave alone
@@ -364,7 +392,6 @@ class InterfaceAnalyzer:
             refs = config_refs.get(name, set())
             has_ip = len(iface.get("ip", [])) > 0
             is_switch = iface["is_hardware_switch"]
-            is_member = iface["is_hardware_switch_member"]
 
             iface["refs"] = sorted(refs) if refs else []
 
@@ -427,19 +454,32 @@ class InterfaceAnalyzer:
             query_failures=self._query_failures,
         )
 
-    def harden(self, *, deploy: bool = False) -> "HardeningReport":
+    def harden(self, *, deploy: bool = False, progress: bool = False, confirm: bool = True) -> "HardeningReport":
         """Audit and optionally deploy the hardening config.
 
         Args:
             deploy: If True, deploy the config script to the device.
                     If False (default), dry-run only.
+            progress: If True, print progress messages during API queries.
+            confirm: If True (default), prompt for confirmation before deploying.
 
         Returns:
             HardeningReport with deployment results
         """
-        report = self.audit()
+        report = self.audit(progress=progress)
 
         if deploy and report.candidates:
+            # Show what will be changed and ask for confirmation
+            if confirm:
+                report.print_summary()
+                iface_names = ", ".join(i["name"] for i in sorted(report.candidates, key=lambda x: x["name"]))
+                print(f"  About to DISABLE {len(report.candidates)} interface(s): {iface_names}")
+                print(f"  on {report.hostname} ({self.host})\n")
+                answer = input("  Proceed with deployment? [y/N]: ").strip().lower()
+                if answer not in ("y", "yes"):
+                    print("  Deployment cancelled.")
+                    return report
+
             script = report.hardening_script()
             result = self._upload_config(script)
             report.deployed = True
@@ -694,7 +734,7 @@ class FleetHardener:
                 print(f"[{dev['host']}] ERROR: {e}")
         return reports
 
-    def harden_all(self, *, deploy: bool = False) -> List[HardeningReport]:
+    def harden_all(self, *, deploy: bool = False, progress: bool = False, confirm: bool = True) -> List[HardeningReport]:
         """Audit and optionally deploy hardening to all devices."""
         reports = []
         for dev in self._devices:
@@ -704,7 +744,7 @@ class FleetHardener:
                     verify_ssl=self.verify_ssl, timeout=self.timeout,
                     port=dev["port"],
                 ) as analyzer:
-                    reports.append(analyzer.harden(deploy=deploy))
+                    reports.append(analyzer.harden(deploy=deploy, progress=progress, confirm=confirm))
             except Exception as e:
                 print(f"[{dev['host']}] ERROR: {e}")
         return reports
@@ -748,6 +788,8 @@ Examples:
                         help="Deploy hardening config (default: dry-run audit only)")
     parser.add_argument("--save-scripts", action="store_true",
                         help="Save hardening and rollback scripts to files")
+    parser.add_argument("--yes", "-y", action="store_true",
+                        help="Skip deploy confirmation prompt (use with caution)")
     parser.add_argument("--verify-ssl", action="store_true", help="Verify SSL certificates")
     parser.add_argument("--timeout", type=int, default=30, help="Timeout in seconds (default: 30)")
     parser.add_argument("--json", action="store_true", help="Output report as JSON")
@@ -761,7 +803,7 @@ Examples:
         count = fleet.load_from_file(args.config)
         print(f"Loaded {count} device(s) from {args.config}")
 
-        reports = fleet.harden_all(deploy=args.deploy)
+        reports = fleet.harden_all(deploy=args.deploy, progress=not args.json, confirm=not args.yes)
 
         if args.json:
             print(json.dumps([r.to_dict() for r in reports], indent=2))
@@ -793,7 +835,7 @@ Examples:
         args.host, token,
         verify_ssl=args.verify_ssl, timeout=args.timeout, port=args.port,
     ) as analyzer:
-        report = analyzer.harden(deploy=args.deploy)
+        report = analyzer.harden(deploy=args.deploy, progress=not args.json, confirm=not args.yes)
 
         if args.json:
             print(json.dumps(report.to_dict(), indent=2))
