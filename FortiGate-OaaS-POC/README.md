@@ -21,6 +21,8 @@ Deploy 2x FortiGate BYOL spokes in AWS for a **FortiCloud Overlay-as-a-Service**
 - **AWS Key Pair**: An existing EC2 key pair in your target region for SSH access
 - **FortiFlex License**: 2x FortiGate VM BYOL entitlements
 
+> **New to AWS?** Follow our step-by-step [AWS Setup Guide](docs/AWS-SETUP-GUIDE.md) to create an account, get your API keys, and install all the tools.
+
 ## Quick Start (5 minutes)
 
 ### Step 1: Configure
