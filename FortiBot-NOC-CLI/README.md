@@ -281,6 +281,18 @@ Always recommend opening a TAC case for firmware bugs...
 """
 ```
 
+## Future Enhancements
+
+These features are on the roadmap for future releases:
+
+- **Scheduled Diagnostics** -- Cron-style health checks (e.g., "run health check every 4 hours") with alerting on threshold violations
+- **Device Groups** -- Batch commands across 10+ FortiGates (e.g., `fortibot ask "Check VPN tunnels" --group all-branches`)
+- **Report Export** -- Generate PDF/CSV/HTML diagnostic reports for management and compliance
+- **Audit Logging** -- Structured logs (JSON/syslog) of who ran what, when, from where -- critical for MSSP compliance
+- **Secrets Manager Integration** -- Support for HashiCorp Vault, AWS Secrets Manager, or OS keyring instead of plaintext config file
+
+Contributions welcome! See the [Contributing](#contributing) section below.
+
 ## FortiGate API Token Setup
 
 To create an API token on your FortiGate:
