@@ -50,10 +50,11 @@ cd FortiBot-NOC-CLI
 pip install .
 ```
 
-Or if you prefer installing dependencies manually:
+Or if you hit issues with the above, install dependencies first, then the CLI:
 
 ```bash
 pip install -r requirements.txt
+pip install .
 ```
 
 ### First Run
@@ -153,7 +154,7 @@ fortibot ask "Check VPN tunnels" --device dc-primary
 
 ### Config File
 
-Device credentials are stored in `~/.fortibot/config.yaml` with owner-only permissions (0600):
+Device credentials are stored in `~/.fortibot/config.yaml`:
 
 ```yaml
 claude_api_key: sk-ant-api03-...
@@ -322,7 +323,7 @@ These features are on the roadmap for future releases:
 - **Audit Logging** -- Structured logs (JSON/syslog) of who ran what, when, from where -- critical for MSSP compliance
 - **Secrets Manager Integration** -- Support for HashiCorp Vault, AWS Secrets Manager, or OS keyring instead of plaintext config file
 
-Contributions welcome! See the [Contributing](#contributing) section below.
+Contributions and feature requests welcome!
 
 ## All Commands
 
