@@ -25,14 +25,35 @@ You: "Is my firewall healthy?"
 ### Prerequisites
 
 - Python 3.9+
-- A FortiGate with REST API access (API token)
+- A FortiGate with REST API access (API token) -- see [API Token Setup](#fortigate-api-token-setup) below
 - An Anthropic API key ([get one here](https://console.anthropic.com/))
+
+### FortiGate API Token Setup
+
+You need a REST API token from your FortiGate before starting. This takes ~2 minutes:
+
+1. Log into FortiGate GUI
+2. Go to **System > Administrators**
+3. Click **Create New > REST API Admin**
+   - **Username:** `fortibot-api`
+   - **Admin Profile:** `super_admin_readonly` (or a custom read-only profile)
+   - **Trusted Hosts:** Add your workstation's IP address
+4. Click **OK** -- the API token is displayed **once**
+5. **Copy the token immediately** -- you won't see it again
+
+> **Tip:** If you don't see the REST API Admin option, your FortiGate may need HTTPS API access enabled under **System > Feature Visibility**.
 
 ### Install
 
 ```bash
 cd FortiBot-NOC-CLI
-pip install -e .
+pip install .
+```
+
+Or if you prefer installing dependencies manually:
+
+```bash
+pip install -r requirements.txt
 ```
 
 ### First Run
@@ -46,6 +67,14 @@ The setup wizard walks you through:
 2. Enter FortiGate IP, port, and API token (connection verified)
 3. Optionally add SSH credentials (needed for SD-WAN, NPU, ping/traceroute)
 4. Name your device
+
+### Verify Everything Works
+
+```bash
+fortibot doctor
+```
+
+This checks Python, packages, API key validity, and FortiGate REST/SSH connectivity for all configured devices. Run this first if something isn't working.
 
 ### Start Asking Questions
 
@@ -155,13 +184,15 @@ export FORTIBOT_MODEL="claude-haiku-4-5-20251001"  # Faster, cheaper
 fortibot ask "Quick health check"
 ```
 
-### Model Options
+### Model Options & Cost Expectations
 
-| Model | Speed | Cost | Best For |
-|-------|-------|------|----------|
-| `claude-haiku-4-5-20251001` | Fast | Low | Quick checks, high volume |
-| `claude-sonnet-4-20250514` | Balanced | Medium | Default, best value |
-| `claude-opus-4-20250514` | Thorough | High | Complex multi-device diagnosis |
+| Model | Speed | Approx. Cost per Query | Best For |
+|-------|-------|------------------------|----------|
+| `claude-haiku-4-5-20251001` | Fast | ~$0.003 | Quick checks, high volume |
+| `claude-sonnet-4-20250514` | Balanced | ~$0.01-0.03 | Default, best value |
+| `claude-opus-4-20250514` | Thorough | ~$0.05-0.15 | Complex multi-device diagnosis |
+
+> **Typical monthly cost:** A NOC running ~50 queries/day with Sonnet costs roughly **$15-45/month**. Use Haiku for high-volume automated checks to keep costs under **$5/month**.
 
 ## Output Formats
 
@@ -293,36 +324,12 @@ These features are on the roadmap for future releases:
 
 Contributions welcome! See the [Contributing](#contributing) section below.
 
-## FortiGate API Token Setup
-
-To create an API token on your FortiGate:
-
-1. Log into FortiGate GUI
-2. Go to **System > Administrators**
-3. Create a new REST API Admin:
-   - **Username:** `fortibot-api`
-   - **Profile:** `super_admin_readonly` (or a custom read-only profile)
-   - **Trusted Hosts:** Add your management IP
-4. Generate the API token
-5. Copy the token -- you won't see it again
-
-**Minimum permissions needed:** Read-only access to:
-- System status and resources
-- Interface status
-- Routing table
-- VPN/IPsec status
-- HA status
-- Firewall sessions
-- Logs (traffic + event)
-- Firmware info
-- License status
-- Configuration backup
-
 ## All Commands
 
 | Command | Description |
 |---------|-------------|
 | `fortibot init` | Interactive setup wizard |
+| `fortibot doctor` | Verify config, API keys, and device connectivity |
 | `fortibot ask "<question>"` | AI-powered query |
 | `fortibot chat` | Interactive AI chat session |
 | `fortibot health-check` | CPU, memory, disk, sessions |
@@ -357,13 +364,15 @@ cryptography>=41.0   # TLS for SSH
 
 ## Security Notes
 
-- Config file permissions are set to `0600` (owner-only read/write)
-- SSH passwords are stored in plaintext in `~/.fortibot/config.yaml` -- for production environments, use `ANTHROPIC_API_KEY` env var and consider integrating with your organization's secrets manager
+- On Linux/macOS, config file permissions are set to `0600` (owner-only). On Windows, the file inherits your user profile permissions
+- SSH passwords and API tokens are stored in plaintext in `~/.fortibot/config.yaml` -- for production environments, use the `ANTHROPIC_API_KEY` env var and consider integrating with your organization's secrets manager
 - SSL verification is disabled for FortiGate REST API calls (`verify=False`) because most FortiGates use self-signed certificates
 - Destructive SSH commands are blocked by regex-based guardrails
 - All diagnostic data is sent to Claude API for analysis -- review Anthropic's data handling policy for your compliance requirements
 
 ## Troubleshooting
+
+**First step for any issue:** run `fortibot doctor` -- it tests everything and tells you exactly what's broken.
 
 | Error | Fix |
 |-------|-----|

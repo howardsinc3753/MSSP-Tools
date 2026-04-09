@@ -5,6 +5,12 @@ All commands for FortiBot NOC-BOT.
 import json
 import sys
 import re
+import os
+
+# Fix Unicode output on Windows CMD (cp1252 can't render box-drawing chars)
+if sys.platform == "win32":
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
 
 import click
 from rich.console import Console
@@ -664,6 +670,140 @@ def trace(trace_spec, device):
             console.print()
     else:
         _print_result(result, "Reachability")
+
+
+@main.command()
+def doctor():
+    """Check that everything is configured and reachable."""
+    from fortibot.config import get_claude_key, list_devices, get_default_device_name, get_device
+
+    console.print(BANNER)
+    console.print("[bold]Running connectivity checks...[/bold]\n")
+
+    all_ok = True
+
+    # 1. Python version
+    py_ver = sys.version.split()[0]
+    console.print(f"  [green]\u2713[/green] Python {py_ver}")
+
+    # 2. Required packages
+    missing_pkgs = []
+    for pkg in ["click", "rich", "anthropic", "paramiko", "requests", "yaml"]:
+        try:
+            __import__(pkg)
+        except ImportError:
+            missing_pkgs.append(pkg)
+    if missing_pkgs:
+        console.print(f"  [red]\u2717[/red] Missing packages: {', '.join(missing_pkgs)}")
+        console.print(f"    [dim]Fix: pip install {' '.join(missing_pkgs)}[/dim]")
+        all_ok = False
+    else:
+        console.print("  [green]\u2713[/green] All required packages installed")
+
+    # 3. Claude API key
+    api_key = get_claude_key()
+    if api_key:
+        console.print(f"  [green]\u2713[/green] Claude API key configured (ends ...{api_key[-4:]})")
+        # Test it
+        try:
+            import anthropic
+            client = anthropic.Anthropic(api_key=api_key)
+            client.messages.create(
+                model="claude-sonnet-4-20250514", max_tokens=16,
+                messages=[{"role": "user", "content": "ping"}],
+            )
+            console.print("  [green]\u2713[/green] Claude API key is valid")
+        except Exception as e:
+            console.print(f"  [red]\u2717[/red] Claude API key test failed: {e}")
+            all_ok = False
+    else:
+        console.print("  [red]\u2717[/red] Claude API key not configured")
+        console.print("    [dim]Fix: fortibot init  (or set ANTHROPIC_API_KEY env var)[/dim]")
+        all_ok = False
+
+    # 4. Devices
+    devs = list_devices()
+    default_name = get_default_device_name()
+    if not devs:
+        console.print("  [red]\u2717[/red] No FortiGate devices configured")
+        console.print("    [dim]Fix: fortibot init[/dim]")
+        all_ok = False
+    else:
+        console.print(f"  [green]\u2713[/green] {len(devs)} device(s) configured (default: {default_name})")
+
+        # Test each device
+        import requests as _req
+        import urllib3
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+        for name, dev in devs.items():
+            ip = dev.get("ip", "?")
+            port = dev.get("port", 443)
+            token = dev.get("api_token", "")
+            marker = " [cyan](default)[/cyan]" if name == default_name else ""
+
+            # REST API check
+            try:
+                resp = _req.get(
+                    f"https://{ip}:{port}/api/v2/monitor/system/status",
+                    headers={"Authorization": f"Bearer {token}"},
+                    verify=False, timeout=10,
+                )
+                if resp.status_code == 200:
+                    info = resp.json().get("results", {})
+                    hostname = info.get("hostname", "?")
+                    console.print(f"  [green]\u2713[/green] {name}{marker} \u2014 REST API OK ({hostname} @ {ip}:{port})")
+                elif resp.status_code == 401:
+                    console.print(f"  [red]\u2717[/red] {name}{marker} \u2014 REST API 401 Unauthorized (bad token?)")
+                    all_ok = False
+                else:
+                    console.print(f"  [yellow]![/yellow] {name}{marker} \u2014 REST API HTTP {resp.status_code}")
+                    all_ok = False
+            except _req.exceptions.ConnectionError:
+                console.print(f"  [red]\u2717[/red] {name}{marker} \u2014 Cannot reach {ip}:{port}")
+                console.print(f"    [dim]Can you ping {ip}? Is HTTPS admin enabled?[/dim]")
+                all_ok = False
+            except Exception as e:
+                console.print(f"  [red]\u2717[/red] {name}{marker} \u2014 {e}")
+                all_ok = False
+
+            # SSH check
+            ssh_user = dev.get("ssh_user")
+            if ssh_user:
+                try:
+                    import paramiko
+                    client = paramiko.SSHClient()
+                    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                    client.connect(
+                        ip, port=dev.get("ssh_port", 22), username=ssh_user,
+                        password=dev.get("ssh_pass", ""), timeout=10,
+                        allow_agent=False, look_for_keys=False,
+                    )
+                    client.close()
+                    console.print(f"  [green]\u2713[/green] {name} \u2014 SSH OK (user: {ssh_user})")
+                except Exception as e:
+                    console.print(f"  [red]\u2717[/red] {name} \u2014 SSH failed: {e}")
+                    all_ok = False
+            else:
+                console.print(f"  [yellow]![/yellow] {name} \u2014 SSH not configured (SD-WAN/NPU/ping tools won't work)")
+
+    console.print()
+    if all_ok:
+        console.print(
+            Panel(
+                "[bold green]All checks passed![/bold green]\n"
+                "You're ready to go. Try: [cyan]fortibot ask \"Is my firewall healthy?\"[/cyan]",
+                border_style="green", box=box.ROUNDED,
+            )
+        )
+    else:
+        console.print(
+            Panel(
+                "[bold yellow]Some checks failed.[/bold yellow]\n"
+                "Fix the issues above, then run [cyan]fortibot doctor[/cyan] again.",
+                border_style="yellow", box=box.ROUNDED,
+            )
+        )
 
 
 @main.command("man")

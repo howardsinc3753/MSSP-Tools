@@ -3,6 +3,7 @@ FortiBot NOC - Configuration & Credential Store
 Stores FortiGate targets and API keys in ~/.fortibot/
 """
 import os
+import sys
 import yaml
 from pathlib import Path
 from typing import Optional, Dict
@@ -37,7 +38,9 @@ def save_config(config: dict):
     ensure_config_dir()
     with open(CONFIG_FILE, "w") as f:
         yaml.dump(config, f, default_flow_style=False)
-    os.chmod(CONFIG_FILE, 0o600)
+    # Set owner-only permissions (no-op on Windows, but we try)
+    if sys.platform != "win32":
+        os.chmod(CONFIG_FILE, 0o600)
 
 
 # -- Claude API Key ----------------------------------------------------------

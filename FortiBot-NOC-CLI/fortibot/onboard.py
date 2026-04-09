@@ -8,6 +8,11 @@ import requests
 import urllib3
 import paramiko
 
+# Fix Unicode output on Windows CMD (cp1252 can't render box-drawing chars)
+if sys.platform == "win32":
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+
 from rich.console import Console
 from rich.panel import Panel
 from rich.prompt import Prompt, Confirm
@@ -79,8 +84,12 @@ def _test_fortigate(ip: str, port: int, token: str) -> dict:
         return {
             "success": False,
             "error": (
-                f"Cannot connect to {ip}:{port}. "
-                "Check IP address, HTTPS port, and firewall rules."
+                f"Cannot connect to {ip}:{port}.\n"
+                "  Troubleshooting steps:\n"
+                f"  1. Can you ping {ip}? (verify network reachability)\n"
+                "  2. Is HTTPS admin access enabled on that interface?\n"
+                "  3. Is your workstation IP in the admin Trusted Hosts list?\n"
+                f"  4. Is the management port actually {port}? (check FortiGate GUI)"
             ),
         }
     except requests.exceptions.HTTPError as e:
@@ -167,7 +176,14 @@ def run_onboarding():
     console.print(
         Panel(
             "[bold white]FortiGate Connection[/bold white]\n"
-            "Provide the management IP and REST API token for your FortiGate.",
+            "Provide the management IP and REST API token for your FortiGate.\n\n"
+            "[dim]Don't have an API token yet? Here's how to create one:[/dim]\n"
+            "[dim]  1. FortiGate GUI > System > Administrators[/dim]\n"
+            "[dim]  2. Create New > REST API Admin[/dim]\n"
+            "[dim]  3. Profile: super_admin_readonly[/dim]\n"
+            "[dim]  4. Add your workstation IP to Trusted Hosts[/dim]\n"
+            "[dim]  5. Copy the generated token (shown only once)[/dim]\n"
+            "[dim]  Run [cyan]fortibot man[/cyan] for full details.[/dim]",
             border_style="yellow",
             box=box.ROUNDED,
         )
