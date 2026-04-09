@@ -105,6 +105,41 @@ Python SDK for Fortinet FortiZTP (Zero Touch Provisioning) API. Automate device 
 
 ---
 
+### [FortiBot NOC-CLI](FortiBot-NOC-CLI/)
+**Status:** ✅ Production Ready - April 2026
+
+AI-powered FortiGate diagnostics CLI using Claude's agentic tool-use. NOC engineers ask questions in natural language, and the AI orchestrates 15+ diagnostic tools in real time via REST API and SSH.
+
+**Key Features:**
+- Natural language queries ("Is my firewall healthy?", "Which VPN tunnels are down?")
+- 15 diagnostic tools (health, interfaces, routing, VPN, HA, SD-WAN, NPU, firmware, sessions, logs, backup, reachability)
+- Agentic workflow with full tool execution visibility
+- Multi-device support with easy switching
+- Interactive chat mode for follow-up questions
+- SSH safety guardrails (destructive commands blocked)
+- JSON output for scripting and automation
+- Extensible framework — add your own custom tools
+
+**What's Included:**
+- Complete CLI with `fortibot init` setup wizard
+- 15 pre-built diagnostic tools (REST API + SSH)
+- AI engine with Claude tool-use integration
+- Rich terminal UI (color panels, tables, workflow traces)
+- Pilot manual and documentation
+- Framework for building custom tools
+
+**Use Cases:**
+- Morning health checks across FortiGate fleet
+- Reachability diagnosis (route lookup + ping + traceroute)
+- VPN tunnel monitoring and troubleshooting
+- SD-WAN SLA investigation
+- Firmware audit and upgrade planning
+- Configuration backup automation
+
+[📖 View Documentation →](FortiBot-NOC-CLI/)
+
+---
+
 ## 🚀 Coming Soon
 
 More MSSP tools are in development:
@@ -151,7 +186,7 @@ Found a bug? Help us improve! Please open a GitHub Issue with:
 1. **Go to:** https://github.com/howardsinc3753/MSSP-Tools/issues
 2. **Click:** "New Issue"
 3. **Include:**
-   - Tool name (e.g., "SOCaaS SDK", "FortiFlex MSSP Toolkit", "FortiGate Monitor", "FortiZTP SDK")
+   - Tool name (e.g., "FortiBot NOC-CLI", "SOCaaS SDK", "FortiFlex MSSP Toolkit", "FortiGate Monitor", "FortiZTP SDK")
    - Description of the issue
    - Steps to reproduce
    - Expected vs actual behavior
