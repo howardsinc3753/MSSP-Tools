@@ -1,0 +1,4146 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "termsOfService": "http:\/\/fortinet.com\/terms\/",
+        "version": "v2",
+        "contact": {
+            "url": "http:\/\/modskristensen.net",
+            "name": "FortiOS Web Application Team",
+            "email": "fosguiqateam@fortinet.com"
+        },
+        "description": "REST API for configuring FortiWEB objects and settings",
+        "title": "FortiWEB Monitor"
+    },
+    "basePath": "\/api\/v2.0\/",
+    "host": "172.16.177.65",
+    "schemes": [
+        "https"
+    ],
+    "consumes": [
+        "application\/x-www-form-urlencoded"
+    ],
+    "produces": [
+        "application\/json"
+    ],
+    "securityDefinitions": {
+        "APIKeyHeader": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    },
+    "security": [
+        {
+            "APIKeyHeader": []
+        }
+    ],
+    "tags": [
+        {
+            "name": "machine_learning\/anomalydetection.delmlexcept"
+        },
+        {
+            "name": "machine_learning\/policy.refresharg"
+        },
+        {
+            "name": "machine_learning\/api_learning_policy.exportdata"
+        },
+        {
+            "name": "machine_learning\/api_learning_policy.exportdata.query"
+        },
+        {
+            "name": "machine_learning\/api_learning_policy.exportdata.download"
+        },
+        {
+            "name": "machine_learning\/policy.exportdata"
+        },
+        {
+            "name": "machine_learning\/policy.exportdata.query"
+        },
+        {
+            "name": "machine_learning\/policy.exportdata.download"
+        },
+        {
+            "name": "machine_learning\/policy.botdetection"
+        },
+        {
+            "name": "machine_learning\/policy.refreshpolicy"
+        },
+        {
+            "name": "machine_learning\/policy.urlstatistics"
+        },
+        {
+            "name": "machine_learning\/botdetection.importdata"
+        },
+        {
+            "name": "machine_learning\/botdetection.importdata.query"
+        },
+        {
+            "name": "machine_learning\/bot_detection.event"
+        },
+        {
+            "name": "machine_learning\/bot_detection.model"
+        },
+        {
+            "name": "machine_learning\/bot_detection.reset"
+        },
+        {
+            "name": "machine_learning\/policy.importdata"
+        },
+        {
+            "name": "machine_learning\/policy.importdata.query"
+        },
+        {
+            "name": "machine_learning\/policy.treejson"
+        },
+        {
+            "name": "machine_learning\/policy.overview"
+        },
+        {
+            "name": "machine_learning\/policy.anomalydetection"
+        },
+        {
+            "name": "machine_learning\/policy.getargs"
+        },
+        {
+            "name": "machine_learning\/policy.refreshdomain"
+        },
+        {
+            "name": "machine_learning\/policy.discardpolicy"
+        },
+        {
+            "name": "machine_learning\/policy.treeview.setargdiscard"
+        },
+        {
+            "name": "machine_learning\/policy.exportargdata"
+        },
+        {
+            "name": "machine_learning\/api_learning_policy.get_policy_rule"
+        },
+        {
+            "name": "machine_learning\/api_learning_policy.get_policy_rules"
+        },
+        {
+            "name": "machine_learning\/api_learning_policy.put_policy_rule"
+        },
+        {
+            "name": "machine_learning\/api_learning_policy.delete_policy_rule"
+        },
+        {
+            "name": "machine_learning\/api_learning_policy.delete_cloud_rule"
+        },
+        {
+            "name": "machine_learning\/api_learning_policy.schemafile.download"
+        },
+        {
+            "name": "machine_learning\/policy.refreshurl"
+        },
+        {
+            "name": "machine_learning\/api_learning_policy.create_policy_rule"
+        },
+        {
+            "name": "machine_learning\/bot_detection.exportdata"
+        },
+        {
+            "name": "machine_learning\/bot_detection.exportdata.query"
+        },
+        {
+            "name": "machine_learning\/bot_detection.exportdata.download"
+        },
+        {
+            "name": "machine_learning\/policy.getargsdpicture"
+        },
+        {
+            "name": "machine_learning\/api_learning_policy.refreshpolicy"
+        },
+        {
+            "name": "machine_learning\/api_learning_policy.refreshdomain"
+        },
+        {
+            "name": "machine_learning\/api_learning_policy.refreshurl"
+        },
+        {
+            "name": "machine_learning\/policy.getarganormaly"
+        },
+        {
+            "name": "machine_learning\/api_learning_policy.geturlcategories"
+        },
+        {
+            "name": "machine_learning\/api_learning_policy.importdata"
+        },
+        {
+            "name": "machine_learning\/api_learning_policy.importdata.query"
+        },
+        {
+            "name": "machine_learning\/policy.svmattacktypes"
+        },
+        {
+            "name": "machine_learning\/api_learning_policy.getarganormaly"
+        },
+        {
+            "name": "machine_learning\/anomalydetection.setargsettings"
+        },
+        {
+            "name": "machine_learning\/policy.getdomaininfo"
+        },
+        {
+            "name": "machine_learning\/anomalydetection.currentlimit"
+        },
+        {
+            "name": "machine_learning\/policy.args_para"
+        },
+        {
+            "name": "machine_learning\/policy.importargdata"
+        }
+    ],
+    "paths": {
+        "\/machine_learning\/anomalydetection.delmlexcept": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "description": "status"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "is_noisy_sample": {
+                                    "type": "integer",
+                                    "description": "is noisy sample"
+                                },
+                                "set_noise_flag": {
+                                    "type": "integer",
+                                    "description": "set noise flag"
+                                },
+                                "domain_id": {
+                                    "type": "integer",
+                                    "description": "domain id"
+                                },
+                                "url_id": {
+                                    "type": "integer",
+                                    "description": "url id"
+                                },
+                                "arg_id": {
+                                    "type": "integer",
+                                    "description": "arg id"
+                                },
+                                "policy_id": {
+                                    "type": "string",
+                                    "description": "policy id"
+                                },
+                                "sub_type": {
+                                    "type": "string",
+                                    "description": "sub type"
+                                },
+                                "sample_id": {
+                                    "type": "string",
+                                    "description": "sample id"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/anomalydetection.delmlexcept"
+                ]
+            }
+        },
+        "\/machine_learning\/policy.refresharg": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "_id": {
+                                            "type": "integer",
+                                            "description": " id"
+                                        },
+                                        "showmessage": {
+                                            "type": "string",
+                                            "description": "showmessage"
+                                        },
+                                        "pingResult": {
+                                            "type": "integer",
+                                            "description": "pingResult"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "string",
+                                    "description": "data"
+                                },
+                                "action": {
+                                    "type": "integer",
+                                    "description": "action"
+                                },
+                                "policy_name": {
+                                    "type": "string",
+                                    "description": "policy name"
+                                },
+                                "domain_id": {
+                                    "type": "integer",
+                                    "description": "domain id"
+                                },
+                                "url_id": {
+                                    "type": "integer",
+                                    "description": "url id"
+                                },
+                                "arg_id": {
+                                    "type": "integer",
+                                    "description": "arg id"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/policy.refresharg"
+                ]
+            }
+        },
+        "\/machine_learning\/api_learning_policy.exportdata": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "description": "status"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "policy_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy id"
+                    },
+                    {
+                        "name": "rule_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "rule id"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/api_learning_policy.exportdata"
+                ]
+            }
+        },
+        "\/machine_learning\/api_learning_policy.exportdata.query": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "percent": {
+                                            "type": "integer",
+                                            "description": "percent"
+                                        },
+                                        "filename": {
+                                            "type": "string",
+                                            "description": "filename"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "policy_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy id"
+                    },
+                    {
+                        "name": "rule_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "rule id"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/api_learning_policy.exportdata.query"
+                ]
+            }
+        },
+        "\/machine_learning\/api_learning_policy.exportdata.download": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": []
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "name"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/api_learning_policy.exportdata.download"
+                ]
+            }
+        },
+        "\/machine_learning\/policy.exportdata": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "description": "status"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "type"
+                    },
+                    {
+                        "name": "id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "id"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/policy.exportdata"
+                ]
+            }
+        },
+        "\/machine_learning\/policy.exportdata.query": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "percent": {
+                                            "type": "integer",
+                                            "description": "percent"
+                                        },
+                                        "filename": {
+                                            "type": "string",
+                                            "description": "filename"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "id"
+                    },
+                    {
+                        "name": "type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "type"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/policy.exportdata.query"
+                ]
+            }
+        },
+        "\/machine_learning\/policy.exportdata.download": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": []
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "name"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/policy.exportdata.download"
+                ]
+            }
+        },
+        "\/machine_learning\/policy.botdetection": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "description": "status"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "policy_id": {
+                                    "type": "string",
+                                    "description": "policy id"
+                                },
+                                "allow_ip": {
+                                    "type": "array",
+                                    "description": "allow ip",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/policy.botdetection"
+                ]
+            }
+        },
+        "\/machine_learning\/policy.refreshpolicy": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "_id": {
+                                            "type": "string",
+                                            "description": " id"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "policy_id": {
+                                    "type": "string",
+                                    "description": "policy id"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/policy.refreshpolicy"
+                ]
+            }
+        },
+        "\/machine_learning\/policy.urlstatistics": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "mkey"
+                    },
+                    {
+                        "name": "policy_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy name"
+                    },
+                    {
+                        "name": "domain",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "domain"
+                    },
+                    {
+                        "name": "url_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "url id"
+                    },
+                    {
+                        "name": "db_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "db name"
+                    },
+                    {
+                        "name": "domain_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "domain id"
+                    },
+                    {
+                        "name": "hmm_sample_level",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "hmm sample level"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/policy.urlstatistics"
+                ]
+            }
+        },
+        "\/machine_learning\/botdetection.importdata": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "description": "status"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "import_file_bot": {
+                                    "type": "string",
+                                    "description": "import file bot"
+                                },
+                                "type": {
+                                    "type": "integer",
+                                    "description": "type"
+                                },
+                                "id": {
+                                    "type": "string",
+                                    "description": "id"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/botdetection.importdata"
+                ]
+            }
+        },
+        "\/machine_learning\/botdetection.importdata.query": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "description": "status"
+                                        },
+                                        "percent": {
+                                            "type": "integer",
+                                            "description": "percent"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "type"
+                    },
+                    {
+                        "name": "id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "id"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/botdetection.importdata.query"
+                ]
+            }
+        },
+        "\/machine_learning\/bot_detection.event": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "time_stamp": {
+                                                "type": "integer",
+                                                "description": "time stamp"
+                                            },
+                                            "from": {
+                                                "type": "string",
+                                                "description": "from"
+                                            },
+                                            "to": {
+                                                "type": "string",
+                                                "description": "to"
+                                            },
+                                            "source": {
+                                                "type": "string",
+                                                "description": "source"
+                                            },
+                                            "reason": {
+                                                "type": "string",
+                                                "description": "reason"
+                                            },
+                                            "type": {
+                                                "type": "integer",
+                                                "description": "type"
+                                            },
+                                            "have_read": {
+                                                "type": "integer",
+                                                "description": "have read"
+                                            },
+                                            "id": {
+                                                "type": "integer",
+                                                "description": "id"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "policy_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy id"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/bot_detection.event"
+                ]
+            }
+        },
+        "\/machine_learning\/bot_detection.model": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "mkey"
+                    },
+                    {
+                        "name": "policy_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy id"
+                    },
+                    {
+                        "name": "type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "type"
+                    },
+                    {
+                        "name": "period",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "period"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/bot_detection.model"
+                ]
+            }
+        },
+        "\/machine_learning\/bot_detection.reset": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "model_status": {
+                                    "type": "string",
+                                    "description": "model status"
+                                },
+                                "ratio": {
+                                    "type": "integer",
+                                    "description": "ratio"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "policy_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy id"
+                    },
+                    {
+                        "name": "type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "type"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/bot_detection.reset"
+                ]
+            }
+        },
+        "\/machine_learning\/policy.importdata": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "description": "status"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "import_file": {
+                                    "type": "string",
+                                    "description": "import file"
+                                },
+                                "type": {
+                                    "type": "integer",
+                                    "description": "type"
+                                },
+                                "id": {
+                                    "type": "string",
+                                    "description": "id"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/policy.importdata"
+                ]
+            }
+        },
+        "\/machine_learning\/policy.importdata.query": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "description": "status"
+                                        },
+                                        "percent": {
+                                            "type": "integer",
+                                            "description": "percent"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "id"
+                    },
+                    {
+                        "name": "type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "type"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/policy.importdata.query"
+                ]
+            }
+        },
+        "\/machine_learning\/policy.treejson": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "domain",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "domain"
+                    },
+                    {
+                        "name": "db_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "db name"
+                    },
+                    {
+                        "name": "policy_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy name"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/policy.treejson"
+                ]
+            }
+        },
+        "\/machine_learning\/policy.overview": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "domain",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "domain"
+                    },
+                    {
+                        "name": "db_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "db name"
+                    },
+                    {
+                        "name": "policy_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy name"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/policy.overview"
+                ]
+            }
+        },
+        "\/machine_learning\/policy.geturls": [],
+        "\/machine_learning\/policy.anomalydetection": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "description": "status"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "policy_id": {
+                                    "type": "string",
+                                    "description": "policy id"
+                                },
+                                "allow_domain": {
+                                    "type": "array",
+                                    "description": "allow domain",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "allow_ip": {
+                                    "type": "array",
+                                    "description": "allow ip",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "ip_list_type_model": {
+                                    "type": "integer",
+                                    "description": "ip list type model"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/policy.anomalydetection"
+                ]
+            }
+        },
+        "\/machine_learning\/policy.getargs": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "url_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "url id"
+                    },
+                    {
+                        "name": "db_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "db name"
+                    },
+                    {
+                        "name": "hmm_sample_level",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "hmm sample level"
+                    },
+                    {
+                        "name": "domain_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "domain id"
+                    },
+                    {
+                        "name": "mkey",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "mkey"
+                    },
+                    {
+                        "name": "policy_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy name"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/policy.getargs"
+                ]
+            }
+        },
+        "\/machine_learning\/policy.refreshdomain": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "description": "status"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "domain_id": {
+                                    "type": "integer",
+                                    "description": "domain id"
+                                },
+                                "policy_name": {
+                                    "type": "string",
+                                    "description": "policy name"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/policy.refreshdomain"
+                ]
+            }
+        },
+        "\/machine_learning\/policy.discardpolicy": {
+            "delete": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "affected": {
+                                            "type": "integer",
+                                            "description": "affected"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "mkey"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/policy.discardpolicy"
+                ]
+            }
+        },
+        "\/machine_learning\/policy.treeview.setargdiscard": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "description": "status"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "domain_id": {
+                                    "type": "integer",
+                                    "description": "domain id"
+                                },
+                                "url_id": {
+                                    "type": "integer",
+                                    "description": "url id"
+                                },
+                                "arg_id": {
+                                    "type": "integer",
+                                    "description": "arg id"
+                                },
+                                "policy_name": {
+                                    "type": "string",
+                                    "description": "policy name"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/policy.treeview.setargdiscard"
+                ]
+            }
+        },
+        "\/machine_learning\/policy.exportargdata": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": []
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "db_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "db name"
+                    },
+                    {
+                        "name": "arg_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "arg id"
+                    },
+                    {
+                        "name": "policy_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy id"
+                    },
+                    {
+                        "name": "passwd",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "passwd"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/policy.exportargdata"
+                ]
+            }
+        },
+        "\/machine_learning\/api_learning_policy.get_policy_rule": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "description": "id"
+                                            },
+                                            "policy-id": {
+                                                "type": "string",
+                                                "description": "policy-id"
+                                            },
+                                            "status": {
+                                                "type": "integer",
+                                                "description": "status"
+                                            },
+                                            "policy-name": {
+                                                "type": "string",
+                                                "description": "policy-name"
+                                            },
+                                            "REDIS_KEY_DOMAIN_VIEW": {
+                                                "type": "integer",
+                                                "description": "REDIS KEY DOMAIN VIEW"
+                                            },
+                                            "REDIS_KEY_ADVANCED_SET": {
+                                                "type": "integer",
+                                                "description": "REDIS KEY ADVANCED SET"
+                                            },
+                                            "rule": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "description": "id"
+                                                        },
+                                                        "domain-name": {
+                                                            "type": "string",
+                                                            "description": "domain-name"
+                                                        },
+                                                        "api-learning-pattern-size": {
+                                                            "type": "integer",
+                                                            "description": "api-learning-pattern-size"
+                                                        },
+                                                        "api-path-size": {
+                                                            "type": "integer",
+                                                            "description": "api-path-size"
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            "count": {
+                                                "type": "integer",
+                                                "description": "count"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "policy_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy id"
+                    },
+                    {
+                        "name": "policy_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy name"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/api_learning_policy.get_policy_rule"
+                ]
+            }
+        },
+        "\/machine_learning\/api_learning_policy.get_policy_rules": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "rules": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "description": "id"
+                                                    },
+                                                    "policy-id": {
+                                                        "type": "string",
+                                                        "description": "policy-id"
+                                                    },
+                                                    "status": {
+                                                        "type": "integer",
+                                                        "description": "status"
+                                                    },
+                                                    "policy-name": {
+                                                        "type": "string",
+                                                        "description": "policy-name"
+                                                    },
+                                                    "rule": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer",
+                                                                    "description": "id"
+                                                                },
+                                                                "domain-name": {
+                                                                    "type": "string",
+                                                                    "description": "domain-name"
+                                                                },
+                                                                "api-learning-pattern-size": {
+                                                                    "type": "integer",
+                                                                    "description": "api-learning-pattern-size"
+                                                                },
+                                                                "api-path-size": {
+                                                                    "type": "integer",
+                                                                    "description": "api-path-size"
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    "count": {
+                                                        "type": "integer",
+                                                        "description": "count"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "domain_view": {
+                                            "type": "integer",
+                                            "description": "domain view"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [],
+                "tags": [
+                    "machine_learning\/api_learning_policy.get_policy_rules"
+                ]
+            }
+        },
+        "\/machine_learning\/api_learning_policy.put_policy_rule": {
+            "put": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "policy_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy id"
+                    },
+                    {
+                        "name": "policy_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy name"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "string",
+                                    "description": "data"
+                                },
+                                "ad": {
+                                    "type": "integer",
+                                    "description": "ad"
+                                },
+                                "REDIS_KEY_DOMAIN_VIEW": {
+                                    "type": "integer",
+                                    "description": "REDIS KEY DOMAIN VIEW"
+                                },
+                                "REDIS_KEY_ADVANCED_SET": {
+                                    "type": "integer",
+                                    "description": "REDIS KEY ADVANCED SET"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/api_learning_policy.put_policy_rule"
+                ]
+            }
+        },
+        "\/machine_learning\/api_learning_policy.delete_policy_rule": {
+            "delete": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "policy_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy id"
+                    },
+                    {
+                        "name": "policy_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy name"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/api_learning_policy.delete_policy_rule"
+                ]
+            }
+        },
+        "\/machine_learning\/api_learning_policy.delete_cloud_rule": {
+            "delete": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "api-learning-policy": {
+                                            "type": "string",
+                                            "description": "api-learning-policy"
+                                        },
+                                        "api-learning-rule": {
+                                            "type": "string",
+                                            "description": "api-learning-rule"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "domain_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "domain name"
+                    },
+                    {
+                        "name": "policy_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy name"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/api_learning_policy.delete_cloud_rule"
+                ]
+            }
+        },
+        "\/machine_learning\/api_learning_policy.schemafile.download": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": []
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "domain_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "domain name"
+                    },
+                    {
+                        "name": "policy_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy name"
+                    },
+                    {
+                        "name": "type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "type"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/api_learning_policy.schemafile.download"
+                ]
+            }
+        },
+        "\/machine_learning\/policy.refreshurl": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "_id": {
+                                            "type": "integer",
+                                            "description": " id"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "action": {
+                                    "type": "integer",
+                                    "description": "action"
+                                },
+                                "policy_name": {
+                                    "type": "string",
+                                    "description": "policy name"
+                                },
+                                "domain_id": {
+                                    "type": "integer",
+                                    "description": "domain id"
+                                },
+                                "url_id": {
+                                    "type": "integer",
+                                    "description": "url id"
+                                },
+                                "path": {
+                                    "type": "string",
+                                    "description": "path"
+                                },
+                                "type": {
+                                    "type": "integer",
+                                    "description": "type"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/policy.refreshurl"
+                ]
+            }
+        },
+        "\/machine_learning\/api_learning_policy.create_policy_rule": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "description": "status"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "string",
+                                    "description": "data"
+                                },
+                                "policy_id": {
+                                    "type": "string",
+                                    "description": "policy id"
+                                },
+                                "redis_host": {
+                                    "type": "string",
+                                    "description": "redis host"
+                                },
+                                "redis_port": {
+                                    "type": "integer",
+                                    "description": "redis port"
+                                },
+                                "redis_type": {
+                                    "type": "integer",
+                                    "description": "redis type"
+                                },
+                                "ip_list_type_model": {
+                                    "type": "integer",
+                                    "description": "ip list type model"
+                                },
+                                "rule_domain": {
+                                    "type": "array",
+                                    "description": "rule domain",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "rule_ip": {
+                                    "type": "array",
+                                    "description": "rule ip",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/api_learning_policy.create_policy_rule"
+                ]
+            }
+        },
+        "\/machine_learning\/bot_detection.exportdata": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "description": "status"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "id"
+                    },
+                    {
+                        "name": "type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "type"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/bot_detection.exportdata"
+                ]
+            }
+        },
+        "\/machine_learning\/bot_detection.exportdata.query": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "percent": {
+                                    "type": "integer",
+                                    "description": "percent"
+                                },
+                                "filename": {
+                                    "type": "string",
+                                    "description": "filename"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "id"
+                    },
+                    {
+                        "name": "type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "type"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/bot_detection.exportdata.query"
+                ]
+            }
+        },
+        "\/machine_learning\/bot_detection.exportdata.download": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": []
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "name"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/bot_detection.exportdata.download"
+                ]
+            }
+        },
+        "\/machine_learning\/policy.getargsdpicture": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "image-base64": {
+                                    "type": "string",
+                                    "description": "image-base64"
+                                },
+                                "error": {
+                                    "type": "integer",
+                                    "description": "error"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "arg_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "arg id"
+                    },
+                    {
+                        "name": "domain_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "domain id"
+                    },
+                    {
+                        "name": "sd",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "sd"
+                    },
+                    {
+                        "name": "sub_type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "sub type"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/policy.getargsdpicture"
+                ]
+            }
+        },
+        "\/machine_learning\/api_learning_policy.refreshpolicy": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "policy-name": {
+                                                "type": "string",
+                                                "description": "policy-name"
+                                            },
+                                            "domain-name": {
+                                                "type": "string",
+                                                "description": "domain-name"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "policy_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy id"
+                    },
+                    {
+                        "name": "policy_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy name"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/api_learning_policy.refreshpolicy"
+                ]
+            }
+        },
+        "\/machine_learning\/api_learning_policy.refreshdomain": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "policy-name": {
+                                            "type": "string",
+                                            "description": "policy-name"
+                                        },
+                                        "domain-name": {
+                                            "type": "string",
+                                            "description": "domain-name"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "rule_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "rule id"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/api_learning_policy.refreshdomain"
+                ]
+            }
+        },
+        "\/machine_learning\/api_learning_policy.refreshurl": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "policy-name": {
+                                            "type": "string",
+                                            "description": "policy-name"
+                                        },
+                                        "domain-name": {
+                                            "type": "string",
+                                            "description": "domain-name"
+                                        },
+                                        "dbid": {
+                                            "type": "integer",
+                                            "description": "dbid"
+                                        },
+                                        "url_id": {
+                                            "type": "integer",
+                                            "description": "url id"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "rule_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "rule id"
+                    },
+                    {
+                        "name": "dbid",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "dbid"
+                    },
+                    {
+                        "name": "url_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "url id"
+                    },
+                    {
+                        "name": "url_md5",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "url md5"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/api_learning_policy.refreshurl"
+                ]
+            }
+        },
+        "\/machine_learning\/policy.getarganormaly": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "mkey"
+                    },
+                    {
+                        "name": "url_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "url id"
+                    },
+                    {
+                        "name": "arg_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "arg id"
+                    },
+                    {
+                        "name": "domain_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "domain id"
+                    },
+                    {
+                        "name": "policy_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy name"
+                    },
+                    {
+                        "name": "db_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "db name"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/policy.getarganormaly"
+                ]
+            }
+        },
+        "\/machine_learning\/api_learning_policy.geturlcategories": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "type"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/api_learning_policy.geturlcategories"
+                ]
+            }
+        },
+        "\/machine_learning\/api_learning_policy.importdata": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "description": "status"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "import_file": {
+                                    "type": "string",
+                                    "description": "import file"
+                                },
+                                "type": {
+                                    "type": "integer",
+                                    "description": "type"
+                                },
+                                "policy_id": {
+                                    "type": "string",
+                                    "description": "policy id"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/api_learning_policy.importdata"
+                ]
+            }
+        },
+        "\/machine_learning\/api_learning_policy.importdata.query": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "description": "status"
+                                        },
+                                        "percent": {
+                                            "type": "integer",
+                                            "description": "percent"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "policy_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy id"
+                    },
+                    {
+                        "name": "type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "type"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/api_learning_policy.importdata.query"
+                ]
+            }
+        },
+        "\/machine_learning\/policy.svmattacktypes": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [],
+                "tags": [
+                    "machine_learning\/policy.svmattacktypes"
+                ]
+            }
+        },
+        "\/machine_learning\/api_learning_policy.getarganormaly": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "mkey"
+                    },
+                    {
+                        "name": "url_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "url id"
+                    },
+                    {
+                        "name": "arg_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "arg id"
+                    },
+                    {
+                        "name": "dbid",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "dbid"
+                    },
+                    {
+                        "name": "rule_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "rule id"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/api_learning_policy.getarganormaly"
+                ]
+            }
+        },
+        "\/machine_learning\/anomalydetection.setargsettings": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "description": "status"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "policy_id": {
+                                    "type": "string",
+                                    "description": "policy id"
+                                },
+                                "domain_id": {
+                                    "type": "integer",
+                                    "description": "domain id"
+                                },
+                                "url_id": {
+                                    "type": "integer",
+                                    "description": "url id"
+                                },
+                                "arg_id": {
+                                    "type": "integer",
+                                    "description": "arg id"
+                                },
+                                "mkey": {
+                                    "type": "string",
+                                    "description": "mkey"
+                                },
+                                "settings_type": {
+                                    "type": "integer",
+                                    "description": "settings type"
+                                },
+                                "definitely_val": {
+                                    "type": "string",
+                                    "description": "definitely val"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/anomalydetection.setargsettings"
+                ]
+            }
+        },
+        "\/machine_learning\/policy.getdomaininfo": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "policy_id": {
+                                                "type": "string",
+                                                "description": "policy id"
+                                            },
+                                            "mkey": {
+                                                "type": "string",
+                                                "description": "mkey"
+                                            },
+                                            "id": {
+                                                "type": "string",
+                                                "description": "id"
+                                            },
+                                            "domain_name": {
+                                                "type": "string",
+                                                "description": "domain name"
+                                            },
+                                            "domain_index": {
+                                                "type": "string",
+                                                "description": "domain index"
+                                            },
+                                            "db_name": {
+                                                "type": "string",
+                                                "description": "db name"
+                                            },
+                                            "db_id": {
+                                                "type": "integer",
+                                                "description": "db id"
+                                            },
+                                            "hmm_sample_level": {
+                                                "type": "integer",
+                                                "description": "hmm sample level"
+                                            }
+                                        }
+                                    }
+                                },
+                                "REDIS_KEY_ADVANCED_SET": {
+                                    "type": "integer",
+                                    "description": "REDIS KEY ADVANCED SET"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "policy_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy name"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/policy.getdomaininfo"
+                ]
+            }
+        },
+        "\/machine_learning\/anomalydetection.currentlimit": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "current": {
+                                    "type": "integer",
+                                    "description": "current"
+                                },
+                                "limit": {
+                                    "type": "integer",
+                                    "description": "limit"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [],
+                "tags": [
+                    "machine_learning\/anomalydetection.currentlimit"
+                ]
+            }
+        },
+        "\/machine_learning\/policy.args_para": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "mkey"
+                    },
+                    {
+                        "name": "policy_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy name"
+                    },
+                    {
+                        "name": "domain",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "domain"
+                    },
+                    {
+                        "name": "db_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "db name"
+                    },
+                    {
+                        "name": "filter",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "filter"
+                    },
+                    {
+                        "name": "db_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "db id"
+                    },
+                    {
+                        "name": "hmm_sample_level",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "hmm sample level"
+                    },
+                    {
+                        "name": "policy_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy id"
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/policy.args_para"
+                ]
+            }
+        },
+        "\/machine_learning\/policy.importargdata": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "description": "status"
+                                        },
+                                        "import_arg_name": {
+                                            "type": "string",
+                                            "description": "import arg name"
+                                        },
+                                        "import_arg_id": {
+                                            "type": "integer",
+                                            "description": "import arg id"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "import_file": {
+                                    "type": "string",
+                                    "description": "import file"
+                                },
+                                "url_id": {
+                                    "type": "integer",
+                                    "description": "url id"
+                                },
+                                "db_name": {
+                                    "type": "string",
+                                    "description": "db name"
+                                },
+                                "import_password": {
+                                    "type": "string",
+                                    "description": "import password"
+                                },
+                                "domain_id": {
+                                    "type": "integer",
+                                    "description": "domain id"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "machine_learning\/policy.importargdata"
+                ]
+            }
+        }
+    }
+}

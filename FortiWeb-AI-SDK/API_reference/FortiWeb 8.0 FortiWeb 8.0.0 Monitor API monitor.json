@@ -1,0 +1,1413 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "termsOfService": "http:\/\/fortinet.com\/terms\/",
+        "version": "v2",
+        "contact": {
+            "url": "http:\/\/modskristensen.net",
+            "name": "FortiOS Web Application Team",
+            "email": "fosguiqateam@fortinet.com"
+        },
+        "description": "REST API for configuring FortiWEB objects and settings",
+        "title": "FortiWEB Monitor"
+    },
+    "basePath": "\/api\/v2.0\/",
+    "host": "172.16.177.65",
+    "schemes": [
+        "https"
+    ],
+    "consumes": [
+        "application\/x-www-form-urlencoded"
+    ],
+    "produces": [
+        "application\/json"
+    ],
+    "securityDefinitions": {
+        "APIKeyHeader": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    },
+    "security": [
+        {
+            "APIKeyHeader": []
+        }
+    ],
+    "tags": [
+        {
+            "name": "monitor\/blockedusers"
+        },
+        {
+            "name": "monitor\/clientmanagement"
+        },
+        {
+            "name": "monitor\/clientmanagement-fortiview"
+        },
+        {
+            "name": "monitor\/permission-check"
+        },
+        {
+            "name": "monitor\/blockedips"
+        },
+        {
+            "name": "monitor\/activeusers"
+        },
+        {
+            "name": "monitor\/blocked-client-ids"
+        }
+    ],
+    "paths": {
+        "\/monitor\/blockedusers": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "blocked_users": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "seq": {
+                                                        "type": "integer",
+                                                        "description": "seq"
+                                                    },
+                                                    "policy": {
+                                                        "type": "string",
+                                                        "description": "policy"
+                                                    },
+                                                    "policy_name": {
+                                                        "type": "string",
+                                                        "description": "policy name"
+                                                    },
+                                                    "profile": {
+                                                        "type": "string",
+                                                        "description": "profile"
+                                                    },
+                                                    "rule": {
+                                                        "type": "integer",
+                                                        "description": "rule"
+                                                    },
+                                                    "rule_name": {
+                                                        "type": "string",
+                                                        "description": "rule name"
+                                                    },
+                                                    "username": {
+                                                        "type": "string",
+                                                        "description": "username"
+                                                    },
+                                                    "sid": {
+                                                        "type": "string",
+                                                        "description": "sid"
+                                                    },
+                                                    "ngid": {
+                                                        "type": "string",
+                                                        "description": "ngid"
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "description": "name"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "server_policies": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "seq": {
+                                                        "type": "integer",
+                                                        "description": "seq"
+                                                    },
+                                                    "policy": {
+                                                        "type": "string",
+                                                        "description": "policy"
+                                                    },
+                                                    "policy_name": {
+                                                        "type": "string",
+                                                        "description": "policy name"
+                                                    },
+                                                    "profile": {
+                                                        "type": "string",
+                                                        "description": "profile"
+                                                    },
+                                                    "rule": {
+                                                        "type": "integer",
+                                                        "description": "rule"
+                                                    },
+                                                    "rule_name": {
+                                                        "type": "string",
+                                                        "description": "rule name"
+                                                    },
+                                                    "username": {
+                                                        "type": "string",
+                                                        "description": "username"
+                                                    },
+                                                    "sid": {
+                                                        "type": "string",
+                                                        "description": "sid"
+                                                    },
+                                                    "ngid": {
+                                                        "type": "string",
+                                                        "description": "ngid"
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "description": "name"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "type"
+                    },
+                    {
+                        "name": "policy_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy name"
+                    }
+                ],
+                "tags": [
+                    "monitor\/blockedusers"
+                ]
+            },
+            "delete": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "description": "status"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "type"
+                    },
+                    {
+                        "name": "policy_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy name"
+                    },
+                    {
+                        "name": "release_all",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "release all"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "blocked_users": {
+                                    "type": "array",
+                                    "description": "blocked users",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "user\" ": {
+                                    "type": "string",
+                                    "description": "user\" "
+                                },
+                                "rule_name\" ": {
+                                    "type": "string",
+                                    "description": "rule name\" "
+                                },
+                                "sid\" ": {
+                                    "type": "string",
+                                    "description": "sid\" "
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "monitor\/blockedusers"
+                ]
+            }
+        },
+        "\/monitor\/clientmanagement": {
+            "delete": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "id": {
+                                    "type": "integer",
+                                    "description": "id"
+                                },
+                                "client_id": {
+                                    "type": "string",
+                                    "description": "client id"
+                                },
+                                "identified_by": {
+                                    "type": "integer",
+                                    "description": "identified by"
+                                },
+                                "threat_score": {
+                                    "type": "integer",
+                                    "description": "threat score"
+                                },
+                                "signature_score": {
+                                    "type": "integer",
+                                    "description": "signature score"
+                                },
+                                "risk_level": {
+                                    "type": "integer",
+                                    "description": "risk level"
+                                },
+                                "last_ip": {
+                                    "type": "string",
+                                    "description": "last ip"
+                                },
+                                "access_time": {
+                                    "type": "string",
+                                    "description": "access time"
+                                },
+                                "create_time": {
+                                    "type": "string",
+                                    "description": "create time"
+                                },
+                                "server_policy": {
+                                    "type": "string",
+                                    "description": "server policy"
+                                },
+                                "average_occurence_per_min": {
+                                    "type": "string",
+                                    "description": "average occurence per min"
+                                },
+                                "average_occurence_per_sec": {
+                                    "type": "string",
+                                    "description": "average occurence per sec"
+                                },
+                                "peak_occurence_per_min": {
+                                    "type": "string",
+                                    "description": "peak occurence per min"
+                                },
+                                "peak_occurence_per_sec": {
+                                    "type": "string",
+                                    "description": "peak occurence per sec"
+                                },
+                                "geo_location": {
+                                    "type": "string",
+                                    "description": "geo location"
+                                },
+                                "user_agent": {
+                                    "type": "string",
+                                    "description": "user agent"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "op_type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "op type"
+                    },
+                    {
+                        "name": "client_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "client id"
+                    },
+                    {
+                        "name": "cur_page",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "cur page"
+                    },
+                    {
+                        "name": "type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "type"
+                    },
+                    {
+                        "name": "reverse",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "reverse"
+                    },
+                    {
+                        "name": "day",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "day"
+                    },
+                    {
+                        "name": "begin",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "begin"
+                    },
+                    {
+                        "name": "filter",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "filter"
+                    }
+                ],
+                "tags": [
+                    "monitor\/clientmanagement"
+                ]
+            }
+        },
+        "\/monitor\/clientmanagement-fortiview": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "average_occurrence_per_min": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "start_range": {
+                                                        "type": "integer",
+                                                        "description": "start range"
+                                                    },
+                                                    "end_range": {
+                                                        "type": "integer",
+                                                        "description": "end range"
+                                                    },
+                                                    "frequency": {
+                                                        "type": "integer",
+                                                        "description": "frequency"
+                                                    },
+                                                    "country": {
+                                                        "type": "string",
+                                                        "description": "country"
+                                                    },
+                                                    "count": {
+                                                        "type": "integer",
+                                                        "description": "count"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "description": "type"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "average_occurrence_per_sec": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "start_range": {
+                                                        "type": "integer",
+                                                        "description": "start range"
+                                                    },
+                                                    "end_range": {
+                                                        "type": "integer",
+                                                        "description": "end range"
+                                                    },
+                                                    "frequency": {
+                                                        "type": "integer",
+                                                        "description": "frequency"
+                                                    },
+                                                    "country": {
+                                                        "type": "string",
+                                                        "description": "country"
+                                                    },
+                                                    "count": {
+                                                        "type": "integer",
+                                                        "description": "count"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "description": "type"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "peak_occurrence_per_min": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "start_range": {
+                                                        "type": "integer",
+                                                        "description": "start range"
+                                                    },
+                                                    "end_range": {
+                                                        "type": "integer",
+                                                        "description": "end range"
+                                                    },
+                                                    "frequency": {
+                                                        "type": "integer",
+                                                        "description": "frequency"
+                                                    },
+                                                    "country": {
+                                                        "type": "string",
+                                                        "description": "country"
+                                                    },
+                                                    "count": {
+                                                        "type": "integer",
+                                                        "description": "count"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "description": "type"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "peak_occurrence_per_sec": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "start_range": {
+                                                        "type": "integer",
+                                                        "description": "start range"
+                                                    },
+                                                    "end_range": {
+                                                        "type": "integer",
+                                                        "description": "end range"
+                                                    },
+                                                    "frequency": {
+                                                        "type": "integer",
+                                                        "description": "frequency"
+                                                    },
+                                                    "country": {
+                                                        "type": "string",
+                                                        "description": "country"
+                                                    },
+                                                    "count": {
+                                                        "type": "integer",
+                                                        "description": "count"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "description": "type"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "geo_location": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "start_range": {
+                                                        "type": "integer",
+                                                        "description": "start range"
+                                                    },
+                                                    "end_range": {
+                                                        "type": "integer",
+                                                        "description": "end range"
+                                                    },
+                                                    "frequency": {
+                                                        "type": "integer",
+                                                        "description": "frequency"
+                                                    },
+                                                    "country": {
+                                                        "type": "string",
+                                                        "description": "country"
+                                                    },
+                                                    "count": {
+                                                        "type": "integer",
+                                                        "description": "count"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "description": "type"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "user_agent": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "start_range": {
+                                                        "type": "integer",
+                                                        "description": "start range"
+                                                    },
+                                                    "end_range": {
+                                                        "type": "integer",
+                                                        "description": "end range"
+                                                    },
+                                                    "frequency": {
+                                                        "type": "integer",
+                                                        "description": "frequency"
+                                                    },
+                                                    "country": {
+                                                        "type": "string",
+                                                        "description": "country"
+                                                    },
+                                                    "count": {
+                                                        "type": "integer",
+                                                        "description": "count"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "description": "type"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "policy",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy"
+                    },
+                    {
+                        "name": "day",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "day"
+                    }
+                ],
+                "tags": [
+                    "monitor\/clientmanagement-fortiview"
+                ]
+            }
+        },
+        "\/monitor\/permission-check": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "permitted": {
+                                            "type": "integer",
+                                            "description": "permitted"
+                                        },
+                                        "read_only": {
+                                            "type": "integer",
+                                            "description": "read only"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "grp",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "grp"
+                    },
+                    {
+                        "name": "state",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "state"
+                    }
+                ],
+                "tags": [
+                    "monitor\/permission-check"
+                ]
+            }
+        },
+        "\/monitor\/blockedips": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "policy": {
+                                                "type": "string",
+                                                "description": "policy"
+                                            },
+                                            "_id": {
+                                                "type": "string",
+                                                "description": " id"
+                                            },
+                                            "ips": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "description": "id"
+                                                        },
+                                                        "ip": {
+                                                            "type": "string",
+                                                            "description": "ip"
+                                                        },
+                                                        "reason": {
+                                                            "type": "string",
+                                                            "description": "reason"
+                                                        },
+                                                        "expire_time": {
+                                                            "type": "string",
+                                                            "description": "expire time"
+                                                        },
+                                                        "ip_type": {
+                                                            "type": "string",
+                                                            "description": "ip type"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [],
+                "tags": [
+                    "monitor\/blockedips"
+                ]
+            },
+            "delete": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "affected": {
+                                            "type": "integer",
+                                            "description": "affected"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "policy_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy name"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "ip_list": {
+                                    "type": "string",
+                                    "description": "ip list"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "monitor\/blockedips"
+                ]
+            }
+        },
+        "\/monitor\/activeusers": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "active_users": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "seq": {
+                                                        "type": "integer",
+                                                        "description": "seq"
+                                                    },
+                                                    "vdom": {
+                                                        "type": "string",
+                                                        "description": "vdom"
+                                                    },
+                                                    "policy": {
+                                                        "type": "string",
+                                                        "description": "policy"
+                                                    },
+                                                    "policy_name": {
+                                                        "type": "string",
+                                                        "description": "policy name"
+                                                    },
+                                                    "rule_name": {
+                                                        "type": "string",
+                                                        "description": "rule name"
+                                                    },
+                                                    "profile": {
+                                                        "type": "string",
+                                                        "description": "profile"
+                                                    },
+                                                    "username": {
+                                                        "type": "string",
+                                                        "description": "username"
+                                                    },
+                                                    "type": {
+                                                        "type": "integer",
+                                                        "description": "type"
+                                                    },
+                                                    "rule": {
+                                                        "type": "integer",
+                                                        "description": "rule"
+                                                    },
+                                                    "sid": {
+                                                        "type": "string",
+                                                        "description": "sid"
+                                                    },
+                                                    "policy_id": {
+                                                        "type": "string",
+                                                        "description": "policy id"
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "description": "name"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "server_policies": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "seq": {
+                                                        "type": "integer",
+                                                        "description": "seq"
+                                                    },
+                                                    "vdom": {
+                                                        "type": "string",
+                                                        "description": "vdom"
+                                                    },
+                                                    "policy": {
+                                                        "type": "string",
+                                                        "description": "policy"
+                                                    },
+                                                    "policy_name": {
+                                                        "type": "string",
+                                                        "description": "policy name"
+                                                    },
+                                                    "rule_name": {
+                                                        "type": "string",
+                                                        "description": "rule name"
+                                                    },
+                                                    "profile": {
+                                                        "type": "string",
+                                                        "description": "profile"
+                                                    },
+                                                    "username": {
+                                                        "type": "string",
+                                                        "description": "username"
+                                                    },
+                                                    "type": {
+                                                        "type": "integer",
+                                                        "description": "type"
+                                                    },
+                                                    "rule": {
+                                                        "type": "integer",
+                                                        "description": "rule"
+                                                    },
+                                                    "sid": {
+                                                        "type": "string",
+                                                        "description": "sid"
+                                                    },
+                                                    "policy_id": {
+                                                        "type": "string",
+                                                        "description": "policy id"
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "description": "name"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "type"
+                    },
+                    {
+                        "name": "policy_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy id"
+                    }
+                ],
+                "tags": [
+                    "monitor\/activeusers"
+                ]
+            },
+            "delete": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "description": "status"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "policy",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy"
+                    },
+                    {
+                        "name": "profile",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "profile"
+                    },
+                    {
+                        "name": "rule",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "rule"
+                    },
+                    {
+                        "name": "type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "type"
+                    },
+                    {
+                        "name": "username",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "username"
+                    },
+                    {
+                        "name": "sid",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "sid"
+                    }
+                ],
+                "tags": [
+                    "monitor\/activeusers"
+                ]
+            }
+        },
+        "\/monitor\/blocked-client-ids": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "policy": {
+                                                "type": "string",
+                                                "description": "policy"
+                                            },
+                                            "_id": {
+                                                "type": "string",
+                                                "description": " id"
+                                            },
+                                            "client_ids": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "integer",
+                                                            "description": "id"
+                                                        },
+                                                        "client_id": {
+                                                            "type": "string",
+                                                            "description": "client id"
+                                                        },
+                                                        "reason": {
+                                                            "type": "string",
+                                                            "description": "reason"
+                                                        },
+                                                        "expire_time": {
+                                                            "type": "string",
+                                                            "description": "expire time"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [],
+                "tags": [
+                    "monitor\/blocked-client-ids"
+                ]
+            },
+            "delete": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "affected": {
+                                            "type": "integer",
+                                            "description": "affected"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "policy_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy name"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "id_list": {
+                                    "type": "string",
+                                    "description": "id list"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "monitor\/blocked-client-ids"
+                ]
+            }
+        }
+    }
+}

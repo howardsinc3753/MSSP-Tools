@@ -1,0 +1,19 @@
+# Credentials — NEVER commit
+**/config/*credentials*.yaml
+**/config/*credentials*.yml
+**/.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp

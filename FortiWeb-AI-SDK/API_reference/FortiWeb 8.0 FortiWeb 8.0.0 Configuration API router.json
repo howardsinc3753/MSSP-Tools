@@ -1,0 +1,1331 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "FortiWEB CMDB",
+        "description": "REST API for configuring FortiWEB objects and settings",
+        "version": "v2.0",
+        "termsOfService": "http:\/\/fortinet.com\/terms\/",
+        "contact": {
+            "name": "FortiWEB Team",
+            "email": "fosguiqateam@fortinet.com",
+            "url": "http:\/\/modskristensen.net"
+        }
+    },
+    "basePath": "\/api\/v2.0\/cmdb",
+    "host": "172.16.177.65",
+    "schemes": [
+        "https"
+    ],
+    "consumes": [
+        "application\/x-www-form-urlencoded"
+    ],
+    "produces": [
+        "application\/json"
+    ],
+    "securityDefinitions": {
+        "APIKeyHeader": {
+            "type": "apiKey",
+            "in": "header",
+            "name": "Authorization"
+        }
+    },
+    "security": [
+        {
+            "APIKeyHeader": []
+        }
+    ],
+    "tags": [
+        {
+            "name": "router\/bgp",
+            "description": "BGP route configuration"
+        },
+        {
+            "name": "router\/policy",
+            "description": "policy route configuration"
+        },
+        {
+            "name": "router\/setting",
+            "description": "route table setting"
+        },
+        {
+            "name": "router\/static",
+            "description": "static route configuration"
+        }
+    ],
+    "paths": {
+        "\/router\/bgp": {
+            "get": {
+                "tags": [
+                    "router\/bgp"
+                ],
+                "summary": "Select all entries in a CLI table.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "asn": {
+                                            "type": "string",
+                                            "description": "AS number",
+                                            "maxLength": 63
+                                        },
+                                        "router-id": {
+                                            "type": "string",
+                                            "format": "ipv4",
+                                            "description": "BGP router id"
+                                        },
+                                        "neighbor": {
+                                            "type": "array",
+                                            "description": "BGP neighor list",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "<No.>": {
+                                                        "type": "integer",
+                                                        "description": "The number of the neighbor"
+                                                    },
+                                                    "asn": {
+                                                        "type": "string",
+                                                        "description": "neighbor AS number",
+                                                        "maxLength": 63
+                                                    },
+                                                    "address": {
+                                                        "type": "string",
+                                                        "format": "ipv4",
+                                                        "description": "neighbor(IPv4\/IPv6 address)"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "network": {
+                                            "type": "array",
+                                            "description": "BGP network list",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "<No.>": {
+                                                        "type": "integer",
+                                                        "description": "The number of the network"
+                                                    },
+                                                    "address": {
+                                                        "type": "string",
+                                                        "description": "network(IPv4\/IPv6 address\/mask)"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "router\/bgp"
+                ],
+                "summary": "Update this specific resource.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "asn": {
+                                            "type": "string",
+                                            "description": "AS number",
+                                            "maxLength": 63
+                                        },
+                                        "router-id": {
+                                            "type": "string",
+                                            "format": "ipv4",
+                                            "description": "BGP router id"
+                                        },
+                                        "neighbor": {
+                                            "type": "array",
+                                            "description": "BGP neighor list",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "<No.>": {
+                                                        "type": "integer",
+                                                        "description": "The number of the neighbor"
+                                                    },
+                                                    "asn": {
+                                                        "type": "string",
+                                                        "description": "neighbor AS number",
+                                                        "maxLength": 63
+                                                    },
+                                                    "address": {
+                                                        "type": "string",
+                                                        "format": "ipv4",
+                                                        "description": "neighbor(IPv4\/IPv6 address)"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "network": {
+                                            "type": "array",
+                                            "description": "BGP network list",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "<No.>": {
+                                                        "type": "integer",
+                                                        "description": "The number of the network"
+                                                    },
+                                                    "address": {
+                                                        "type": "string",
+                                                        "description": "network(IPv4\/IPv6 address\/mask)"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "move_flag",
+                        "in": "query",
+                        "description": "If supported, a flag can be specified.\nWhen *move_flag* is set, extra parameters (*move_mkey*, *sub_mkey*) must be provided.\n__*Note:*__ If this parameter is provided when not supported, the action will be ignored and an \u201cinvalid request\u201d error will be returned.\n",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "before",
+                            "after"
+                        ]
+                    },
+                    {
+                        "name": "sub_mkey",
+                        "in": "query",
+                        "description": "specific resource to be moved",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "move_mkey",
+                        "in": "query",
+                        "description": "specific resource to be moved before or after",
+                        "required": false,
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "\/router\/policy": {
+            "get": {
+                "tags": [
+                    "router\/policy"
+                ],
+                "summary": "Select all entries in a CLI table.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "description": "The id of the route.(0~65535)",
+                                            "maximum": 65535,
+                                            "minimum": 0
+                                        },
+                                        "src": {
+                                            "type": "string",
+                                            "description": "Source(IPv4\/IPv6) for this route"
+                                        },
+                                        "dst": {
+                                            "type": "string",
+                                            "description": "Destination(IPv4\/IPv6) for this route"
+                                        },
+                                        "action": {
+                                            "type": "string",
+                                            "description": "Forward Traffic\/Stop Policy Routing",
+                                            "enum": [
+                                                "forward-traffic",
+                                                "stop-policy-routing"
+                                            ]
+                                        },
+                                        "gateway": {
+                                            "type": "string",
+                                            "format": "ipv4",
+                                            "description": "Gateway(IPv4\/IPv6) for this route"
+                                        },
+                                        "iif": {
+                                            "type": "string",
+                                            "description": "Gateway in interface device"
+                                        },
+                                        "oif": {
+                                            "type": "string",
+                                            "description": "Gateway out interface device"
+                                        },
+                                        "priority": {
+                                            "type": "integer",
+                                            "description": "Priority for this route",
+                                            "maximum": 200,
+                                            "minimum": 1
+                                        },
+                                        "fwmark": {
+                                            "type": "integer",
+                                            "description": "Fwmark for this route(0-255)",
+                                            "maximum": 255,
+                                            "minimum": 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "router\/policy"
+                ],
+                "summary": "Create object(s) in this table.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "description": "The id of the route.(0~65535)",
+                                            "maximum": 65535,
+                                            "minimum": 0
+                                        },
+                                        "src": {
+                                            "type": "string",
+                                            "description": "Source(IPv4\/IPv6) for this route"
+                                        },
+                                        "dst": {
+                                            "type": "string",
+                                            "description": "Destination(IPv4\/IPv6) for this route"
+                                        },
+                                        "action": {
+                                            "type": "string",
+                                            "description": "Forward Traffic\/Stop Policy Routing",
+                                            "enum": [
+                                                "forward-traffic",
+                                                "stop-policy-routing"
+                                            ]
+                                        },
+                                        "gateway": {
+                                            "type": "string",
+                                            "format": "ipv4",
+                                            "description": "Gateway(IPv4\/IPv6) for this route"
+                                        },
+                                        "iif": {
+                                            "type": "string",
+                                            "description": "Gateway in interface device"
+                                        },
+                                        "oif": {
+                                            "type": "string",
+                                            "description": "Gateway out interface device"
+                                        },
+                                        "priority": {
+                                            "type": "integer",
+                                            "description": "Priority for this route",
+                                            "maximum": 200,
+                                            "minimum": 1
+                                        },
+                                        "fwmark": {
+                                            "type": "integer",
+                                            "description": "Fwmark for this route(0-255)",
+                                            "maximum": 255,
+                                            "minimum": 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "clone_mkey",
+                        "in": "query",
+                        "description": "Use *clone_mkey* to specify the ID for the new resource to be cloned. \nIf *clone_mkey* is set, *mkey* must be provided which is cloned from.\n",
+                        "required": false,
+                        "type": "string"
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "router\/policy"
+                ],
+                "summary": "Update this specific resource.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "description": "The id of the route.(0~65535)",
+                                            "maximum": 65535,
+                                            "minimum": 0
+                                        },
+                                        "src": {
+                                            "type": "string",
+                                            "description": "Source(IPv4\/IPv6) for this route"
+                                        },
+                                        "dst": {
+                                            "type": "string",
+                                            "description": "Destination(IPv4\/IPv6) for this route"
+                                        },
+                                        "action": {
+                                            "type": "string",
+                                            "description": "Forward Traffic\/Stop Policy Routing",
+                                            "enum": [
+                                                "forward-traffic",
+                                                "stop-policy-routing"
+                                            ]
+                                        },
+                                        "gateway": {
+                                            "type": "string",
+                                            "format": "ipv4",
+                                            "description": "Gateway(IPv4\/IPv6) for this route"
+                                        },
+                                        "iif": {
+                                            "type": "string",
+                                            "description": "Gateway in interface device"
+                                        },
+                                        "oif": {
+                                            "type": "string",
+                                            "description": "Gateway out interface device"
+                                        },
+                                        "priority": {
+                                            "type": "integer",
+                                            "description": "Priority for this route",
+                                            "maximum": 200,
+                                            "minimum": 1
+                                        },
+                                        "fwmark": {
+                                            "type": "integer",
+                                            "description": "Fwmark for this route(0-255)",
+                                            "maximum": 255,
+                                            "minimum": 0
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "move_flag",
+                        "in": "query",
+                        "description": "If supported, a flag can be specified.\nWhen *move_flag* is set, extra parameters (*move_mkey*, *sub_mkey*) must be provided.\n__*Note:*__ If this parameter is provided when not supported, the action will be ignored and an \u201cinvalid request\u201d error will be returned.\n",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "before",
+                            "after"
+                        ]
+                    },
+                    {
+                        "name": "sub_mkey",
+                        "in": "query",
+                        "description": "specific resource to be moved",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "move_mkey",
+                        "in": "query",
+                        "description": "specific resource to be moved before or after",
+                        "required": false,
+                        "type": "string"
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "router\/policy"
+                ],
+                "summary": "Delete this specific resource.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        },
+        "\/router\/setting": {
+            "get": {
+                "tags": [
+                    "router\/setting"
+                ],
+                "summary": "Select all entries in a CLI table.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ip-forward": {
+                                            "type": "string",
+                                            "description": "enable\/disable ip v4 forward",
+                                            "enum": [
+                                                "enable",
+                                                "disable"
+                                            ]
+                                        },
+                                        "ip6-forward": {
+                                            "type": "string",
+                                            "description": "enable\/disable ip v6 forward",
+                                            "enum": [
+                                                "enable",
+                                                "disable"
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "router\/setting"
+                ],
+                "summary": "Update this specific resource.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "ip-forward": {
+                                            "type": "string",
+                                            "description": "enable\/disable ip v4 forward",
+                                            "enum": [
+                                                "enable",
+                                                "disable"
+                                            ]
+                                        },
+                                        "ip6-forward": {
+                                            "type": "string",
+                                            "description": "enable\/disable ip v6 forward",
+                                            "enum": [
+                                                "enable",
+                                                "disable"
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "move_flag",
+                        "in": "query",
+                        "description": "If supported, a flag can be specified.\nWhen *move_flag* is set, extra parameters (*move_mkey*, *sub_mkey*) must be provided.\n__*Note:*__ If this parameter is provided when not supported, the action will be ignored and an \u201cinvalid request\u201d error will be returned.\n",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "before",
+                            "after"
+                        ]
+                    },
+                    {
+                        "name": "sub_mkey",
+                        "in": "query",
+                        "description": "specific resource to be moved",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "move_mkey",
+                        "in": "query",
+                        "description": "specific resource to be moved before or after",
+                        "required": false,
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "\/router\/static": {
+            "get": {
+                "tags": [
+                    "router\/static"
+                ],
+                "summary": "Select all entries in a CLI table.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "description": "The number of the route.(0~65535)",
+                                            "maximum": 65535,
+                                            "minimum": 0
+                                        },
+                                        "dst": {
+                                            "type": "string",
+                                            "description": "Destination(IPv4\/IPv6) for this route"
+                                        },
+                                        "gateway": {
+                                            "type": "string",
+                                            "format": "ipv4",
+                                            "description": "Gateway(IPv4\/IPv6) for this route"
+                                        },
+                                        "device": {
+                                            "type": "string",
+                                            "description": "Gateway out interface device"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "router\/static"
+                ],
+                "summary": "Create object(s) in this table.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "description": "The number of the route.(0~65535)",
+                                            "maximum": 65535,
+                                            "minimum": 0
+                                        },
+                                        "dst": {
+                                            "type": "string",
+                                            "description": "Destination(IPv4\/IPv6) for this route"
+                                        },
+                                        "gateway": {
+                                            "type": "string",
+                                            "format": "ipv4",
+                                            "description": "Gateway(IPv4\/IPv6) for this route"
+                                        },
+                                        "device": {
+                                            "type": "string",
+                                            "description": "Gateway out interface device"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "clone_mkey",
+                        "in": "query",
+                        "description": "Use *clone_mkey* to specify the ID for the new resource to be cloned. \nIf *clone_mkey* is set, *mkey* must be provided which is cloned from.\n",
+                        "required": false,
+                        "type": "string"
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "router\/static"
+                ],
+                "summary": "Update this specific resource.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "description": "The number of the route.(0~65535)",
+                                            "maximum": 65535,
+                                            "minimum": 0
+                                        },
+                                        "dst": {
+                                            "type": "string",
+                                            "description": "Destination(IPv4\/IPv6) for this route"
+                                        },
+                                        "gateway": {
+                                            "type": "string",
+                                            "format": "ipv4",
+                                            "description": "Gateway(IPv4\/IPv6) for this route"
+                                        },
+                                        "device": {
+                                            "type": "string",
+                                            "description": "Gateway out interface device"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "move_flag",
+                        "in": "query",
+                        "description": "If supported, a flag can be specified.\nWhen *move_flag* is set, extra parameters (*move_mkey*, *sub_mkey*) must be provided.\n__*Note:*__ If this parameter is provided when not supported, the action will be ignored and an \u201cinvalid request\u201d error will be returned.\n",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "before",
+                            "after"
+                        ]
+                    },
+                    {
+                        "name": "sub_mkey",
+                        "in": "query",
+                        "description": "specific resource to be moved",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "move_mkey",
+                        "in": "query",
+                        "description": "specific resource to be moved before or after",
+                        "required": false,
+                        "type": "string"
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "router\/static"
+                ],
+                "summary": "Delete this specific resource.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

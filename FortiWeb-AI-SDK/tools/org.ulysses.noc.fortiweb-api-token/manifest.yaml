@@ -1,0 +1,139 @@
+canonical_id: org.ulysses.noc.fortiweb-api-token/1.0.0
+name: FortiWeb API Token Manager
+version: 1.0.0
+description: >
+  Provision and manage API access tokens on a FortiWeb device.
+  First step for enabling programmatic access to FortiWeb configuration
+  and monitoring via the REST API. Supports creating, listing, and
+  revoking API admin accounts.
+metadata:
+  org_namespace: ulysses
+  domain: noc
+  intent: configure
+  vendor: fortinet
+  shelf: noc/fortiweb
+  tags:
+  - fortiweb
+  - api
+  - token
+  - authentication
+  - configuration
+  - waf
+runtime:
+  language: python
+  entry_point: main
+  source_file: org.ulysses.noc.fortiweb-api-token.py
+  python_packages:
+  - pyyaml>=6.0
+  dotnet_packages: []
+  files:
+  - config/fortiweb_credentials.yaml
+  services: []
+parameters:
+  type: object
+  required:
+  - target_ip
+  - action
+  properties:
+    target_ip:
+      type: string
+      description: FortiWeb management IP address
+      format: ipv4
+    action:
+      type: string
+      enum:
+      - create
+      - list
+      - delete
+      description: Action to perform on API admin accounts
+    admin_name:
+      type: string
+      description: Name for the API admin account (required for create/delete)
+    vdom:
+      type: string
+      default: root
+      description: VDOM scope for the API admin
+    accprofile:
+      type: string
+      default: prof_admin
+      description: Access profile to assign (prof_admin for full access)
+    timeout:
+      type: integer
+      default: 30
+      description: Request timeout in seconds
+    verify_ssl:
+      type: boolean
+      default: false
+      description: Verify SSL certificate
+output_schema:
+  type: object
+  properties:
+    success:
+      type: boolean
+      description: Whether the operation succeeded
+    target_ip:
+      type: string
+      description: Target FortiWeb IP address
+    action:
+      type: string
+      description: Action performed
+    api_key:
+      type: string
+      description: Generated API key (only on create action)
+    admin_name:
+      type: string
+      description: API admin account name
+    admins:
+      type: array
+      description: List of API admin accounts (only on list action)
+      items:
+        type: object
+        properties:
+          name:
+            type: string
+          vdom:
+            type: string
+          accprofile:
+            type: string
+    error:
+      type: string
+      description: Error message if success is false
+credentials:
+- ref: vault://fortiweb/admin
+  type: username_password
+  required: false
+  scope:
+  - read
+  - write
+  description: FortiWeb admin credentials for API admin management
+- ref: local://config/fortiweb_credentials.yaml
+  type: config_file
+  required: false
+  description: Local credential file (fallback when vault unavailable)
+capabilities:
+  network:
+    outbound:
+    - https:443
+    - https:8443
+    inbound: []
+  filesystem:
+    read:
+    - config/*.yaml
+    write: []
+  process:
+    spawn: false
+    elevated: false
+  max_execution_time_ms: 30000
+telemetry:
+  metrics_enabled: true
+  log_level: INFO
+  trace_enabled: false
+versioning:
+  breaking_change: false
+  supersedes: null
+security:
+  certified: false
+  certified_at: null
+  certified_by: null
+status: development
+skills_ref: Skills.md

@@ -1,0 +1,136 @@
+canonical_id: org.ulysses.noc.fortiweb-sqli-baseline/1.0.0
+name: FortiWeb SQLi Baseline
+version: 1.0.0
+description: >
+  Audit and enforce SQL Injection best-practice configuration on FortiWeb 8.0+.
+  Checks signature profiles, Syntax Based Detection (SBD), and protection
+  profile wiring against the 80/20 security baseline. Supports read-only
+  audit and optional apply to create a hardened configuration.
+metadata:
+  org_namespace: ulysses
+  domain: noc
+  intent: configure
+  vendor: fortinet
+  shelf: noc/fortiweb
+  tags:
+  - fortiweb
+  - sqli
+  - sql-injection
+  - waf
+  - baseline
+  - security
+  - signatures
+  - sbd
+runtime:
+  language: python
+  entry_point: main
+  source_file: org.ulysses.noc.fortiweb-sqli-baseline.py
+  python_packages:
+  - pyyaml>=6.0
+  dotnet_packages: []
+  files:
+  - config/fortiweb_credentials.yaml
+  services: []
+parameters:
+  type: object
+  required:
+  - target_ip
+  - action
+  properties:
+    target_ip:
+      type: string
+      description: FortiWeb management IP address
+      format: ipv4
+    action:
+      type: string
+      enum:
+      - audit
+      - apply
+      - status
+      description: >
+        audit: Read-only check against baseline (safe).
+        apply: Create best-practice sig+SBD profile and protection profile.
+        status: Quick summary of current SQLi posture.
+    profile_name:
+      type: string
+      default: Inline Standard Protection
+      description: Protection profile to audit (for audit/status actions)
+    bp_prefix:
+      type: string
+      default: BP
+      description: Prefix for best-practice objects created by apply action
+    timeout:
+      type: integer
+      default: 30
+      description: Request timeout in seconds
+    verify_ssl:
+      type: boolean
+      default: false
+      description: Verify SSL certificate
+output_schema:
+  type: object
+  properties:
+    success:
+      type: boolean
+    target_ip:
+      type: string
+    action:
+      type: string
+    score:
+      type: string
+      description: "Audit score (e.g., '8/10')"
+    findings:
+      type: array
+      items:
+        type: object
+        properties:
+          check:
+            type: integer
+          name:
+            type: string
+          status:
+            type: string
+            enum: [PASS, FAIL, WARN, N/A]
+          detail:
+            type: string
+    created_objects:
+      type: array
+      description: Objects created by apply action
+    error:
+      type: string
+credentials:
+- ref: vault://fortiweb/admin
+  type: username_password
+  required: false
+  scope:
+  - read
+  - write
+  description: FortiWeb admin credentials
+- ref: local://config/fortiweb_credentials.yaml
+  type: config_file
+  required: false
+  description: Local credential file (fallback)
+capabilities:
+  network:
+    outbound:
+    - https:443
+    inbound: []
+  filesystem:
+    read:
+    - config/*.yaml
+    write: []
+  process:
+    spawn: false
+    elevated: false
+  max_execution_time_ms: 60000
+telemetry:
+  metrics_enabled: true
+  log_level: INFO
+  trace_enabled: false
+versioning:
+  breaking_change: false
+  supersedes: null
+security:
+  certified: false
+status: development
+skills_ref: Skills.md

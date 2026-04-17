@@ -1,0 +1,56 @@
+canonical_id: org.ulysses.noc.fortiweb-ipintel-baseline/1.0.0
+name: FortiWeb IP Intelligence Baseline
+version: 1.0.0
+description: >
+  Audit and enforce IP Intelligence (FortiGuard IP reputation) on FortiWeb 8.0+.
+  Blocks known botnets, Tor exits, anonymous proxies, phishing hosts, spam
+  sources. Starts in monitor-first mode (alert only) then promotes to alert_deny
+  after 2-week observation window.
+metadata:
+  org_namespace: ulysses
+  domain: noc
+  intent: configure
+  vendor: fortinet
+  shelf: noc/fortiweb
+  tags: [fortiweb, ipintel, threat-intel, fortiguard, baseline, waf]
+runtime:
+  language: python
+  entry_point: main
+  source_file: org.ulysses.noc.fortiweb-ipintel-baseline.py
+  python_packages: [pyyaml>=6.0]
+  files: [config/fortiweb_credentials.yaml]
+parameters:
+  type: object
+  required: [target_ip, action]
+  properties:
+    target_ip: {type: string, format: ipv4}
+    action:
+      type: string
+      enum: [audit, apply-monitor, apply-block, status]
+      description: >
+        audit: Check IP Intelligence config.
+        apply-monitor: Enable at alert-only (safe for day one).
+        apply-block: Promote to alert_deny (after 2 weeks monitoring).
+        status: Quick posture summary.
+    profile_name: {type: string, default: Inline Standard Protection}
+    timeout: {type: integer, default: 30}
+    verify_ssl: {type: boolean, default: false}
+output_schema:
+  type: object
+  properties:
+    success: {type: boolean}
+    action: {type: string}
+    score: {type: string}
+    findings: {type: array}
+    error: {type: string}
+credentials:
+  - {ref: "vault://fortiweb/admin", type: username_password, required: false, scope: [read, write]}
+  - {ref: "local://config/fortiweb_credentials.yaml", type: config_file, required: false}
+capabilities:
+  network: {outbound: [https:443], inbound: []}
+  filesystem: {read: [config/*.yaml], write: []}
+  process: {spawn: false, elevated: false}
+  max_execution_time_ms: 60000
+security: {certified: false}
+status: development
+skills_ref: Skills.md

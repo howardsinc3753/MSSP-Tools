@@ -1,0 +1,999 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "termsOfService": "http:\/\/fortinet.com\/terms\/",
+        "version": "v2",
+        "contact": {
+            "url": "http:\/\/modskristensen.net",
+            "name": "FortiOS Web Application Team",
+            "email": "fosguiqateam@fortinet.com"
+        },
+        "description": "REST API for configuring FortiWEB objects and settings",
+        "title": "FortiWEB Monitor"
+    },
+    "basePath": "\/api\/v2.0\/",
+    "host": "172.16.177.65",
+    "schemes": [
+        "https"
+    ],
+    "consumes": [
+        "application\/x-www-form-urlencoded"
+    ],
+    "produces": [
+        "application\/json"
+    ],
+    "securityDefinitions": {
+        "APIKeyHeader": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    },
+    "security": [
+        {
+            "APIKeyHeader": []
+        }
+    ],
+    "tags": [
+        {
+            "name": "wvs\/wvspolicy"
+        },
+        {
+            "name": "wvs\/scannerintegration"
+        },
+        {
+            "name": "wvs\/wvspolicy.start"
+        },
+        {
+            "name": "wvs\/scanhistory.download"
+        },
+        {
+            "name": "wvs\/wvsplugins"
+        },
+        {
+            "name": "wvs\/wvspolicy.scansummary"
+        },
+        {
+            "name": "wvs\/scanhistory"
+        },
+        {
+            "name": "wvs\/scanhistory.detail"
+        }
+    ],
+    "paths": {
+        "\/wvs\/wvspolicy": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [],
+                "tags": [
+                    "wvs\/wvspolicy"
+                ]
+            }
+        },
+        "\/wvs\/scannerintegration": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "source": {
+                                            "type": "object",
+                                            "description": "source",
+                                            "properties": {
+                                                "buf": {
+                                                    "type": "object",
+                                                    "description": "buf",
+                                                    "properties": {
+                                                        "title": {
+                                                            "type": "string",
+                                                            "description": "title"
+                                                        },
+                                                        "data": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "_id": {
+                                                                        "type": "integer",
+                                                                        "description": " id"
+                                                                    },
+                                                                    "integrate_time": {
+                                                                        "type": "integer",
+                                                                        "description": "integrate time"
+                                                                    },
+                                                                    "formattedDate": {
+                                                                        "type": "string",
+                                                                        "description": "formattedDate"
+                                                                    },
+                                                                    "formattedTime": {
+                                                                        "type": "string",
+                                                                        "description": "formattedTime"
+                                                                    },
+                                                                    "name": {
+                                                                        "type": "string",
+                                                                        "description": "name"
+                                                                    },
+                                                                    "vuln_name": {
+                                                                        "type": "string",
+                                                                        "description": "vuln name"
+                                                                    },
+                                                                    "cve_id": {
+                                                                        "type": "string",
+                                                                        "description": "cve id"
+                                                                    },
+                                                                    "adom_name": {
+                                                                        "type": "string",
+                                                                        "description": "adom name"
+                                                                    },
+                                                                    "can_select": {
+                                                                        "type": "integer",
+                                                                        "description": "can select"
+                                                                    },
+                                                                    "scanner_type": {
+                                                                        "type": "string",
+                                                                        "description": "scanner type"
+                                                                    },
+                                                                    "displayed_scanner_type": {
+                                                                        "type": "string",
+                                                                        "description": "displayed scanner type"
+                                                                    },
+                                                                    "action": {
+                                                                        "type": "string",
+                                                                        "description": "action"
+                                                                    },
+                                                                    "rule_type": {
+                                                                        "type": "string",
+                                                                        "description": "rule type"
+                                                                    },
+                                                                    "rule_name": {
+                                                                        "type": "string",
+                                                                        "description": "rule name"
+                                                                    },
+                                                                    "profile_type": {
+                                                                        "type": "string",
+                                                                        "description": "profile type"
+                                                                    },
+                                                                    "profile_name": {
+                                                                        "type": "string",
+                                                                        "description": "profile name"
+                                                                    },
+                                                                    "severity": {
+                                                                        "type": "string",
+                                                                        "description": "severity"
+                                                                    },
+                                                                    "displayed_severity": {
+                                                                        "type": "string",
+                                                                        "description": "displayed severity"
+                                                                    },
+                                                                    "status": {
+                                                                        "type": "string",
+                                                                        "description": "status"
+                                                                    },
+                                                                    "affected_url": {
+                                                                        "type": "string",
+                                                                        "description": "affected url"
+                                                                    },
+                                                                    "affected_parameter": {
+                                                                        "type": "string",
+                                                                        "description": "affected parameter"
+                                                                    },
+                                                                    "vuln_description": {
+                                                                        "type": "string",
+                                                                        "description": "vuln description"
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "total_lines": {
+                                            "type": "integer",
+                                            "description": "total lines"
+                                        },
+                                        "total_sz": {
+                                            "type": "integer",
+                                            "description": "total sz"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "filters",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "filters"
+                    },
+                    {
+                        "name": "aggregate",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "aggregate"
+                    },
+                    {
+                        "name": "startline",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "startline"
+                    }
+                ],
+                "tags": [
+                    "wvs\/scannerintegration"
+                ]
+            },
+            "delete": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "affected": {
+                                            "type": "integer",
+                                            "description": "affected"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "ids",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "ids"
+                    },
+                    {
+                        "name": "action",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "action"
+                    },
+                    {
+                        "name": "delRule",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "delRule"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": []
+                        }
+                    }
+                ],
+                "tags": [
+                    "wvs\/scannerintegration"
+                ]
+            },
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "description": "status"
+                                        },
+                                        "check_name_status": {
+                                            "type": "integer",
+                                            "description": "check name status"
+                                        },
+                                        "count": {
+                                            "type": "integer",
+                                            "description": "count"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "action",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "action"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "autoGenerate": {
+                                    "type": "string",
+                                    "description": "autoGenerate"
+                                },
+                                "profileType": {
+                                    "type": "string",
+                                    "description": "profileType"
+                                },
+                                "mergetoRule": {
+                                    "type": "string",
+                                    "description": "mergetoRule"
+                                },
+                                "inlineRuleName": {
+                                    "type": "string",
+                                    "description": "inlineRuleName"
+                                },
+                                "offlineRuleName": {
+                                    "type": "string",
+                                    "description": "offlineRuleName"
+                                },
+                                "ruleName": {
+                                    "type": "string",
+                                    "description": "ruleName"
+                                },
+                                "adomName": {
+                                    "type": "string",
+                                    "description": "adomName"
+                                },
+                                "high": {
+                                    "type": "string",
+                                    "description": "high"
+                                },
+                                "medium": {
+                                    "type": "string",
+                                    "description": "medium"
+                                },
+                                "low": {
+                                    "type": "string",
+                                    "description": "low"
+                                },
+                                "scannerType": {
+                                    "type": "string",
+                                    "description": "scannerType"
+                                },
+                                "importMethod": {
+                                    "type": "string",
+                                    "description": "importMethod"
+                                },
+                                "fileName": {
+                                    "type": "string",
+                                    "description": "fileName"
+                                },
+                                "apiKey": {
+                                    "type": "string",
+                                    "description": "apiKey"
+                                },
+                                "applicationName": {
+                                    "type": "string",
+                                    "description": "applicationName"
+                                },
+                                "ids": {
+                                    "type": "string",
+                                    "description": "ids"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "wvs\/scannerintegration"
+                ]
+            }
+        },
+        "\/wvs\/wvspolicy.start": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "action": {
+                                            "type": "integer",
+                                            "description": "action"
+                                        },
+                                        "mkey": {
+                                            "type": "string",
+                                            "description": "mkey"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "mkey": {
+                                    "type": "string",
+                                    "description": "mkey"
+                                },
+                                "action": {
+                                    "type": "string",
+                                    "description": "action"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "wvs\/wvspolicy.start"
+                ]
+            }
+        },
+        "\/wvs\/scanhistory.download": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": []
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "policy_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy name"
+                    },
+                    {
+                        "name": "report",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "report"
+                    }
+                ],
+                "tags": [
+                    "wvs\/scanhistory.download"
+                ]
+            }
+        },
+        "\/wvs\/wvsplugins": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [],
+                "tags": [
+                    "wvs\/wvsplugins"
+                ]
+            }
+        },
+        "\/wvs\/wvspolicy.scansummary": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "target": {
+                                            "type": "string",
+                                            "description": "target"
+                                        },
+                                        "request_count": {
+                                            "type": "integer",
+                                            "description": "request count"
+                                        },
+                                        "request_per_minute": {
+                                            "type": "integer",
+                                            "description": "request per minute"
+                                        },
+                                        "total_alerts_found": {
+                                            "type": "integer",
+                                            "description": "total alerts found"
+                                        },
+                                        "alert_found": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "category": {
+                                                        "type": "string",
+                                                        "description": "category"
+                                                    },
+                                                    "category_cnt": {
+                                                        "type": "integer",
+                                                        "description": "category cnt"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "mkey"
+                    }
+                ],
+                "tags": [
+                    "wvs\/wvspolicy.scansummary"
+                ]
+            }
+        },
+        "\/wvs\/wvsprofile": [],
+        "\/wvs\/scanhistory": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "html": {
+                                                "type": "boolean",
+                                                "description": "html"
+                                            },
+                                            "xml": {
+                                                "type": "boolean",
+                                                "description": "xml"
+                                            },
+                                            "pdf": {
+                                                "type": "boolean",
+                                                "description": "pdf"
+                                            },
+                                            "_id": {
+                                                "type": "string",
+                                                "description": " id"
+                                            },
+                                            "id": {
+                                                "type": "integer",
+                                                "description": "id"
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "description": "name"
+                                            },
+                                            "target_name": {
+                                                "type": "string",
+                                                "description": "target name"
+                                            },
+                                            "request_count": {
+                                                "type": "string",
+                                                "description": "request count"
+                                            },
+                                            "req_per_minute": {
+                                                "type": "string",
+                                                "description": "req per minute"
+                                            },
+                                            "alertsFound": {
+                                                "type": "string",
+                                                "description": "alertsFound"
+                                            },
+                                            "scanTime": {
+                                                "type": "string",
+                                                "description": "scanTime"
+                                            },
+                                            "endTime": {
+                                                "type": "string",
+                                                "description": "endTime"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [],
+                "tags": [
+                    "wvs\/scanhistory"
+                ]
+            },
+            "delete": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "affected": {
+                                            "type": "integer",
+                                            "description": "affected"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "history_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "history name"
+                    }
+                ],
+                "tags": [
+                    "wvs\/scanhistory"
+                ]
+            }
+        },
+        "\/wvs\/scanhistory.detail": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": []
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "mkey"
+                    }
+                ],
+                "tags": [
+                    "wvs\/scanhistory.detail"
+                ]
+            }
+        }
+    }
+}

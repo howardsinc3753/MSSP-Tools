@@ -1,0 +1,2919 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "FortiWEB CMDB",
+        "description": "REST API for configuring FortiWEB objects and settings",
+        "version": "v2.0",
+        "termsOfService": "http:\/\/fortinet.com\/terms\/",
+        "contact": {
+            "name": "FortiWEB Team",
+            "email": "fosguiqateam@fortinet.com",
+            "url": "http:\/\/modskristensen.net"
+        }
+    },
+    "basePath": "\/api\/v2.0\/cmdb",
+    "host": "172.16.177.65",
+    "schemes": [
+        "https"
+    ],
+    "consumes": [
+        "application\/x-www-form-urlencoded"
+    ],
+    "produces": [
+        "application\/json"
+    ],
+    "securityDefinitions": {
+        "APIKeyHeader": {
+            "type": "apiKey",
+            "in": "header",
+            "name": "Authorization"
+        }
+    },
+    "security": [
+        {
+            "APIKeyHeader": []
+        }
+    ],
+    "tags": [
+        {
+            "name": "wvs\/limit",
+            "description": "wvs limit parameters"
+        },
+        {
+            "name": "wvs\/policy",
+            "description": "wvs policy"
+        },
+        {
+            "name": "wvs\/profile",
+            "description": "wvs profile"
+        },
+        {
+            "name": "wvs\/schedule",
+            "description": "wvs schedule"
+        },
+        {
+            "name": "wvs\/template",
+            "description": "wvs template"
+        }
+    ],
+    "paths": {
+        "\/wvs\/limit": {
+            "get": {
+                "tags": [
+                    "wvs\/limit"
+                ],
+                "summary": "Select all entries in a CLI table.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "single-report-size": {
+                                            "type": "integer",
+                                            "description": "single report size(1~5120M)",
+                                            "maximum": 5120,
+                                            "minimum": 1
+                                        },
+                                        "report-path-size": {
+                                            "type": "integer",
+                                            "description": "report path size(1024~51200M)",
+                                            "maximum": 51200,
+                                            "minimum": 1024
+                                        },
+                                        "scan-memory-usage": {
+                                            "type": "integer",
+                                            "description": "max scan memory usage(10~80 percent)",
+                                            "maximum": 80,
+                                            "minimum": 10
+                                        },
+                                        "request-interval": {
+                                            "type": "integer",
+                                            "description": "request interval(1~1000ms)",
+                                            "maximum": 1000,
+                                            "minimum": 1
+                                        },
+                                        "verbose-output": {
+                                            "type": "string",
+                                            "description": "scan log verbose output",
+                                            "enum": [
+                                                "enable",
+                                                "disable"
+                                            ]
+                                        },
+                                        "scan-cpu-usage": {
+                                            "type": "integer",
+                                            "description": "max scan cpu usage(10~80 percent)",
+                                            "maximum": 80,
+                                            "minimum": 10
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "wvs\/limit"
+                ],
+                "summary": "Update this specific resource.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "single-report-size": {
+                                            "type": "integer",
+                                            "description": "single report size(1~5120M)",
+                                            "maximum": 5120,
+                                            "minimum": 1
+                                        },
+                                        "report-path-size": {
+                                            "type": "integer",
+                                            "description": "report path size(1024~51200M)",
+                                            "maximum": 51200,
+                                            "minimum": 1024
+                                        },
+                                        "scan-memory-usage": {
+                                            "type": "integer",
+                                            "description": "max scan memory usage(10~80 percent)",
+                                            "maximum": 80,
+                                            "minimum": 10
+                                        },
+                                        "request-interval": {
+                                            "type": "integer",
+                                            "description": "request interval(1~1000ms)",
+                                            "maximum": 1000,
+                                            "minimum": 1
+                                        },
+                                        "verbose-output": {
+                                            "type": "string",
+                                            "description": "scan log verbose output",
+                                            "enum": [
+                                                "enable",
+                                                "disable"
+                                            ]
+                                        },
+                                        "scan-cpu-usage": {
+                                            "type": "integer",
+                                            "description": "max scan cpu usage(10~80 percent)",
+                                            "maximum": 80,
+                                            "minimum": 10
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "move_flag",
+                        "in": "query",
+                        "description": "If supported, a flag can be specified.\nWhen *move_flag* is set, extra parameters (*move_mkey*, *sub_mkey*) must be provided.\n__*Note:*__ If this parameter is provided when not supported, the action will be ignored and an \u201cinvalid request\u201d error will be returned.\n",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "before",
+                            "after"
+                        ]
+                    },
+                    {
+                        "name": "sub_mkey",
+                        "in": "query",
+                        "description": "specific resource to be moved",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "move_mkey",
+                        "in": "query",
+                        "description": "specific resource to be moved before or after",
+                        "required": false,
+                        "type": "string"
+                    }
+                ]
+            }
+        },
+        "\/wvs\/policy": {
+            "get": {
+                "tags": [
+                    "wvs\/policy"
+                ],
+                "summary": "Select all entries in a CLI table.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "description": "wvs policy name",
+                                            "maxLength": 63
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "description": "",
+                                            "enum": [
+                                                "runonce",
+                                                "schedule"
+                                            ]
+                                        },
+                                        "schedule": {
+                                            "type": "string",
+                                            "description": "schedule "
+                                        },
+                                        "report_format": {
+                                            "type": "string",
+                                            "description": "report format ",
+                                            "enum": [
+                                                "html",
+                                                "xml",
+                                                "pdf"
+                                            ]
+                                        },
+                                        "profile": {
+                                            "type": "string",
+                                            "description": "profile"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "description": "email "
+                                        },
+                                        "runtime": {
+                                            "type": "integer",
+                                            "description": "run time"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "wvs\/policy"
+                ],
+                "summary": "Create object(s) in this table.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "description": "wvs policy name",
+                                            "maxLength": 63
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "description": "",
+                                            "enum": [
+                                                "runonce",
+                                                "schedule"
+                                            ]
+                                        },
+                                        "schedule": {
+                                            "type": "string",
+                                            "description": "schedule "
+                                        },
+                                        "report_format": {
+                                            "type": "string",
+                                            "description": "report format ",
+                                            "enum": [
+                                                "html",
+                                                "xml",
+                                                "pdf"
+                                            ]
+                                        },
+                                        "profile": {
+                                            "type": "string",
+                                            "description": "profile"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "description": "email "
+                                        },
+                                        "runtime": {
+                                            "type": "integer",
+                                            "description": "run time"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "clone_mkey",
+                        "in": "query",
+                        "description": "Use *clone_mkey* to specify the ID for the new resource to be cloned. \nIf *clone_mkey* is set, *mkey* must be provided which is cloned from.\n",
+                        "required": false,
+                        "type": "string"
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "wvs\/policy"
+                ],
+                "summary": "Update this specific resource.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "description": "wvs policy name",
+                                            "maxLength": 63
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "description": "",
+                                            "enum": [
+                                                "runonce",
+                                                "schedule"
+                                            ]
+                                        },
+                                        "schedule": {
+                                            "type": "string",
+                                            "description": "schedule "
+                                        },
+                                        "report_format": {
+                                            "type": "string",
+                                            "description": "report format ",
+                                            "enum": [
+                                                "html",
+                                                "xml",
+                                                "pdf"
+                                            ]
+                                        },
+                                        "profile": {
+                                            "type": "string",
+                                            "description": "profile"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "description": "email "
+                                        },
+                                        "runtime": {
+                                            "type": "integer",
+                                            "description": "run time"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "move_flag",
+                        "in": "query",
+                        "description": "If supported, a flag can be specified.\nWhen *move_flag* is set, extra parameters (*move_mkey*, *sub_mkey*) must be provided.\n__*Note:*__ If this parameter is provided when not supported, the action will be ignored and an \u201cinvalid request\u201d error will be returned.\n",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "before",
+                            "after"
+                        ]
+                    },
+                    {
+                        "name": "sub_mkey",
+                        "in": "query",
+                        "description": "specific resource to be moved",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "move_mkey",
+                        "in": "query",
+                        "description": "specific resource to be moved before or after",
+                        "required": false,
+                        "type": "string"
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "wvs\/policy"
+                ],
+                "summary": "Delete this specific resource.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        },
+        "\/wvs\/profile": {
+            "get": {
+                "tags": [
+                    "wvs\/profile"
+                ],
+                "summary": "Select all entries in a CLI table.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "description": "wvs profile name",
+                                            "maxLength": 63
+                                        },
+                                        "scan-target": {
+                                            "type": "string",
+                                            "description": "scan target",
+                                            "maxLength": 4095
+                                        },
+                                        "scan-template": {
+                                            "type": "string",
+                                            "description": "scan template"
+                                        },
+                                        "request-timeout": {
+                                            "type": "integer",
+                                            "description": "request timeout (0~30 seconds)",
+                                            "maximum": 30,
+                                            "minimum": 0
+                                        },
+                                        "ignore-session-cookies": {
+                                            "type": "string",
+                                            "description": "ignore session cookies",
+                                            "enum": [
+                                                "enable",
+                                                "disable"
+                                            ]
+                                        },
+                                        "user-agent-type": {
+                                            "type": "string",
+                                            "description": "user agent type",
+                                            "enum": [
+                                                "custom",
+                                                "random"
+                                            ]
+                                        },
+                                        "custom-user-agent": {
+                                            "type": "string",
+                                            "description": "custom user agent",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header0": {
+                                            "type": "string",
+                                            "description": "custom header0",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header1": {
+                                            "type": "string",
+                                            "description": "custom header1",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header2": {
+                                            "type": "string",
+                                            "description": "custom header2",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header3": {
+                                            "type": "string",
+                                            "description": "custom header3",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header4": {
+                                            "type": "string",
+                                            "description": "custom header4",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header5": {
+                                            "type": "string",
+                                            "description": "custom header5",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header6": {
+                                            "type": "string",
+                                            "description": "custom header6",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header7": {
+                                            "type": "string",
+                                            "description": "custom header7",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header8": {
+                                            "type": "string",
+                                            "description": "custom header8",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header9": {
+                                            "type": "string",
+                                            "description": "custom header9",
+                                            "maxLength": 4095
+                                        },
+                                        "sub-path-limit": {
+                                            "type": "integer",
+                                            "description": "sub path limit <1~200>",
+                                            "maximum": 200,
+                                            "minimum": 1
+                                        },
+                                        "max-scan-time": {
+                                            "type": "integer",
+                                            "description": "max scan time (1~480 minutes)",
+                                            "maximum": 480,
+                                            "minimum": 1
+                                        },
+                                        "max-crawl-time": {
+                                            "type": "integer",
+                                            "description": "max crawl time (1~240 minutes)",
+                                            "maximum": 240,
+                                            "minimum": 1
+                                        },
+                                        "max-params-limit": {
+                                            "type": "integer",
+                                            "description": "max params limit <1~100>",
+                                            "maximum": 100,
+                                            "minimum": 1
+                                        },
+                                        "max-file-size": {
+                                            "type": "integer",
+                                            "description": "max file size <1~40000000>",
+                                            "maximum": 40000000,
+                                            "minimum": 1
+                                        },
+                                        "max-http-retries": {
+                                            "type": "integer",
+                                            "description": "max http retries <1~10>",
+                                            "maximum": 10,
+                                            "minimum": 1
+                                        },
+                                        "specify-urls-for-scanning": {
+                                            "type": "string",
+                                            "description": "specify urls for scanning",
+                                            "enum": [
+                                                "enable",
+                                                "disable"
+                                            ]
+                                        },
+                                        "follow-regex": {
+                                            "type": "string",
+                                            "description": "follow regex",
+                                            "maxLength": 4095
+                                        },
+                                        "ignore-regex": {
+                                            "type": "string",
+                                            "description": "ignore regex",
+                                            "maxLength": 4095
+                                        },
+                                        "http-basic-authentication": {
+                                            "type": "string",
+                                            "description": "http basic authentication",
+                                            "enum": [
+                                                "enable",
+                                                "disable"
+                                            ]
+                                        },
+                                        "basic-username": {
+                                            "type": "string",
+                                            "description": "basic username",
+                                            "maxLength": 63
+                                        },
+                                        "basic-password": {
+                                            "type": "string",
+                                            "format": "password",
+                                            "description": "basic password"
+                                        },
+                                        "form-based-authentication": {
+                                            "type": "string",
+                                            "description": "form based authentication",
+                                            "enum": [
+                                                "enable",
+                                                "disable"
+                                            ]
+                                        },
+                                        "form-based-username": {
+                                            "type": "string",
+                                            "description": "form based username",
+                                            "maxLength": 63
+                                        },
+                                        "form-based-password": {
+                                            "type": "string",
+                                            "format": "password",
+                                            "description": "form based password"
+                                        },
+                                        "form-based-auth-url": {
+                                            "type": "string",
+                                            "description": "form based authentication url",
+                                            "maxLength": 4095
+                                        },
+                                        "username-field": {
+                                            "type": "string",
+                                            "description": "username field",
+                                            "maxLength": 63
+                                        },
+                                        "password-field": {
+                                            "type": "string",
+                                            "description": "password field",
+                                            "maxLength": 63
+                                        },
+                                        "cookie-jar-file": {
+                                            "type": "string",
+                                            "description": "cookie jar file",
+                                            "maxLength": 63
+                                        },
+                                        "session-check-url": {
+                                            "type": "string",
+                                            "description": "session check url",
+                                            "maxLength": 4095
+                                        },
+                                        "session-check-string": {
+                                            "type": "string",
+                                            "description": "session check string",
+                                            "maxLength": 1023
+                                        },
+                                        "data-format": {
+                                            "type": "string",
+                                            "description": "data format",
+                                            "maxLength": 1023
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "wvs\/profile"
+                ],
+                "summary": "Create object(s) in this table.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "description": "wvs profile name",
+                                            "maxLength": 63
+                                        },
+                                        "scan-target": {
+                                            "type": "string",
+                                            "description": "scan target",
+                                            "maxLength": 4095
+                                        },
+                                        "scan-template": {
+                                            "type": "string",
+                                            "description": "scan template"
+                                        },
+                                        "request-timeout": {
+                                            "type": "integer",
+                                            "description": "request timeout (0~30 seconds)",
+                                            "maximum": 30,
+                                            "minimum": 0
+                                        },
+                                        "ignore-session-cookies": {
+                                            "type": "string",
+                                            "description": "ignore session cookies",
+                                            "enum": [
+                                                "enable",
+                                                "disable"
+                                            ]
+                                        },
+                                        "user-agent-type": {
+                                            "type": "string",
+                                            "description": "user agent type",
+                                            "enum": [
+                                                "custom",
+                                                "random"
+                                            ]
+                                        },
+                                        "custom-user-agent": {
+                                            "type": "string",
+                                            "description": "custom user agent",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header0": {
+                                            "type": "string",
+                                            "description": "custom header0",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header1": {
+                                            "type": "string",
+                                            "description": "custom header1",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header2": {
+                                            "type": "string",
+                                            "description": "custom header2",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header3": {
+                                            "type": "string",
+                                            "description": "custom header3",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header4": {
+                                            "type": "string",
+                                            "description": "custom header4",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header5": {
+                                            "type": "string",
+                                            "description": "custom header5",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header6": {
+                                            "type": "string",
+                                            "description": "custom header6",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header7": {
+                                            "type": "string",
+                                            "description": "custom header7",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header8": {
+                                            "type": "string",
+                                            "description": "custom header8",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header9": {
+                                            "type": "string",
+                                            "description": "custom header9",
+                                            "maxLength": 4095
+                                        },
+                                        "sub-path-limit": {
+                                            "type": "integer",
+                                            "description": "sub path limit <1~200>",
+                                            "maximum": 200,
+                                            "minimum": 1
+                                        },
+                                        "max-scan-time": {
+                                            "type": "integer",
+                                            "description": "max scan time (1~480 minutes)",
+                                            "maximum": 480,
+                                            "minimum": 1
+                                        },
+                                        "max-crawl-time": {
+                                            "type": "integer",
+                                            "description": "max crawl time (1~240 minutes)",
+                                            "maximum": 240,
+                                            "minimum": 1
+                                        },
+                                        "max-params-limit": {
+                                            "type": "integer",
+                                            "description": "max params limit <1~100>",
+                                            "maximum": 100,
+                                            "minimum": 1
+                                        },
+                                        "max-file-size": {
+                                            "type": "integer",
+                                            "description": "max file size <1~40000000>",
+                                            "maximum": 40000000,
+                                            "minimum": 1
+                                        },
+                                        "max-http-retries": {
+                                            "type": "integer",
+                                            "description": "max http retries <1~10>",
+                                            "maximum": 10,
+                                            "minimum": 1
+                                        },
+                                        "specify-urls-for-scanning": {
+                                            "type": "string",
+                                            "description": "specify urls for scanning",
+                                            "enum": [
+                                                "enable",
+                                                "disable"
+                                            ]
+                                        },
+                                        "follow-regex": {
+                                            "type": "string",
+                                            "description": "follow regex",
+                                            "maxLength": 4095
+                                        },
+                                        "ignore-regex": {
+                                            "type": "string",
+                                            "description": "ignore regex",
+                                            "maxLength": 4095
+                                        },
+                                        "http-basic-authentication": {
+                                            "type": "string",
+                                            "description": "http basic authentication",
+                                            "enum": [
+                                                "enable",
+                                                "disable"
+                                            ]
+                                        },
+                                        "basic-username": {
+                                            "type": "string",
+                                            "description": "basic username",
+                                            "maxLength": 63
+                                        },
+                                        "basic-password": {
+                                            "type": "string",
+                                            "format": "password",
+                                            "description": "basic password"
+                                        },
+                                        "form-based-authentication": {
+                                            "type": "string",
+                                            "description": "form based authentication",
+                                            "enum": [
+                                                "enable",
+                                                "disable"
+                                            ]
+                                        },
+                                        "form-based-username": {
+                                            "type": "string",
+                                            "description": "form based username",
+                                            "maxLength": 63
+                                        },
+                                        "form-based-password": {
+                                            "type": "string",
+                                            "format": "password",
+                                            "description": "form based password"
+                                        },
+                                        "form-based-auth-url": {
+                                            "type": "string",
+                                            "description": "form based authentication url",
+                                            "maxLength": 4095
+                                        },
+                                        "username-field": {
+                                            "type": "string",
+                                            "description": "username field",
+                                            "maxLength": 63
+                                        },
+                                        "password-field": {
+                                            "type": "string",
+                                            "description": "password field",
+                                            "maxLength": 63
+                                        },
+                                        "cookie-jar-file": {
+                                            "type": "string",
+                                            "description": "cookie jar file",
+                                            "maxLength": 63
+                                        },
+                                        "session-check-url": {
+                                            "type": "string",
+                                            "description": "session check url",
+                                            "maxLength": 4095
+                                        },
+                                        "session-check-string": {
+                                            "type": "string",
+                                            "description": "session check string",
+                                            "maxLength": 1023
+                                        },
+                                        "data-format": {
+                                            "type": "string",
+                                            "description": "data format",
+                                            "maxLength": 1023
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "clone_mkey",
+                        "in": "query",
+                        "description": "Use *clone_mkey* to specify the ID for the new resource to be cloned. \nIf *clone_mkey* is set, *mkey* must be provided which is cloned from.\n",
+                        "required": false,
+                        "type": "string"
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "wvs\/profile"
+                ],
+                "summary": "Update this specific resource.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "description": "wvs profile name",
+                                            "maxLength": 63
+                                        },
+                                        "scan-target": {
+                                            "type": "string",
+                                            "description": "scan target",
+                                            "maxLength": 4095
+                                        },
+                                        "scan-template": {
+                                            "type": "string",
+                                            "description": "scan template"
+                                        },
+                                        "request-timeout": {
+                                            "type": "integer",
+                                            "description": "request timeout (0~30 seconds)",
+                                            "maximum": 30,
+                                            "minimum": 0
+                                        },
+                                        "ignore-session-cookies": {
+                                            "type": "string",
+                                            "description": "ignore session cookies",
+                                            "enum": [
+                                                "enable",
+                                                "disable"
+                                            ]
+                                        },
+                                        "user-agent-type": {
+                                            "type": "string",
+                                            "description": "user agent type",
+                                            "enum": [
+                                                "custom",
+                                                "random"
+                                            ]
+                                        },
+                                        "custom-user-agent": {
+                                            "type": "string",
+                                            "description": "custom user agent",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header0": {
+                                            "type": "string",
+                                            "description": "custom header0",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header1": {
+                                            "type": "string",
+                                            "description": "custom header1",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header2": {
+                                            "type": "string",
+                                            "description": "custom header2",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header3": {
+                                            "type": "string",
+                                            "description": "custom header3",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header4": {
+                                            "type": "string",
+                                            "description": "custom header4",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header5": {
+                                            "type": "string",
+                                            "description": "custom header5",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header6": {
+                                            "type": "string",
+                                            "description": "custom header6",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header7": {
+                                            "type": "string",
+                                            "description": "custom header7",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header8": {
+                                            "type": "string",
+                                            "description": "custom header8",
+                                            "maxLength": 4095
+                                        },
+                                        "custom-header9": {
+                                            "type": "string",
+                                            "description": "custom header9",
+                                            "maxLength": 4095
+                                        },
+                                        "sub-path-limit": {
+                                            "type": "integer",
+                                            "description": "sub path limit <1~200>",
+                                            "maximum": 200,
+                                            "minimum": 1
+                                        },
+                                        "max-scan-time": {
+                                            "type": "integer",
+                                            "description": "max scan time (1~480 minutes)",
+                                            "maximum": 480,
+                                            "minimum": 1
+                                        },
+                                        "max-crawl-time": {
+                                            "type": "integer",
+                                            "description": "max crawl time (1~240 minutes)",
+                                            "maximum": 240,
+                                            "minimum": 1
+                                        },
+                                        "max-params-limit": {
+                                            "type": "integer",
+                                            "description": "max params limit <1~100>",
+                                            "maximum": 100,
+                                            "minimum": 1
+                                        },
+                                        "max-file-size": {
+                                            "type": "integer",
+                                            "description": "max file size <1~40000000>",
+                                            "maximum": 40000000,
+                                            "minimum": 1
+                                        },
+                                        "max-http-retries": {
+                                            "type": "integer",
+                                            "description": "max http retries <1~10>",
+                                            "maximum": 10,
+                                            "minimum": 1
+                                        },
+                                        "specify-urls-for-scanning": {
+                                            "type": "string",
+                                            "description": "specify urls for scanning",
+                                            "enum": [
+                                                "enable",
+                                                "disable"
+                                            ]
+                                        },
+                                        "follow-regex": {
+                                            "type": "string",
+                                            "description": "follow regex",
+                                            "maxLength": 4095
+                                        },
+                                        "ignore-regex": {
+                                            "type": "string",
+                                            "description": "ignore regex",
+                                            "maxLength": 4095
+                                        },
+                                        "http-basic-authentication": {
+                                            "type": "string",
+                                            "description": "http basic authentication",
+                                            "enum": [
+                                                "enable",
+                                                "disable"
+                                            ]
+                                        },
+                                        "basic-username": {
+                                            "type": "string",
+                                            "description": "basic username",
+                                            "maxLength": 63
+                                        },
+                                        "basic-password": {
+                                            "type": "string",
+                                            "format": "password",
+                                            "description": "basic password"
+                                        },
+                                        "form-based-authentication": {
+                                            "type": "string",
+                                            "description": "form based authentication",
+                                            "enum": [
+                                                "enable",
+                                                "disable"
+                                            ]
+                                        },
+                                        "form-based-username": {
+                                            "type": "string",
+                                            "description": "form based username",
+                                            "maxLength": 63
+                                        },
+                                        "form-based-password": {
+                                            "type": "string",
+                                            "format": "password",
+                                            "description": "form based password"
+                                        },
+                                        "form-based-auth-url": {
+                                            "type": "string",
+                                            "description": "form based authentication url",
+                                            "maxLength": 4095
+                                        },
+                                        "username-field": {
+                                            "type": "string",
+                                            "description": "username field",
+                                            "maxLength": 63
+                                        },
+                                        "password-field": {
+                                            "type": "string",
+                                            "description": "password field",
+                                            "maxLength": 63
+                                        },
+                                        "cookie-jar-file": {
+                                            "type": "string",
+                                            "description": "cookie jar file",
+                                            "maxLength": 63
+                                        },
+                                        "session-check-url": {
+                                            "type": "string",
+                                            "description": "session check url",
+                                            "maxLength": 4095
+                                        },
+                                        "session-check-string": {
+                                            "type": "string",
+                                            "description": "session check string",
+                                            "maxLength": 1023
+                                        },
+                                        "data-format": {
+                                            "type": "string",
+                                            "description": "data format",
+                                            "maxLength": 1023
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "move_flag",
+                        "in": "query",
+                        "description": "If supported, a flag can be specified.\nWhen *move_flag* is set, extra parameters (*move_mkey*, *sub_mkey*) must be provided.\n__*Note:*__ If this parameter is provided when not supported, the action will be ignored and an \u201cinvalid request\u201d error will be returned.\n",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "before",
+                            "after"
+                        ]
+                    },
+                    {
+                        "name": "sub_mkey",
+                        "in": "query",
+                        "description": "specific resource to be moved",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "move_mkey",
+                        "in": "query",
+                        "description": "specific resource to be moved before or after",
+                        "required": false,
+                        "type": "string"
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "wvs\/profile"
+                ],
+                "summary": "Delete this specific resource.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        },
+        "\/wvs\/schedule": {
+            "get": {
+                "tags": [
+                    "wvs\/schedule"
+                ],
+                "summary": "Select all entries in a CLI table.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "description": "wvs schedule name",
+                                            "maxLength": 63
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "description": "schedule type",
+                                            "enum": [
+                                                "onetime",
+                                                "recurring"
+                                            ]
+                                        },
+                                        "date": {
+                                            "type": "string",
+                                            "description": "time and date"
+                                        },
+                                        "time": {
+                                            "type": "string",
+                                            "description": "configure schedule time"
+                                        },
+                                        "wday": {
+                                            "type": "string",
+                                            "description": "weekday",
+                                            "enum": [
+                                                "Sunday",
+                                                "Monday",
+                                                "Tuesday",
+                                                "Wednesday",
+                                                "Thursday",
+                                                "Friday",
+                                                "Saturday"
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "wvs\/schedule"
+                ],
+                "summary": "Create object(s) in this table.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "description": "wvs schedule name",
+                                            "maxLength": 63
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "description": "schedule type",
+                                            "enum": [
+                                                "onetime",
+                                                "recurring"
+                                            ]
+                                        },
+                                        "date": {
+                                            "type": "string",
+                                            "description": "time and date"
+                                        },
+                                        "time": {
+                                            "type": "string",
+                                            "description": "configure schedule time"
+                                        },
+                                        "wday": {
+                                            "type": "string",
+                                            "description": "weekday",
+                                            "enum": [
+                                                "Sunday",
+                                                "Monday",
+                                                "Tuesday",
+                                                "Wednesday",
+                                                "Thursday",
+                                                "Friday",
+                                                "Saturday"
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "clone_mkey",
+                        "in": "query",
+                        "description": "Use *clone_mkey* to specify the ID for the new resource to be cloned. \nIf *clone_mkey* is set, *mkey* must be provided which is cloned from.\n",
+                        "required": false,
+                        "type": "string"
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "wvs\/schedule"
+                ],
+                "summary": "Update this specific resource.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "description": "wvs schedule name",
+                                            "maxLength": 63
+                                        },
+                                        "type": {
+                                            "type": "string",
+                                            "description": "schedule type",
+                                            "enum": [
+                                                "onetime",
+                                                "recurring"
+                                            ]
+                                        },
+                                        "date": {
+                                            "type": "string",
+                                            "description": "time and date"
+                                        },
+                                        "time": {
+                                            "type": "string",
+                                            "description": "configure schedule time"
+                                        },
+                                        "wday": {
+                                            "type": "string",
+                                            "description": "weekday",
+                                            "enum": [
+                                                "Sunday",
+                                                "Monday",
+                                                "Tuesday",
+                                                "Wednesday",
+                                                "Thursday",
+                                                "Friday",
+                                                "Saturday"
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "move_flag",
+                        "in": "query",
+                        "description": "If supported, a flag can be specified.\nWhen *move_flag* is set, extra parameters (*move_mkey*, *sub_mkey*) must be provided.\n__*Note:*__ If this parameter is provided when not supported, the action will be ignored and an \u201cinvalid request\u201d error will be returned.\n",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "before",
+                            "after"
+                        ]
+                    },
+                    {
+                        "name": "sub_mkey",
+                        "in": "query",
+                        "description": "specific resource to be moved",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "move_mkey",
+                        "in": "query",
+                        "description": "specific resource to be moved before or after",
+                        "required": false,
+                        "type": "string"
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "wvs\/schedule"
+                ],
+                "summary": "Delete this specific resource.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        },
+        "\/wvs\/template": {
+            "get": {
+                "tags": [
+                    "wvs\/template"
+                ],
+                "summary": "Select all entries in a CLI table.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "description": "wvs template name",
+                                            "maxLength": 63
+                                        },
+                                        "audit": {
+                                            "type": "string",
+                                            "description": "audit plugin",
+                                            "enum": [
+                                                "BLIND_SQLI",
+                                                "BUFFER_OVERFLOW",
+                                                "CORS_ORIGIN",
+                                                "CSRF",
+                                                "DAV",
+                                                "DESERIALIZATION",
+                                                "EVAL",
+                                                "FILE_UPLOAD",
+                                                "FORMAT_STRING",
+                                                "FRONTPAGE",
+                                                "GENERIC",
+                                                "GLOBAL_REDIRECT",
+                                                "HTACCESS_METHODS",
+                                                "LDAPI",
+                                                "LFI",
+                                                "MEMCACHEI",
+                                                "MX_INJECTION",
+                                                "OS_COMMANDING",
+                                                "PHISHING_VECTOR",
+                                                "PREG_REPLACE",
+                                                "REDOS",
+                                                "RESPONSE_SPLITTING",
+                                                "RFD",
+                                                "RFI",
+                                                "ROSETTA_FLASH",
+                                                "SHELL_SHOCK",
+                                                "SQLI",
+                                                "SSI",
+                                                "SSL_CERTIFICATE",
+                                                "UN_SSL",
+                                                "WEBSOCKET_HIJACKING",
+                                                "XPATH",
+                                                "XSS",
+                                                "XST",
+                                                "XXE"
+                                            ]
+                                        },
+                                        "bruteforce": {
+                                            "type": "string",
+                                            "description": "bruteforce plugins",
+                                            "enum": [
+                                                "BASIC_AUTH",
+                                                "FORM_AUTH"
+                                            ]
+                                        },
+                                        "crawl": {
+                                            "type": "string",
+                                            "description": "crawl plugins",
+                                            "enum": [
+                                                "ARCHIVE_DOT_ORG",
+                                                "BING_SPIDER",
+                                                "CONTENT_NEGOTIATION",
+                                                "DIGIT_SUM",
+                                                "DIR_FILE_BRUTER",
+                                                "DOT_DS_STORE",
+                                                "DOT_LISTING",
+                                                "DWSYNC_XML",
+                                                "FIND_BACKDOORS",
+                                                "FIND_CAPTCHAS",
+                                                "FIND_DVCS",
+                                                "GENEXUS_XML",
+                                                "GHDB",
+                                                "GOOGLE_SPIDER",
+                                                "ORACLE_DISCOVERY",
+                                                "PHISHTANK",
+                                                "PHPINFO",
+                                                "PYKTO",
+                                                "RIA_ENUMERATOR",
+                                                "ROBOTS_TXT",
+                                                "SITEMAP_XML",
+                                                "SPIDER_MAN",
+                                                "URL_FUZZER",
+                                                "URLLIST_TXT",
+                                                "USER_DIR",
+                                                "WEB_SPIDER",
+                                                "WORDNET",
+                                                "WORDPRESS_ENUMERATE_USERS",
+                                                "WORDPRESS_FINGERPRINT",
+                                                "WORDPRESS_FULLPATHDISCLOSURE",
+                                                "WSDL_FINDER"
+                                            ]
+                                        },
+                                        "grep": {
+                                            "type": "string",
+                                            "description": "grep plugins",
+                                            "enum": [
+                                                "ANALYZE_COOKIES",
+                                                "BLANK_BODY",
+                                                "CACHE_CONTROL",
+                                                "CLAMAV",
+                                                "CLICK_JACKING",
+                                                "CODE_DISCLOSURE",
+                                                "CONTENT_SNIFFING",
+                                                "CREDIT_CARDS",
+                                                "CROSS_DOMAIN_JS",
+                                                "CSP",
+                                                "DIRECTORY_INDEXING",
+                                                "DOM_XSS",
+                                                "DOT_NET_EVENT_VALIDATION",
+                                                "ERROR_500",
+                                                "ERROR_PAGES",
+                                                "FEEDS",
+                                                "FILE_UPLOAD",
+                                                "FORM_AUTOCOMPLETE",
+                                                "FORM_CLEARTEXT_PASSWORD",
+                                                "GET_EMAILS",
+                                                "HASH_ANALYSIS",
+                                                "HTML_COMMENTS",
+                                                "HTTP_AUTH_DETECT",
+                                                "HTTP_IN_BODY",
+                                                "LANG",
+                                                "META_TAGS",
+                                                "MOTW",
+                                                "OBJECTS",
+                                                "ORACLE",
+                                                "PASSWORD_PROFILING",
+                                                "PATH_DISCLOSURE",
+                                                "PRIVATE_IP",
+                                                "RETIREJS",
+                                                "SERIALIZED_OBJECT",
+                                                "SSN",
+                                                "STRANGE_HEADERS",
+                                                "STRANGE_HTTP_CODES",
+                                                "STRANGE_PARAMETERS",
+                                                "STRANGE_REASON",
+                                                "STRICT_TRANSPORT_SECURITY",
+                                                "SVN_USERS",
+                                                "SYMFONY",
+                                                "URL_SESSION",
+                                                "WEBSOCKETS_LINKS",
+                                                "WSDL_GREPER",
+                                                "XSS_PROTECTION_HEADER"
+                                            ]
+                                        },
+                                        "infrastructure": {
+                                            "type": "string",
+                                            "description": "infrastructure plugins",
+                                            "enum": [
+                                                "AFD",
+                                                "ALLOWED_METHODS",
+                                                "DETECT_REVERSE_PROXY",
+                                                "DETECT_TRANSPARENT_PROXY",
+                                                "DNS_WILDCARD",
+                                                "DOMAIN_DOT",
+                                                "DOT_NET_ERRORS",
+                                                "FAVICON_IDENTIFICATION",
+                                                "FIND_JBOSS",
+                                                "FIND_VHOSTS",
+                                                "FINGER_BING",
+                                                "FINGER_GOOGLE",
+                                                "FINGER_PKS",
+                                                "FINGERPRINT_WAF",
+                                                "FINGERPRINT_OS",
+                                                "FRONTPAGE_VERSION",
+                                                "HALBERD",
+                                                "HMAP",
+                                                "HTTP_VS_HTTPS_DIST",
+                                                "JETLEAK",
+                                                "MS15_034",
+                                                "PHP_EGGS",
+                                                "SERVER_HEADER",
+                                                "SERVER_STATUS",
+                                                "SHARED_HOSTING",
+                                                "WERKZEUG_DEBUGGER",
+                                                "XSSED_DOT_COM",
+                                                "ZONE_H"
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "wvs\/template"
+                ],
+                "summary": "Create object(s) in this table.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "description": "wvs template name",
+                                            "maxLength": 63
+                                        },
+                                        "audit": {
+                                            "type": "string",
+                                            "description": "audit plugin",
+                                            "enum": [
+                                                "BLIND_SQLI",
+                                                "BUFFER_OVERFLOW",
+                                                "CORS_ORIGIN",
+                                                "CSRF",
+                                                "DAV",
+                                                "DESERIALIZATION",
+                                                "EVAL",
+                                                "FILE_UPLOAD",
+                                                "FORMAT_STRING",
+                                                "FRONTPAGE",
+                                                "GENERIC",
+                                                "GLOBAL_REDIRECT",
+                                                "HTACCESS_METHODS",
+                                                "LDAPI",
+                                                "LFI",
+                                                "MEMCACHEI",
+                                                "MX_INJECTION",
+                                                "OS_COMMANDING",
+                                                "PHISHING_VECTOR",
+                                                "PREG_REPLACE",
+                                                "REDOS",
+                                                "RESPONSE_SPLITTING",
+                                                "RFD",
+                                                "RFI",
+                                                "ROSETTA_FLASH",
+                                                "SHELL_SHOCK",
+                                                "SQLI",
+                                                "SSI",
+                                                "SSL_CERTIFICATE",
+                                                "UN_SSL",
+                                                "WEBSOCKET_HIJACKING",
+                                                "XPATH",
+                                                "XSS",
+                                                "XST",
+                                                "XXE"
+                                            ]
+                                        },
+                                        "bruteforce": {
+                                            "type": "string",
+                                            "description": "bruteforce plugins",
+                                            "enum": [
+                                                "BASIC_AUTH",
+                                                "FORM_AUTH"
+                                            ]
+                                        },
+                                        "crawl": {
+                                            "type": "string",
+                                            "description": "crawl plugins",
+                                            "enum": [
+                                                "ARCHIVE_DOT_ORG",
+                                                "BING_SPIDER",
+                                                "CONTENT_NEGOTIATION",
+                                                "DIGIT_SUM",
+                                                "DIR_FILE_BRUTER",
+                                                "DOT_DS_STORE",
+                                                "DOT_LISTING",
+                                                "DWSYNC_XML",
+                                                "FIND_BACKDOORS",
+                                                "FIND_CAPTCHAS",
+                                                "FIND_DVCS",
+                                                "GENEXUS_XML",
+                                                "GHDB",
+                                                "GOOGLE_SPIDER",
+                                                "ORACLE_DISCOVERY",
+                                                "PHISHTANK",
+                                                "PHPINFO",
+                                                "PYKTO",
+                                                "RIA_ENUMERATOR",
+                                                "ROBOTS_TXT",
+                                                "SITEMAP_XML",
+                                                "SPIDER_MAN",
+                                                "URL_FUZZER",
+                                                "URLLIST_TXT",
+                                                "USER_DIR",
+                                                "WEB_SPIDER",
+                                                "WORDNET",
+                                                "WORDPRESS_ENUMERATE_USERS",
+                                                "WORDPRESS_FINGERPRINT",
+                                                "WORDPRESS_FULLPATHDISCLOSURE",
+                                                "WSDL_FINDER"
+                                            ]
+                                        },
+                                        "grep": {
+                                            "type": "string",
+                                            "description": "grep plugins",
+                                            "enum": [
+                                                "ANALYZE_COOKIES",
+                                                "BLANK_BODY",
+                                                "CACHE_CONTROL",
+                                                "CLAMAV",
+                                                "CLICK_JACKING",
+                                                "CODE_DISCLOSURE",
+                                                "CONTENT_SNIFFING",
+                                                "CREDIT_CARDS",
+                                                "CROSS_DOMAIN_JS",
+                                                "CSP",
+                                                "DIRECTORY_INDEXING",
+                                                "DOM_XSS",
+                                                "DOT_NET_EVENT_VALIDATION",
+                                                "ERROR_500",
+                                                "ERROR_PAGES",
+                                                "FEEDS",
+                                                "FILE_UPLOAD",
+                                                "FORM_AUTOCOMPLETE",
+                                                "FORM_CLEARTEXT_PASSWORD",
+                                                "GET_EMAILS",
+                                                "HASH_ANALYSIS",
+                                                "HTML_COMMENTS",
+                                                "HTTP_AUTH_DETECT",
+                                                "HTTP_IN_BODY",
+                                                "LANG",
+                                                "META_TAGS",
+                                                "MOTW",
+                                                "OBJECTS",
+                                                "ORACLE",
+                                                "PASSWORD_PROFILING",
+                                                "PATH_DISCLOSURE",
+                                                "PRIVATE_IP",
+                                                "RETIREJS",
+                                                "SERIALIZED_OBJECT",
+                                                "SSN",
+                                                "STRANGE_HEADERS",
+                                                "STRANGE_HTTP_CODES",
+                                                "STRANGE_PARAMETERS",
+                                                "STRANGE_REASON",
+                                                "STRICT_TRANSPORT_SECURITY",
+                                                "SVN_USERS",
+                                                "SYMFONY",
+                                                "URL_SESSION",
+                                                "WEBSOCKETS_LINKS",
+                                                "WSDL_GREPER",
+                                                "XSS_PROTECTION_HEADER"
+                                            ]
+                                        },
+                                        "infrastructure": {
+                                            "type": "string",
+                                            "description": "infrastructure plugins",
+                                            "enum": [
+                                                "AFD",
+                                                "ALLOWED_METHODS",
+                                                "DETECT_REVERSE_PROXY",
+                                                "DETECT_TRANSPARENT_PROXY",
+                                                "DNS_WILDCARD",
+                                                "DOMAIN_DOT",
+                                                "DOT_NET_ERRORS",
+                                                "FAVICON_IDENTIFICATION",
+                                                "FIND_JBOSS",
+                                                "FIND_VHOSTS",
+                                                "FINGER_BING",
+                                                "FINGER_GOOGLE",
+                                                "FINGER_PKS",
+                                                "FINGERPRINT_WAF",
+                                                "FINGERPRINT_OS",
+                                                "FRONTPAGE_VERSION",
+                                                "HALBERD",
+                                                "HMAP",
+                                                "HTTP_VS_HTTPS_DIST",
+                                                "JETLEAK",
+                                                "MS15_034",
+                                                "PHP_EGGS",
+                                                "SERVER_HEADER",
+                                                "SERVER_STATUS",
+                                                "SHARED_HOSTING",
+                                                "WERKZEUG_DEBUGGER",
+                                                "XSSED_DOT_COM",
+                                                "ZONE_H"
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "clone_mkey",
+                        "in": "query",
+                        "description": "Use *clone_mkey* to specify the ID for the new resource to be cloned. \nIf *clone_mkey* is set, *mkey* must be provided which is cloned from.\n",
+                        "required": false,
+                        "type": "string"
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "wvs\/template"
+                ],
+                "summary": "Update this specific resource.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "description": "wvs template name",
+                                            "maxLength": 63
+                                        },
+                                        "audit": {
+                                            "type": "string",
+                                            "description": "audit plugin",
+                                            "enum": [
+                                                "BLIND_SQLI",
+                                                "BUFFER_OVERFLOW",
+                                                "CORS_ORIGIN",
+                                                "CSRF",
+                                                "DAV",
+                                                "DESERIALIZATION",
+                                                "EVAL",
+                                                "FILE_UPLOAD",
+                                                "FORMAT_STRING",
+                                                "FRONTPAGE",
+                                                "GENERIC",
+                                                "GLOBAL_REDIRECT",
+                                                "HTACCESS_METHODS",
+                                                "LDAPI",
+                                                "LFI",
+                                                "MEMCACHEI",
+                                                "MX_INJECTION",
+                                                "OS_COMMANDING",
+                                                "PHISHING_VECTOR",
+                                                "PREG_REPLACE",
+                                                "REDOS",
+                                                "RESPONSE_SPLITTING",
+                                                "RFD",
+                                                "RFI",
+                                                "ROSETTA_FLASH",
+                                                "SHELL_SHOCK",
+                                                "SQLI",
+                                                "SSI",
+                                                "SSL_CERTIFICATE",
+                                                "UN_SSL",
+                                                "WEBSOCKET_HIJACKING",
+                                                "XPATH",
+                                                "XSS",
+                                                "XST",
+                                                "XXE"
+                                            ]
+                                        },
+                                        "bruteforce": {
+                                            "type": "string",
+                                            "description": "bruteforce plugins",
+                                            "enum": [
+                                                "BASIC_AUTH",
+                                                "FORM_AUTH"
+                                            ]
+                                        },
+                                        "crawl": {
+                                            "type": "string",
+                                            "description": "crawl plugins",
+                                            "enum": [
+                                                "ARCHIVE_DOT_ORG",
+                                                "BING_SPIDER",
+                                                "CONTENT_NEGOTIATION",
+                                                "DIGIT_SUM",
+                                                "DIR_FILE_BRUTER",
+                                                "DOT_DS_STORE",
+                                                "DOT_LISTING",
+                                                "DWSYNC_XML",
+                                                "FIND_BACKDOORS",
+                                                "FIND_CAPTCHAS",
+                                                "FIND_DVCS",
+                                                "GENEXUS_XML",
+                                                "GHDB",
+                                                "GOOGLE_SPIDER",
+                                                "ORACLE_DISCOVERY",
+                                                "PHISHTANK",
+                                                "PHPINFO",
+                                                "PYKTO",
+                                                "RIA_ENUMERATOR",
+                                                "ROBOTS_TXT",
+                                                "SITEMAP_XML",
+                                                "SPIDER_MAN",
+                                                "URL_FUZZER",
+                                                "URLLIST_TXT",
+                                                "USER_DIR",
+                                                "WEB_SPIDER",
+                                                "WORDNET",
+                                                "WORDPRESS_ENUMERATE_USERS",
+                                                "WORDPRESS_FINGERPRINT",
+                                                "WORDPRESS_FULLPATHDISCLOSURE",
+                                                "WSDL_FINDER"
+                                            ]
+                                        },
+                                        "grep": {
+                                            "type": "string",
+                                            "description": "grep plugins",
+                                            "enum": [
+                                                "ANALYZE_COOKIES",
+                                                "BLANK_BODY",
+                                                "CACHE_CONTROL",
+                                                "CLAMAV",
+                                                "CLICK_JACKING",
+                                                "CODE_DISCLOSURE",
+                                                "CONTENT_SNIFFING",
+                                                "CREDIT_CARDS",
+                                                "CROSS_DOMAIN_JS",
+                                                "CSP",
+                                                "DIRECTORY_INDEXING",
+                                                "DOM_XSS",
+                                                "DOT_NET_EVENT_VALIDATION",
+                                                "ERROR_500",
+                                                "ERROR_PAGES",
+                                                "FEEDS",
+                                                "FILE_UPLOAD",
+                                                "FORM_AUTOCOMPLETE",
+                                                "FORM_CLEARTEXT_PASSWORD",
+                                                "GET_EMAILS",
+                                                "HASH_ANALYSIS",
+                                                "HTML_COMMENTS",
+                                                "HTTP_AUTH_DETECT",
+                                                "HTTP_IN_BODY",
+                                                "LANG",
+                                                "META_TAGS",
+                                                "MOTW",
+                                                "OBJECTS",
+                                                "ORACLE",
+                                                "PASSWORD_PROFILING",
+                                                "PATH_DISCLOSURE",
+                                                "PRIVATE_IP",
+                                                "RETIREJS",
+                                                "SERIALIZED_OBJECT",
+                                                "SSN",
+                                                "STRANGE_HEADERS",
+                                                "STRANGE_HTTP_CODES",
+                                                "STRANGE_PARAMETERS",
+                                                "STRANGE_REASON",
+                                                "STRICT_TRANSPORT_SECURITY",
+                                                "SVN_USERS",
+                                                "SYMFONY",
+                                                "URL_SESSION",
+                                                "WEBSOCKETS_LINKS",
+                                                "WSDL_GREPER",
+                                                "XSS_PROTECTION_HEADER"
+                                            ]
+                                        },
+                                        "infrastructure": {
+                                            "type": "string",
+                                            "description": "infrastructure plugins",
+                                            "enum": [
+                                                "AFD",
+                                                "ALLOWED_METHODS",
+                                                "DETECT_REVERSE_PROXY",
+                                                "DETECT_TRANSPARENT_PROXY",
+                                                "DNS_WILDCARD",
+                                                "DOMAIN_DOT",
+                                                "DOT_NET_ERRORS",
+                                                "FAVICON_IDENTIFICATION",
+                                                "FIND_JBOSS",
+                                                "FIND_VHOSTS",
+                                                "FINGER_BING",
+                                                "FINGER_GOOGLE",
+                                                "FINGER_PKS",
+                                                "FINGERPRINT_WAF",
+                                                "FINGERPRINT_OS",
+                                                "FRONTPAGE_VERSION",
+                                                "HALBERD",
+                                                "HMAP",
+                                                "HTTP_VS_HTTPS_DIST",
+                                                "JETLEAK",
+                                                "MS15_034",
+                                                "PHP_EGGS",
+                                                "SERVER_HEADER",
+                                                "SERVER_STATUS",
+                                                "SHARED_HOSTING",
+                                                "WERKZEUG_DEBUGGER",
+                                                "XSSED_DOT_COM",
+                                                "ZONE_H"
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "move_flag",
+                        "in": "query",
+                        "description": "If supported, a flag can be specified.\nWhen *move_flag* is set, extra parameters (*move_mkey*, *sub_mkey*) must be provided.\n__*Note:*__ If this parameter is provided when not supported, the action will be ignored and an \u201cinvalid request\u201d error will be returned.\n",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "before",
+                            "after"
+                        ]
+                    },
+                    {
+                        "name": "sub_mkey",
+                        "in": "query",
+                        "description": "specific resource to be moved",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "move_mkey",
+                        "in": "query",
+                        "description": "specific resource to be moved before or after",
+                        "required": false,
+                        "type": "string"
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "wvs\/template"
+                ],
+                "summary": "Delete this specific resource.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

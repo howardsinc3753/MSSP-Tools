@@ -1,0 +1,100 @@
+canonical_id: org.ulysses.noc.fortiweb-tls-baseline/1.0.0
+name: FortiWeb TLS Cipher Baseline
+version: 1.0.0
+description: >
+  Audit and enforce TLS/cipher best-practice on FortiWeb 8.0+.
+  Checks cipher groups and server policies for weak protocols (TLS 1.0/1.1),
+  weak ciphers (3DES, RC4, NULL, EXPORT, CBC), and insecure renegotiation.
+  Creates hardened cipher groups matching Mozilla-Intermediate standard.
+metadata:
+  org_namespace: ulysses
+  domain: noc
+  intent: configure
+  vendor: fortinet
+  shelf: noc/fortiweb
+  tags:
+  - fortiweb
+  - tls
+  - ssl
+  - cipher
+  - security
+  - baseline
+  - waf
+runtime:
+  language: python
+  entry_point: main
+  source_file: org.ulysses.noc.fortiweb-tls-baseline.py
+  python_packages:
+  - pyyaml>=6.0
+  dotnet_packages: []
+  files:
+  - config/fortiweb_credentials.yaml
+  services: []
+parameters:
+  type: object
+  required:
+  - target_ip
+  - action
+  properties:
+    target_ip:
+      type: string
+      description: FortiWeb management IP address
+      format: ipv4
+    action:
+      type: string
+      enum:
+      - audit
+      - apply
+      - status
+      description: >
+        audit: Check all cipher groups + server policies for weak TLS.
+        apply: Create hardened cipher group.
+        status: Quick TLS posture summary.
+    bp_prefix:
+      type: string
+      default: BP
+      description: Prefix for objects created by apply action
+    timeout:
+      type: integer
+      default: 30
+    verify_ssl:
+      type: boolean
+      default: false
+output_schema:
+  type: object
+  properties:
+    success:
+      type: boolean
+    action:
+      type: string
+    score:
+      type: string
+    findings:
+      type: array
+    created_objects:
+      type: array
+    error:
+      type: string
+credentials:
+- ref: vault://fortiweb/admin
+  type: username_password
+  required: false
+  scope: [read, write]
+- ref: local://config/fortiweb_credentials.yaml
+  type: config_file
+  required: false
+capabilities:
+  network:
+    outbound: [https:443]
+    inbound: []
+  filesystem:
+    read: [config/*.yaml]
+    write: []
+  process:
+    spawn: false
+    elevated: false
+  max_execution_time_ms: 60000
+security:
+  certified: false
+status: development
+skills_ref: Skills.md

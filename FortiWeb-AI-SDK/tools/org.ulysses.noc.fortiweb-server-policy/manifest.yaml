@@ -1,0 +1,97 @@
+canonical_id: org.ulysses.noc.fortiweb-server-policy/1.0.0
+name: FortiWeb Server Policy Builder
+version: 1.0.0
+description: >
+  Creates the full server policy stack on FortiWeb 8.0+ — VIP, Virtual Server,
+  Server Pool, and Server Policy — tied together with a protection profile
+  and optional TLS cipher group. This is the keystone that activates all
+  baseline security controls for actual traffic inspection.
+metadata:
+  org_namespace: ulysses
+  domain: noc
+  intent: deploy
+  vendor: fortinet
+  shelf: noc/fortiweb
+  tags: [fortiweb, server-policy, deployment, reverse-proxy, waf]
+runtime:
+  language: python
+  entry_point: main
+  source_file: org.ulysses.noc.fortiweb-server-policy.py
+  python_packages: [pyyaml>=6.0]
+  files: [config/fortiweb_credentials.yaml]
+parameters:
+  type: object
+  required: [target_ip, action]
+  properties:
+    target_ip:
+      type: string
+      format: ipv4
+      description: FortiWeb management IP
+    action:
+      type: string
+      enum: [audit, apply, status, delete]
+      description: >
+        audit: Check existing server policies for best practice.
+        apply: Create full policy stack (VIP + VServer + Pool + Policy).
+        status: List current server policies and their protection profiles.
+        delete: Remove a policy and its dependencies.
+    policy_name:
+      type: string
+      default: BP-WebApp-Policy
+      description: Name for the server policy
+    vip_address:
+      type: string
+      description: IPv4 address for the FortiWeb virtual IP (listening IP)
+    vip_interface:
+      type: string
+      default: port1
+      description: FortiWeb interface hosting the VIP
+    backend_ip:
+      type: string
+      description: Backend server IP (Rocky Linux app server)
+    backend_port:
+      type: integer
+      default: 80
+      description: Backend server port
+    https_enabled:
+      type: boolean
+      default: false
+      description: Enable HTTPS on the virtual server
+    certificate_name:
+      type: string
+      description: FortiWeb certificate name (required if https_enabled)
+    cipher_group:
+      type: string
+      description: SSL ciphers group to use (e.g., BP-TLS-Hardened)
+    protection_profile:
+      type: string
+      default: BP-SQLi-Protection
+      description: Inline Web Protection Profile to apply
+    bp_prefix:
+      type: string
+      default: BP
+      description: Prefix for created objects
+    timeout:
+      type: integer
+      default: 30
+    verify_ssl:
+      type: boolean
+      default: false
+output_schema:
+  type: object
+  properties:
+    success: {type: boolean}
+    action: {type: string}
+    created_objects: {type: array}
+    error: {type: string}
+credentials:
+  - {ref: "vault://fortiweb/admin", type: username_password, required: false, scope: [read, write]}
+  - {ref: "local://config/fortiweb_credentials.yaml", type: config_file, required: false}
+capabilities:
+  network: {outbound: [https:443], inbound: []}
+  filesystem: {read: [config/*.yaml], write: []}
+  process: {spawn: false, elevated: false}
+  max_execution_time_ms: 60000
+security: {certified: false}
+status: development
+skills_ref: Skills.md

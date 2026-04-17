@@ -1,0 +1,54 @@
+canonical_id: org.ulysses.noc.fortiweb-json-baseline/1.0.0
+name: FortiWeb JSON Protection Baseline
+version: 1.0.0
+description: >
+  Audit and enforce JSON validation on FortiWeb 8.0+. Protects REST APIs by
+  enforcing JSON structure limits (depth, key count, value size), enables
+  attack signatures within JSON bodies, and blocks malformed JSON.
+metadata:
+  org_namespace: ulysses
+  domain: noc
+  intent: configure
+  vendor: fortinet
+  shelf: noc/fortiweb
+  tags: [fortiweb, json, api, rest, baseline, waf]
+runtime:
+  language: python
+  entry_point: main
+  source_file: org.ulysses.noc.fortiweb-json-baseline.py
+  python_packages: [pyyaml>=6.0]
+  files: [config/fortiweb_credentials.yaml]
+parameters:
+  type: object
+  required: [target_ip, action]
+  properties:
+    target_ip: {type: string, format: ipv4}
+    action:
+      type: string
+      enum: [audit, apply, status]
+    profile_name: {type: string, default: Inline Standard Protection}
+    bp_prefix: {type: string, default: BP}
+    max_body_kb: {type: integer, default: 10240, description: Max JSON body size in KB}
+    max_depth: {type: integer, default: 32}
+    max_keys: {type: integer, default: 1000}
+    timeout: {type: integer, default: 30}
+    verify_ssl: {type: boolean, default: false}
+output_schema:
+  type: object
+  properties:
+    success: {type: boolean}
+    action: {type: string}
+    score: {type: string}
+    findings: {type: array}
+    error: {type: string}
+credentials:
+  - {ref: "vault://fortiweb/admin", type: username_password, required: false, scope: [read, write]}
+  - {ref: "local://config/fortiweb_credentials.yaml", type: config_file, required: false}
+capabilities:
+  network: {outbound: [https:443], inbound: []}
+  filesystem: {read: [config/*.yaml], write: []}
+  process: {spawn: false, elevated: false}
+  max_execution_time_ms: 60000
+security: {certified: false}
+status: development
+skills_ref: Skills.md

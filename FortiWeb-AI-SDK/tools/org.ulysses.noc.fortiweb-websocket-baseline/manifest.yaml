@@ -1,0 +1,56 @@
+canonical_id: org.ulysses.noc.fortiweb-websocket-baseline/1.0.0
+name: FortiWeb WebSocket Security Baseline
+version: 1.0.0
+description: >
+  Audit and enforce WebSocket security on FortiWeb 8.0+. Critical for apps
+  using Socket.IO or native WebSocket. Without proper rules, FortiWeb may
+  mishandle WebSocket upgrades and break real-time features.
+metadata:
+  org_namespace: ulysses
+  domain: noc
+  intent: configure
+  vendor: fortinet
+  shelf: noc/fortiweb
+  tags: [fortiweb, websocket, socketio, realtime, baseline, waf]
+runtime:
+  language: python
+  entry_point: main
+  source_file: org.ulysses.noc.fortiweb-websocket-baseline.py
+  python_packages: [pyyaml>=6.0]
+  files: [config/fortiweb_credentials.yaml]
+parameters:
+  type: object
+  required: [target_ip, action]
+  properties:
+    target_ip: {type: string, format: ipv4}
+    action:
+      type: string
+      enum: [audit, apply, status]
+    profile_name: {type: string, default: Inline Standard Protection}
+    bp_prefix: {type: string, default: BP}
+    ws_path:
+      type: string
+      default: "^/.*"
+      description: URL regex matching WebSocket endpoints (e.g., ^/socket.io/)
+    max_frame_size: {type: integer, default: 65536}
+    max_message_size: {type: integer, default: 16777216}
+    timeout: {type: integer, default: 30}
+    verify_ssl: {type: boolean, default: false}
+output_schema:
+  type: object
+  properties:
+    success: {type: boolean}
+    action: {type: string}
+    findings: {type: array}
+    error: {type: string}
+credentials:
+  - {ref: "vault://fortiweb/admin", type: username_password, required: false, scope: [read, write]}
+  - {ref: "local://config/fortiweb_credentials.yaml", type: config_file, required: false}
+capabilities:
+  network: {outbound: [https:443], inbound: []}
+  filesystem: {read: [config/*.yaml], write: []}
+  process: {spawn: false, elevated: false}
+  max_execution_time_ms: 60000
+security: {certified: false}
+status: development
+skills_ref: Skills.md

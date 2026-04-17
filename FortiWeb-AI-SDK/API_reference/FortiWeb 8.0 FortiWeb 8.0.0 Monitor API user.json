@@ -1,0 +1,606 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "termsOfService": "http:\/\/fortinet.com\/terms\/",
+        "version": "v2",
+        "contact": {
+            "url": "http:\/\/modskristensen.net",
+            "name": "FortiOS Web Application Team",
+            "email": "fosguiqateam@fortinet.com"
+        },
+        "description": "REST API for configuring FortiWEB objects and settings",
+        "title": "FortiWEB Monitor"
+    },
+    "basePath": "\/api\/v2.0\/",
+    "host": "172.16.177.65",
+    "schemes": [
+        "https"
+    ],
+    "consumes": [
+        "application\/x-www-form-urlencoded"
+    ],
+    "produces": [
+        "application\/json"
+    ],
+    "securityDefinitions": {
+        "APIKeyHeader": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    },
+    "security": [
+        {
+            "APIKeyHeader": []
+        }
+    ],
+    "tags": [
+        {
+            "name": "user\/remoteserver.saml.downloadspmetafile"
+        },
+        {
+            "name": "user\/remoteserver.saml.getmetafileid"
+        },
+        {
+            "name": "user\/remoteserver.ldapservertest"
+        },
+        {
+            "name": "user\/remoteserver.tacacsservertest"
+        },
+        {
+            "name": "user\/remoteserver.radiusservertest"
+        },
+        {
+            "name": "user\/remoteserver.ldapclearcache"
+        }
+    ],
+    "paths": {
+        "\/user\/remoteserver.saml": [],
+        "\/user\/remoteserver.saml.downloadspmetafile": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": []
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "mkey"
+                    }
+                ],
+                "tags": [
+                    "user\/remoteserver.saml.downloadspmetafile"
+                ]
+            }
+        },
+        "\/user\/remoteserver.saml.getmetafileid": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "entity_id": {
+                                            "type": "string",
+                                            "description": "entity id"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "mkey"
+                    }
+                ],
+                "tags": [
+                    "user\/remoteserver.saml.getmetafileid"
+                ]
+            }
+        },
+        "\/user\/remoteserver.ldapservertest": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "_id": {
+                                            "type": "string",
+                                            "description": " id"
+                                        },
+                                        "showmessage": {
+                                            "type": "string",
+                                            "description": "showmessage"
+                                        },
+                                        "pingResult": {
+                                            "type": "integer",
+                                            "description": "pingResult"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "userNameTest": {
+                                    "type": "string",
+                                    "description": "userNameTest"
+                                },
+                                "passWordTest": {
+                                    "type": "string",
+                                    "description": "passWordTest"
+                                },
+                                "name": {
+                                    "type": "string",
+                                    "description": "name"
+                                },
+                                "server": {
+                                    "type": "string",
+                                    "description": "server"
+                                },
+                                "port": {
+                                    "type": "integer",
+                                    "description": "port"
+                                },
+                                "common-name-id": {
+                                    "type": "string",
+                                    "description": "common-name-id"
+                                },
+                                "distinguished-name": {
+                                    "type": "string",
+                                    "description": "distinguished-name"
+                                },
+                                "bind-type": {
+                                    "type": "string",
+                                    "description": "bind-type"
+                                },
+                                "username": {
+                                    "type": "string",
+                                    "description": "username"
+                                },
+                                "password": {
+                                    "type": "string",
+                                    "description": "password"
+                                },
+                                "filter": {
+                                    "type": "string",
+                                    "description": "filter"
+                                },
+                                "group_authentication": {
+                                    "type": "string",
+                                    "description": "group authentication"
+                                },
+                                "group_type": {
+                                    "type": "string",
+                                    "description": "group type"
+                                },
+                                "group_dn": {
+                                    "type": "string",
+                                    "description": "group dn"
+                                },
+                                "ssl-connection": {
+                                    "type": "string",
+                                    "description": "ssl-connection"
+                                },
+                                "protocol": {
+                                    "type": "string",
+                                    "description": "protocol"
+                                },
+                                "ca-cert_val": {
+                                    "type": "integer",
+                                    "description": "ca-cert val"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "user\/remoteserver.ldapservertest"
+                ]
+            }
+        },
+        "\/user\/remoteserver.tacacsservertest": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "_id": {
+                                            "type": "string",
+                                            "description": " id"
+                                        },
+                                        "pingResult": {
+                                            "type": "integer",
+                                            "description": "pingResult"
+                                        },
+                                        "showmessage": {
+                                            "type": "string",
+                                            "description": "showmessage"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "username": {
+                                    "type": "string",
+                                    "description": "username"
+                                },
+                                "password": {
+                                    "type": "string",
+                                    "description": "password"
+                                },
+                                "name": {
+                                    "type": "string",
+                                    "description": "name"
+                                },
+                                "server": {
+                                    "type": "string",
+                                    "description": "server"
+                                },
+                                "cp": {
+                                    "type": "integer",
+                                    "description": "cp"
+                                },
+                                "secret": {
+                                    "type": "string",
+                                    "description": "secret"
+                                },
+                                "auth-type": {
+                                    "type": "string",
+                                    "description": "auth-type"
+                                },
+                                "type": {
+                                    "type": "string",
+                                    "description": "type"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "user\/remoteserver.tacacsservertest"
+                ]
+            }
+        },
+        "\/user\/remoteserver.radiusservertest": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "_id": {
+                                            "type": "string",
+                                            "description": " id"
+                                        },
+                                        "pingResult": {
+                                            "type": "integer",
+                                            "description": "pingResult"
+                                        },
+                                        "showmessage": {
+                                            "type": "string",
+                                            "description": "showmessage"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "username": {
+                                    "type": "string",
+                                    "description": "username"
+                                },
+                                "password": {
+                                    "type": "string",
+                                    "description": "password"
+                                },
+                                "name": {
+                                    "type": "string",
+                                    "description": "name"
+                                },
+                                "server": {
+                                    "type": "string",
+                                    "description": "server"
+                                },
+                                "server-port": {
+                                    "type": "integer",
+                                    "description": "server-port"
+                                },
+                                "secret": {
+                                    "type": "string",
+                                    "description": "secret"
+                                },
+                                "secondary-server": {
+                                    "type": "string",
+                                    "description": "secondary-server"
+                                },
+                                "secondary-server-port": {
+                                    "type": "integer",
+                                    "description": "secondary-server-port"
+                                },
+                                "secondary-secret": {
+                                    "type": "string",
+                                    "description": "secondary-secret"
+                                },
+                                "nas-ip": {
+                                    "type": "string",
+                                    "description": "nas-ip"
+                                },
+                                "auth-type": {
+                                    "type": "integer",
+                                    "description": "auth-type"
+                                },
+                                "fac-push": {
+                                    "type": "integer",
+                                    "description": "fac-push"
+                                },
+                                "require-msg-auth": {
+                                    "type": "integer",
+                                    "description": "require-msg-auth"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "user\/remoteserver.radiusservertest"
+                ]
+            }
+        },
+        "\/user\/remoteserver.ldapclearcache": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "result": {
+                                    "type": "object",
+                                    "description": "result",
+                                    "properties": {
+                                        "_id": {
+                                            "type": "string",
+                                            "description": " id"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "mkey"
+                    }
+                ],
+                "tags": [
+                    "user\/remoteserver.ldapclearcache"
+                ]
+            }
+        }
+    }
+}

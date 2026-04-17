@@ -1,0 +1,1346 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "termsOfService": "http:\/\/fortinet.com\/terms\/",
+        "version": "v2",
+        "contact": {
+            "url": "http:\/\/modskristensen.net",
+            "name": "FortiOS Web Application Team",
+            "email": "fosguiqateam@fortinet.com"
+        },
+        "description": "REST API for configuring FortiWEB objects and settings",
+        "title": "FortiWEB Monitor"
+    },
+    "basePath": "\/api\/v2.0\/",
+    "host": "172.16.177.65",
+    "schemes": [
+        "https"
+    ],
+    "consumes": [
+        "application\/x-www-form-urlencoded"
+    ],
+    "produces": [
+        "application\/json"
+    ],
+    "securityDefinitions": {
+        "APIKeyHeader": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    },
+    "security": [
+        {
+            "APIKeyHeader": []
+        }
+    ],
+    "tags": [
+        {
+            "name": "fortiview\/statistics"
+        },
+        {
+            "name": "fortiview\/sessions.data_json"
+        },
+        {
+            "name": "fortiview\/logs.json"
+        },
+        {
+            "name": "fortiview\/clear"
+        },
+        {
+            "name": "fortiview\/threat.json"
+        },
+        {
+            "name": "fortiview\/attackstat.policyjson"
+        },
+        {
+            "name": "fortiview\/bot.analysis"
+        },
+        {
+            "name": "fortiview\/bot.loganalysis"
+        },
+        {
+            "name": "fortiview\/fabric.policyjson"
+        },
+        {
+            "name": "fortiview\/attackstat.tablejson"
+        },
+        {
+            "name": "fortiview\/sessions.delete"
+        },
+        {
+            "name": "fortiview\/fabric.scanner.integrationlist"
+        },
+        {
+            "name": "fortiview\/sessions.session_data_json"
+        },
+        {
+            "name": "fortiview\/statistics.genpdf"
+        },
+        {
+            "name": "fortiview\/fabric.scanner.integration"
+        },
+        {
+            "name": "fortiview\/banip.json"
+        }
+    ],
+    "paths": {
+        "\/fortiview\/statistics": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "filter_mode",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "filter mode"
+                    },
+                    {
+                        "name": "filter",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "filter"
+                    },
+                    {
+                        "name": "session_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "session id"
+                    },
+                    {
+                        "name": "type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "type"
+                    },
+                    {
+                        "name": "report_by",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "report by"
+                    },
+                    {
+                        "name": "sort_by",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "sort by"
+                    },
+                    {
+                        "name": "correlate_by",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "correlate by"
+                    },
+                    {
+                        "name": "correlate_type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "correlate type"
+                    },
+                    {
+                        "name": "start",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "start"
+                    },
+                    {
+                        "name": "end",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "end"
+                    },
+                    {
+                        "name": "count",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "count"
+                    },
+                    {
+                        "name": "tendby",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "tendby"
+                    }
+                ],
+                "tags": [
+                    "fortiview\/statistics"
+                ]
+            }
+        },
+        "\/fortiview\/sessions.data_json": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "sort_by",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "sort by"
+                    },
+                    {
+                        "name": "filter",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "filter"
+                    },
+                    {
+                        "name": "view_level",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "view level"
+                    },
+                    {
+                        "name": "report_by",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "report by"
+                    },
+                    {
+                        "name": "sessions_summary",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "sessions summary"
+                    }
+                ],
+                "tags": [
+                    "fortiview\/sessions.data_json"
+                ]
+            }
+        },
+        "\/fortiview\/logs.json": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": []
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "filter",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "filter"
+                    },
+                    {
+                        "name": "flag",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "flag"
+                    },
+                    {
+                        "name": "page",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "page"
+                    },
+                    {
+                        "name": "log_type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "log type"
+                    },
+                    {
+                        "name": "count",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "count"
+                    },
+                    {
+                        "name": "session_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "session id"
+                    }
+                ],
+                "tags": [
+                    "fortiview\/logs.json"
+                ]
+            }
+        },
+        "\/fortiview\/clear": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "status": {
+                                    "type": "integer",
+                                    "description": "status"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "session_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "session id"
+                    }
+                ],
+                "tags": [
+                    "fortiview\/clear"
+                ]
+            }
+        },
+        "\/fortiview\/threat.json": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "type"
+                    },
+                    {
+                        "name": "session_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "session id"
+                    },
+                    {
+                        "name": "count",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "count"
+                    },
+                    {
+                        "name": "index_offset",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "index offset"
+                    },
+                    {
+                        "name": "file_path",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "file path"
+                    },
+                    {
+                        "name": "page",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "page"
+                    },
+                    {
+                        "name": "start",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "start"
+                    }
+                ],
+                "tags": [
+                    "fortiview\/threat.json"
+                ]
+            }
+        },
+        "\/fortiview\/attackstat.policyjson": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "time",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "time"
+                    },
+                    {
+                        "name": "start_time",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "start time"
+                    },
+                    {
+                        "name": "session_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "session id"
+                    },
+                    {
+                        "name": "report_by",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "report by"
+                    }
+                ],
+                "tags": [
+                    "fortiview\/attackstat.policyjson"
+                ]
+            }
+        },
+        "\/fortiview\/bot.analysis": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": []
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "vd",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "vd"
+                    },
+                    {
+                        "name": "policy",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy"
+                    },
+                    {
+                        "name": "type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "type"
+                    },
+                    {
+                        "name": "page",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "page"
+                    }
+                ],
+                "tags": [
+                    "fortiview\/bot.analysis"
+                ]
+            }
+        },
+        "\/fortiview\/bot.loganalysis": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "vd",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "vd"
+                    },
+                    {
+                        "name": "policy",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy"
+                    },
+                    {
+                        "name": "type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "type"
+                    },
+                    {
+                        "name": "main",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "main"
+                    },
+                    {
+                        "name": "sub",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "sub"
+                    }
+                ],
+                "tags": [
+                    "fortiview\/bot.loganalysis"
+                ]
+            }
+        },
+        "\/fortiview\/fabric.policyjson": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mode",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "mode"
+                    },
+                    {
+                        "name": "key",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "key"
+                    },
+                    {
+                        "name": "page",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "page"
+                    }
+                ],
+                "tags": [
+                    "fortiview\/fabric.policyjson"
+                ]
+            }
+        },
+        "\/fortiview\/attackstat.tablejson": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "time",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "time"
+                    },
+                    {
+                        "name": "start_time",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "start time"
+                    },
+                    {
+                        "name": "session_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "session id"
+                    },
+                    {
+                        "name": "filter",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "filter"
+                    },
+                    {
+                        "name": "report_by",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "report by"
+                    },
+                    {
+                        "name": "count",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "count"
+                    }
+                ],
+                "tags": [
+                    "fortiview\/attackstat.tablejson"
+                ]
+            }
+        },
+        "\/fortiview\/sessions.delete": {
+            "delete": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "success": {
+                                            "type": "string",
+                                            "description": "success"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "json": {
+                                    "type": "string",
+                                    "description": "json"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "fortiview\/sessions.delete"
+                ]
+            }
+        },
+        "\/fortiview\/fabric.scanner.integrationlist": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "status",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "status"
+                    },
+                    {
+                        "name": "page",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "page"
+                    },
+                    {
+                        "name": "count",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "count"
+                    },
+                    {
+                        "name": "filter",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "filter"
+                    }
+                ],
+                "tags": [
+                    "fortiview\/fabric.scanner.integrationlist"
+                ]
+            }
+        },
+        "\/fortiview\/sessions.session_data_json": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "sort_by",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "sort by"
+                    },
+                    {
+                        "name": "filter",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "filter"
+                    }
+                ],
+                "tags": [
+                    "fortiview\/sessions.session_data_json"
+                ]
+            }
+        },
+        "\/fortiview\/statistics.genpdf": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": []
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": []
+                        }
+                    }
+                ],
+                "tags": [
+                    "fortiview\/statistics.genpdf"
+                ]
+            }
+        },
+        "\/fortiview\/fabric.scanner.integration": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "total": {
+                                    "type": "integer",
+                                    "description": "total"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "summary_type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "summary type"
+                    }
+                ],
+                "tags": [
+                    "fortiview\/fabric.scanner.integration"
+                ]
+            }
+        },
+        "\/fortiview\/banip.json": {
+            "delete": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "affected": {
+                                            "type": "integer",
+                                            "description": "affected"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "policy_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy name"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "ip_list": {
+                                    "type": "array",
+                                    "description": "ip list",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "fortiview\/banip.json"
+                ]
+            },
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "affected": {
+                                            "type": "integer",
+                                            "description": "affected"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "policy_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "policy name"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "block_time": {
+                                    "type": "integer",
+                                    "description": "block time"
+                                },
+                                "ip_list": {
+                                    "type": "array",
+                                    "description": "ip list",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "fortiview\/banip.json"
+                ]
+            }
+        }
+    }
+}

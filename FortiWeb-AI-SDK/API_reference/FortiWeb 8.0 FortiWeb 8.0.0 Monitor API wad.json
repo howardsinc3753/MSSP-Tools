@@ -1,0 +1,1949 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "termsOfService": "http:\/\/fortinet.com\/terms\/",
+        "version": "v2",
+        "contact": {
+            "url": "http:\/\/modskristensen.net",
+            "name": "FortiOS Web Application Team",
+            "email": "fosguiqateam@fortinet.com"
+        },
+        "description": "REST API for configuring FortiWEB objects and settings",
+        "title": "FortiWEB Monitor"
+    },
+    "basePath": "\/api\/v2.0\/",
+    "host": "172.16.177.65",
+    "schemes": [
+        "https"
+    ],
+    "consumes": [
+        "application\/x-www-form-urlencoded"
+    ],
+    "produces": [
+        "application\/json"
+    ],
+    "securityDefinitions": {
+        "APIKeyHeader": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    },
+    "security": [
+        {
+            "APIKeyHeader": []
+        }
+    ],
+    "tags": [
+        {
+            "name": "wad\/wad.antidefacement.blob"
+        },
+        {
+            "name": "wad\/antidefacement.blob.image"
+        },
+        {
+            "name": "wad\/antidefacement.oneitem"
+        },
+        {
+            "name": "wad\/wad.antidefacement.revert"
+        },
+        {
+            "name": "wad\/antidefacement.bakeupfiles.getree"
+        },
+        {
+            "name": "wad\/antidefacement"
+        },
+        {
+            "name": "wad\/wad.antidefacement.bakeupfiles"
+        },
+        {
+            "name": "wad\/wad.antidefacement.commitdiff"
+        },
+        {
+            "name": "wad\/antidefacement.changelist"
+        },
+        {
+            "name": "wad\/antidefacement.test"
+        },
+        {
+            "name": "wad\/antidefacement.debuglog.list"
+        },
+        {
+            "name": "wad\/antidefacement.revertlist"
+        }
+    ],
+    "paths": {
+        "\/wad\/wad.antidefacement.blob": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "version": {
+                                            "type": "string",
+                                            "description": "version"
+                                        },
+                                        "image": {
+                                            "type": "integer",
+                                            "description": "image"
+                                        },
+                                        "status": {
+                                            "type": "integer",
+                                            "description": "status"
+                                        },
+                                        "body": {
+                                            "type": "string",
+                                            "description": "body"
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "description": "name"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "id"
+                    },
+                    {
+                        "name": "path",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "path"
+                    },
+                    {
+                        "name": "name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "name"
+                    },
+                    {
+                        "name": "rev",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "rev"
+                    }
+                ],
+                "tags": [
+                    "wad\/wad.antidefacement.blob"
+                ]
+            }
+        },
+        "\/wad\/antidefacement.blob.image": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": []
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "id"
+                    },
+                    {
+                        "name": "path",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "path"
+                    },
+                    {
+                        "name": "name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "name"
+                    },
+                    {
+                        "name": "rev",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "rev"
+                    }
+                ],
+                "tags": [
+                    "wad\/antidefacement.blob.image"
+                ]
+            }
+        },
+        "\/wad\/antidefacement.oneitem": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "totalBackup": {
+                                                "type": "integer",
+                                                "description": "totalBackup"
+                                            },
+                                            "canBackupList": {
+                                                "type": "boolean",
+                                                "description": "canBackupList"
+                                            },
+                                            "totalChanged": {
+                                                "type": "integer",
+                                                "description": "totalChanged"
+                                            },
+                                            "canChangedList": {
+                                                "type": "boolean",
+                                                "description": "canChangedList"
+                                            },
+                                            "totalFiles": {
+                                                "type": "integer",
+                                                "description": "totalFiles"
+                                            },
+                                            "connected": {
+                                                "type": "boolean",
+                                                "description": "connected"
+                                            },
+                                            "_id": {
+                                                "type": "integer",
+                                                "description": " id"
+                                            },
+                                            "id": {
+                                                "type": "integer",
+                                                "description": "id"
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "description": "name"
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "description": "description"
+                                            },
+                                            "can_delete": {
+                                                "type": "boolean",
+                                                "description": "can delete"
+                                            },
+                                            "can_view": {
+                                                "type": "boolean",
+                                                "description": "can view"
+                                            },
+                                            "q_ref": {
+                                                "type": "integer",
+                                                "description": "q ref"
+                                            },
+                                            "enableMonitor": {
+                                                "type": "boolean",
+                                                "description": "enableMonitor"
+                                            },
+                                            "hostnameIPAddress": {
+                                                "type": "string",
+                                                "description": "hostnameIPAddress"
+                                            },
+                                            "connectionType": {
+                                                "type": "integer",
+                                                "description": "connectionType"
+                                            },
+                                            "fTPPort": {
+                                                "type": "integer",
+                                                "description": "fTPPort"
+                                            },
+                                            "connectedString": {
+                                                "type": "string",
+                                                "description": "connectedString"
+                                            },
+                                            "sSHPort": {
+                                                "type": "integer",
+                                                "description": "sSHPort"
+                                            },
+                                            "folderofWebSite": {
+                                                "type": "string",
+                                                "description": "folderofWebSite"
+                                            },
+                                            "windowsShareName": {
+                                                "type": "string",
+                                                "description": "windowsShareName"
+                                            },
+                                            "userName": {
+                                                "type": "string",
+                                                "description": "userName"
+                                            },
+                                            "password": {
+                                                "type": "string",
+                                                "description": "password"
+                                            },
+                                            "alertEmailPolicy": {
+                                                "type": "string",
+                                                "description": "alertEmailPolicy"
+                                            },
+                                            "disalertEmailPolicy": {
+                                                "type": "string",
+                                                "description": "disalertEmailPolicy"
+                                            },
+                                            "fileFilter": {
+                                                "type": "string",
+                                                "description": "fileFilter"
+                                            },
+                                            "disfileFilter": {
+                                                "type": "string",
+                                                "description": "disfileFilter"
+                                            },
+                                            "monitorIntervalforRootFolder": {
+                                                "type": "integer",
+                                                "description": "monitorIntervalforRootFolder"
+                                            },
+                                            "monitorIntervalforOtherFolder": {
+                                                "type": "integer",
+                                                "description": "monitorIntervalforOtherFolder"
+                                            },
+                                            "maximumDepthofMonitoredFolders": {
+                                                "type": "integer",
+                                                "description": "maximumDepthofMonitoredFolders"
+                                            },
+                                            "skipFilesLargerThan": {
+                                                "type": "integer",
+                                                "description": "skipFilesLargerThan"
+                                            },
+                                            "skipFilesWithTheseExtensions": {
+                                                "type": "string",
+                                                "description": "skipFilesWithTheseExtensions"
+                                            },
+                                            "restoreChangedFileAutomatically": {
+                                                "type": "boolean",
+                                                "description": "restoreChangedFileAutomatically"
+                                            },
+                                            "acknowlegeAuto": {
+                                                "type": "boolean",
+                                                "description": "acknowlegeAuto"
+                                            },
+                                            "slight": {
+                                                "type": "boolean",
+                                                "description": "slight"
+                                            },
+                                            "unit_k": {
+                                                "type": "boolean",
+                                                "description": "unit k"
+                                            },
+                                            "traffics_unit": {
+                                                "type": "integer",
+                                                "description": "traffics unit"
+                                            },
+                                            "traffics_unit_hour": {
+                                                "type": "integer",
+                                                "description": "traffics unit hour"
+                                            },
+                                            "diskusage": {
+                                                "type": "integer",
+                                                "description": "diskusage"
+                                            },
+                                            "siteusage": {
+                                                "type": "integer",
+                                                "description": "siteusage"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "id"
+                    }
+                ],
+                "tags": [
+                    "wad\/antidefacement.oneitem"
+                ]
+            }
+        },
+        "\/wad\/wad.antidefacement.revert": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "payload": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "description": "id"
+                                            },
+                                            "commitTime": {
+                                                "type": "string",
+                                                "description": "commitTime"
+                                            },
+                                            "can_view": {
+                                                "type": "boolean",
+                                                "description": "can view"
+                                            },
+                                            "ver": {
+                                                "type": "integer",
+                                                "description": "ver"
+                                            },
+                                            "oldrev": {
+                                                "type": "string",
+                                                "description": "oldrev"
+                                            },
+                                            "newrev": {
+                                                "type": "string",
+                                                "description": "newrev"
+                                            },
+                                            "can_revert": {
+                                                "type": "boolean",
+                                                "description": "can revert"
+                                            },
+                                            "rev": {
+                                                "type": "string",
+                                                "description": "rev"
+                                            }
+                                        }
+                                    }
+                                },
+                                "total": {
+                                    "type": "integer",
+                                    "description": "total"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "id"
+                    },
+                    {
+                        "name": "subkey",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "subkey"
+                    },
+                    {
+                        "name": "startline",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "startline"
+                    },
+                    {
+                        "name": "viewlines",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "viewlines"
+                    },
+                    {
+                        "name": "sortfield",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "sortfield"
+                    },
+                    {
+                        "name": "from_value",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "from value"
+                    },
+                    {
+                        "name": "to_value",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "to value"
+                    },
+                    {
+                        "name": "negate",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "negate"
+                    },
+                    {
+                        "name": "rev",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "rev"
+                    },
+                    {
+                        "name": "ver",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "ver"
+                    },
+                    {
+                        "name": "oldrev",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "oldrev"
+                    },
+                    {
+                        "name": "newrev",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "newrev"
+                    }
+                ],
+                "tags": [
+                    "wad\/wad.antidefacement.revert"
+                ]
+            }
+        },
+        "\/wad\/antidefacement.bakeupfiles.getree": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "rdn": {
+                                                "type": "string",
+                                                "description": "rdn"
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "description": "name"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "id"
+                    }
+                ],
+                "tags": [
+                    "wad\/antidefacement.bakeupfiles.getree"
+                ]
+            }
+        },
+        "\/wad\/antidefacement": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "totalBackup": {
+                                                "type": "integer",
+                                                "description": "totalBackup"
+                                            },
+                                            "canBackupList": {
+                                                "type": "boolean",
+                                                "description": "canBackupList"
+                                            },
+                                            "totalChanged": {
+                                                "type": "integer",
+                                                "description": "totalChanged"
+                                            },
+                                            "canChangedList": {
+                                                "type": "boolean",
+                                                "description": "canChangedList"
+                                            },
+                                            "totalFiles": {
+                                                "type": "integer",
+                                                "description": "totalFiles"
+                                            },
+                                            "connected": {
+                                                "type": "boolean",
+                                                "description": "connected"
+                                            },
+                                            "_id": {
+                                                "type": "integer",
+                                                "description": " id"
+                                            },
+                                            "id": {
+                                                "type": "integer",
+                                                "description": "id"
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "description": "name"
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "description": "description"
+                                            },
+                                            "can_delete": {
+                                                "type": "boolean",
+                                                "description": "can delete"
+                                            },
+                                            "can_view": {
+                                                "type": "boolean",
+                                                "description": "can view"
+                                            },
+                                            "q_ref": {
+                                                "type": "integer",
+                                                "description": "q ref"
+                                            },
+                                            "enableMonitor": {
+                                                "type": "boolean",
+                                                "description": "enableMonitor"
+                                            },
+                                            "hostnameIPAddress": {
+                                                "type": "string",
+                                                "description": "hostnameIPAddress"
+                                            },
+                                            "connectionType": {
+                                                "type": "integer",
+                                                "description": "connectionType"
+                                            },
+                                            "fTPPort": {
+                                                "type": "integer",
+                                                "description": "fTPPort"
+                                            },
+                                            "connectedString": {
+                                                "type": "string",
+                                                "description": "connectedString"
+                                            },
+                                            "sSHPort": {
+                                                "type": "integer",
+                                                "description": "sSHPort"
+                                            },
+                                            "folderofWebSite": {
+                                                "type": "string",
+                                                "description": "folderofWebSite"
+                                            },
+                                            "windowsShareName": {
+                                                "type": "string",
+                                                "description": "windowsShareName"
+                                            },
+                                            "userName": {
+                                                "type": "string",
+                                                "description": "userName"
+                                            },
+                                            "password": {
+                                                "type": "string",
+                                                "description": "password"
+                                            },
+                                            "alertEmailPolicy": {
+                                                "type": "string",
+                                                "description": "alertEmailPolicy"
+                                            },
+                                            "disalertEmailPolicy": {
+                                                "type": "string",
+                                                "description": "disalertEmailPolicy"
+                                            },
+                                            "fileFilter": {
+                                                "type": "string",
+                                                "description": "fileFilter"
+                                            },
+                                            "disfileFilter": {
+                                                "type": "string",
+                                                "description": "disfileFilter"
+                                            },
+                                            "monitorIntervalforRootFolder": {
+                                                "type": "integer",
+                                                "description": "monitorIntervalforRootFolder"
+                                            },
+                                            "monitorIntervalforOtherFolder": {
+                                                "type": "integer",
+                                                "description": "monitorIntervalforOtherFolder"
+                                            },
+                                            "maximumDepthofMonitoredFolders": {
+                                                "type": "integer",
+                                                "description": "maximumDepthofMonitoredFolders"
+                                            },
+                                            "skipFilesLargerThan": {
+                                                "type": "integer",
+                                                "description": "skipFilesLargerThan"
+                                            },
+                                            "skipFilesWithTheseExtensions": {
+                                                "type": "string",
+                                                "description": "skipFilesWithTheseExtensions"
+                                            },
+                                            "restoreChangedFileAutomatically": {
+                                                "type": "boolean",
+                                                "description": "restoreChangedFileAutomatically"
+                                            },
+                                            "acknowlegeAuto": {
+                                                "type": "boolean",
+                                                "description": "acknowlegeAuto"
+                                            },
+                                            "unit_k": {
+                                                "type": "boolean",
+                                                "description": "unit k"
+                                            },
+                                            "traffics_unit": {
+                                                "type": "integer",
+                                                "description": "traffics unit"
+                                            },
+                                            "traffics_unit_hour": {
+                                                "type": "integer",
+                                                "description": "traffics unit hour"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "simple_list",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "simple list"
+                    }
+                ],
+                "tags": [
+                    "wad\/antidefacement"
+                ]
+            }
+        },
+        "\/wad\/wad.antidefacement.bakeupfiles": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "size": {
+                                                "type": "integer",
+                                                "description": "size"
+                                            },
+                                            "dateModified": {
+                                                "type": "string",
+                                                "description": "dateModified"
+                                            },
+                                            "_id": {
+                                                "type": "string",
+                                                "description": " id"
+                                            },
+                                            "name": {
+                                                "type": "string",
+                                                "description": "name"
+                                            },
+                                            "type": {
+                                                "type": "string",
+                                                "description": "type"
+                                            },
+                                            "canviewhistory": {
+                                                "type": "boolean",
+                                                "description": "canviewhistory"
+                                            },
+                                            "candelete": {
+                                                "type": "boolean",
+                                                "description": "candelete"
+                                            },
+                                            "path": {
+                                                "type": "string",
+                                                "description": "path"
+                                            },
+                                            "fullpath": {
+                                                "type": "string",
+                                                "description": "fullpath"
+                                            },
+                                            "disid": {
+                                                "type": "integer",
+                                                "description": "disid"
+                                            },
+                                            "pathname": {
+                                                "type": "string",
+                                                "description": "pathname"
+                                            },
+                                            "action": {
+                                                "type": "string",
+                                                "description": "action"
+                                            },
+                                            "can_view": {
+                                                "type": "boolean",
+                                                "description": "can view"
+                                            },
+                                            "version": {
+                                                "type": "integer",
+                                                "description": "version"
+                                            },
+                                            "catpath": {
+                                                "type": "string",
+                                                "description": "catpath"
+                                            },
+                                            "catname": {
+                                                "type": "string",
+                                                "description": "catname"
+                                            },
+                                            "can_diff": {
+                                                "type": "boolean",
+                                                "description": "can diff"
+                                            },
+                                            "lastversion": {
+                                                "type": "integer",
+                                                "description": "lastversion"
+                                            },
+                                            "diffpath": {
+                                                "type": "string",
+                                                "description": "diffpath"
+                                            },
+                                            "diffname": {
+                                                "type": "string",
+                                                "description": "diffname"
+                                            },
+                                            "can_revert": {
+                                                "type": "boolean",
+                                                "description": "can revert"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "id"
+                    },
+                    {
+                        "name": "subkey",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "subkey"
+                    },
+                    {
+                        "name": "rpath",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "rpath"
+                    },
+                    {
+                        "name": "path",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "path"
+                    },
+                    {
+                        "name": "cmd",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "cmd"
+                    },
+                    {
+                        "name": "name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "name"
+                    },
+                    {
+                        "name": "recover",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "recover"
+                    },
+                    {
+                        "name": "rev",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "rev"
+                    }
+                ],
+                "tags": [
+                    "wad\/wad.antidefacement.bakeupfiles"
+                ]
+            }
+        },
+        "\/wad\/wad.antidefacement.commitdiff": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "body": {
+                                            "type": "string",
+                                            "description": "body"
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "description": "name"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "id"
+                    },
+                    {
+                        "name": "path",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "path"
+                    },
+                    {
+                        "name": "name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "name"
+                    },
+                    {
+                        "name": "oldrev",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "oldrev"
+                    },
+                    {
+                        "name": "newrev",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "newrev"
+                    }
+                ],
+                "tags": [
+                    "wad\/wad.antidefacement.commitdiff"
+                ]
+            }
+        },
+        "\/wad\/antidefacement.changelist": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "payload": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "description": "id"
+                                                    },
+                                                    "siteid": {
+                                                        "type": "integer",
+                                                        "description": "siteid"
+                                                    },
+                                                    "_id": {
+                                                        "type": "integer",
+                                                        "description": " id"
+                                                    },
+                                                    "result": {
+                                                        "type": "string",
+                                                        "description": "result"
+                                                    },
+                                                    "pathName": {
+                                                        "type": "string",
+                                                        "description": "pathName"
+                                                    },
+                                                    "path": {
+                                                        "type": "string",
+                                                        "description": "path"
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "description": "name"
+                                                    },
+                                                    "scanTime": {
+                                                        "type": "string",
+                                                        "description": "scanTime"
+                                                    },
+                                                    "resultString": {
+                                                        "type": "string",
+                                                        "description": "resultString"
+                                                    },
+                                                    "size": {
+                                                        "type": "integer",
+                                                        "description": "size"
+                                                    },
+                                                    "baksize": {
+                                                        "type": "integer",
+                                                        "description": "baksize"
+                                                    },
+                                                    "mtime": {
+                                                        "type": "string",
+                                                        "description": "mtime"
+                                                    },
+                                                    "baktime": {
+                                                        "type": "string",
+                                                        "description": "baktime"
+                                                    },
+                                                    "del_file": {
+                                                        "type": "boolean",
+                                                        "description": "del file"
+                                                    },
+                                                    "add_file": {
+                                                        "type": "boolean",
+                                                        "description": "add file"
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "description": "status"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "description": "total"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "id"
+                    },
+                    {
+                        "name": "startline",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "startline"
+                    },
+                    {
+                        "name": "viewlines",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "viewlines"
+                    },
+                    {
+                        "name": "sortfield",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "sortfield"
+                    },
+                    {
+                        "name": "result",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "result"
+                    },
+                    {
+                        "name": "from_value",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "from value"
+                    },
+                    {
+                        "name": "to_value",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "to value"
+                    },
+                    {
+                        "name": "negate",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "negate"
+                    }
+                ],
+                "tags": [
+                    "wad\/antidefacement.changelist"
+                ]
+            },
+            "put": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "id": {
+                                    "type": "integer",
+                                    "description": "id"
+                                },
+                                "command": {
+                                    "type": "string",
+                                    "description": "command"
+                                },
+                                "path": {
+                                    "type": "string",
+                                    "description": "path"
+                                },
+                                "pathname": {
+                                    "type": "string",
+                                    "description": "pathname"
+                                },
+                                "real_id": {
+                                    "type": "string",
+                                    "description": "real id"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "wad\/antidefacement.changelist"
+                ]
+            },
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "id": {
+                                    "type": "integer",
+                                    "description": "id"
+                                },
+                                "command": {
+                                    "type": "string",
+                                    "description": "command"
+                                },
+                                "path": {
+                                    "type": "string",
+                                    "description": "path"
+                                },
+                                "pathname": {
+                                    "type": "string",
+                                    "description": "pathname"
+                                },
+                                "real_id": {
+                                    "type": "string",
+                                    "description": "real id"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "wad\/antidefacement.changelist"
+                ]
+            }
+        },
+        "\/wad\/antidefacement.test": {
+            "put": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "description": "status"
+                                        },
+                                        "test": {
+                                            "type": "string",
+                                            "description": "test"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "id": {
+                                    "type": "integer",
+                                    "description": "id"
+                                },
+                                "connectionType": {
+                                    "type": "integer",
+                                    "description": "connectionType"
+                                },
+                                "fTPPort": {
+                                    "type": "integer",
+                                    "description": "fTPPort"
+                                },
+                                "sSHPort": {
+                                    "type": "integer",
+                                    "description": "sSHPort"
+                                },
+                                "hostnameIPAddress": {
+                                    "type": "string",
+                                    "description": "hostnameIPAddress"
+                                },
+                                "windowsShareName": {
+                                    "type": "string",
+                                    "description": "windowsShareName"
+                                },
+                                "folderofWebSite": {
+                                    "type": "string",
+                                    "description": "folderofWebSite"
+                                },
+                                "userName": {
+                                    "type": "string",
+                                    "description": "userName"
+                                },
+                                "password": {
+                                    "type": "string",
+                                    "description": "password"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "wad\/antidefacement.test"
+                ]
+            },
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "description": "status"
+                                        },
+                                        "test": {
+                                            "type": "string",
+                                            "description": "test"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "id": {
+                                    "type": "integer",
+                                    "description": "id"
+                                },
+                                "connectionType": {
+                                    "type": "integer",
+                                    "description": "connectionType"
+                                },
+                                "fTPPort": {
+                                    "type": "integer",
+                                    "description": "fTPPort"
+                                },
+                                "sSHPort": {
+                                    "type": "integer",
+                                    "description": "sSHPort"
+                                },
+                                "hostnameIPAddress": {
+                                    "type": "string",
+                                    "description": "hostnameIPAddress"
+                                },
+                                "windowsShareName": {
+                                    "type": "string",
+                                    "description": "windowsShareName"
+                                },
+                                "folderofWebSite": {
+                                    "type": "string",
+                                    "description": "folderofWebSite"
+                                },
+                                "userName": {
+                                    "type": "string",
+                                    "description": "userName"
+                                },
+                                "password": {
+                                    "type": "string",
+                                    "description": "password"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "wad\/antidefacement.test"
+                ]
+            }
+        },
+        "\/wad\/antidefacement.debuglog.list": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": []
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [],
+                "tags": [
+                    "wad\/antidefacement.debuglog.list"
+                ]
+            }
+        },
+        "\/wad\/antidefacement.revertlist": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "payload": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "description": "id"
+                                            },
+                                            "commitTime": {
+                                                "type": "string",
+                                                "description": "commitTime"
+                                            },
+                                            "can_view": {
+                                                "type": "boolean",
+                                                "description": "can view"
+                                            },
+                                            "ver": {
+                                                "type": "integer",
+                                                "description": "ver"
+                                            },
+                                            "oldrev": {
+                                                "type": "string",
+                                                "description": "oldrev"
+                                            },
+                                            "newrev": {
+                                                "type": "string",
+                                                "description": "newrev"
+                                            },
+                                            "can_revert": {
+                                                "type": "boolean",
+                                                "description": "can revert"
+                                            },
+                                            "rev": {
+                                                "type": "string",
+                                                "description": "rev"
+                                            }
+                                        }
+                                    }
+                                },
+                                "total": {
+                                    "type": "integer",
+                                    "description": "total"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "id"
+                    },
+                    {
+                        "name": "subpath",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "subpath"
+                    },
+                    {
+                        "name": "startline",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "startline"
+                    },
+                    {
+                        "name": "viewlines",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "viewlines"
+                    },
+                    {
+                        "name": "sortfield",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "sortfield"
+                    },
+                    {
+                        "name": "from_value",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "from value"
+                    },
+                    {
+                        "name": "to_value",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "to value"
+                    },
+                    {
+                        "name": "negate",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "negate"
+                    },
+                    {
+                        "name": "rev",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "rev"
+                    },
+                    {
+                        "name": "ver",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "ver"
+                    },
+                    {
+                        "name": "oldrev",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "oldrev"
+                    },
+                    {
+                        "name": "newrev",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "newrev"
+                    }
+                ],
+                "tags": [
+                    "wad\/antidefacement.revertlist"
+                ]
+            }
+        }
+    }
+}

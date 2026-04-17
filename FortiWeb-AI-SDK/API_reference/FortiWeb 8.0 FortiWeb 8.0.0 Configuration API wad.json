@@ -1,0 +1,1106 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "FortiWEB CMDB",
+        "description": "REST API for configuring FortiWEB objects and settings",
+        "version": "v2.0",
+        "termsOfService": "http:\/\/fortinet.com\/terms\/",
+        "contact": {
+            "name": "FortiWEB Team",
+            "email": "fosguiqateam@fortinet.com",
+            "url": "http:\/\/modskristensen.net"
+        }
+    },
+    "basePath": "\/api\/v2.0\/cmdb",
+    "host": "172.16.177.65",
+    "schemes": [
+        "https"
+    ],
+    "consumes": [
+        "application\/x-www-form-urlencoded"
+    ],
+    "produces": [
+        "application\/json"
+    ],
+    "securityDefinitions": {
+        "APIKeyHeader": {
+            "type": "apiKey",
+            "in": "header",
+            "name": "Authorization"
+        }
+    },
+    "security": [
+        {
+            "APIKeyHeader": []
+        }
+    ],
+    "tags": [
+        {
+            "name": "wad\/file-filter",
+            "description": "Web Site file filter"
+        },
+        {
+            "name": "wad\/website",
+            "description": "Web Site with Anti-Defacement"
+        }
+    ],
+    "paths": {
+        "\/wad\/file-filter": {
+            "get": {
+                "tags": [
+                    "wad\/file-filter"
+                ],
+                "summary": "Select all entries in a CLI table.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "description": "filter name",
+                                            "maxLength": 63
+                                        },
+                                        "filter-type": {
+                                            "type": "string",
+                                            "description": "filter type",
+                                            "enum": [
+                                                "black-file-list",
+                                                "white-file-list"
+                                            ]
+                                        },
+                                        "members": {
+                                            "type": "array",
+                                            "description": "file filter members",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "description": "filter id"
+                                                    },
+                                                    "file-type": {
+                                                        "type": "string",
+                                                        "description": "file type",
+                                                        "enum": [
+                                                            "directory",
+                                                            "regular-file"
+                                                        ]
+                                                    },
+                                                    "file-name": {
+                                                        "type": "string",
+                                                        "description": "file name",
+                                                        "maxLength": 1023
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "wad\/file-filter"
+                ],
+                "summary": "Create object(s) in this table.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "description": "filter name",
+                                            "maxLength": 63
+                                        },
+                                        "filter-type": {
+                                            "type": "string",
+                                            "description": "filter type",
+                                            "enum": [
+                                                "black-file-list",
+                                                "white-file-list"
+                                            ]
+                                        },
+                                        "members": {
+                                            "type": "array",
+                                            "description": "file filter members",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "description": "filter id"
+                                                    },
+                                                    "file-type": {
+                                                        "type": "string",
+                                                        "description": "file type",
+                                                        "enum": [
+                                                            "directory",
+                                                            "regular-file"
+                                                        ]
+                                                    },
+                                                    "file-name": {
+                                                        "type": "string",
+                                                        "description": "file name",
+                                                        "maxLength": 1023
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "clone_mkey",
+                        "in": "query",
+                        "description": "Use *clone_mkey* to specify the ID for the new resource to be cloned. \nIf *clone_mkey* is set, *mkey* must be provided which is cloned from.\n",
+                        "required": false,
+                        "type": "string"
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "wad\/file-filter"
+                ],
+                "summary": "Update this specific resource.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "description": "filter name",
+                                            "maxLength": 63
+                                        },
+                                        "filter-type": {
+                                            "type": "string",
+                                            "description": "filter type",
+                                            "enum": [
+                                                "black-file-list",
+                                                "white-file-list"
+                                            ]
+                                        },
+                                        "members": {
+                                            "type": "array",
+                                            "description": "file filter members",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "description": "filter id"
+                                                    },
+                                                    "file-type": {
+                                                        "type": "string",
+                                                        "description": "file type",
+                                                        "enum": [
+                                                            "directory",
+                                                            "regular-file"
+                                                        ]
+                                                    },
+                                                    "file-name": {
+                                                        "type": "string",
+                                                        "description": "file name",
+                                                        "maxLength": 1023
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "move_flag",
+                        "in": "query",
+                        "description": "If supported, a flag can be specified.\nWhen *move_flag* is set, extra parameters (*move_mkey*, *sub_mkey*) must be provided.\n__*Note:*__ If this parameter is provided when not supported, the action will be ignored and an \u201cinvalid request\u201d error will be returned.\n",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "before",
+                            "after"
+                        ]
+                    },
+                    {
+                        "name": "sub_mkey",
+                        "in": "query",
+                        "description": "specific resource to be moved",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "move_mkey",
+                        "in": "query",
+                        "description": "specific resource to be moved before or after",
+                        "required": false,
+                        "type": "string"
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "wad\/file-filter"
+                ],
+                "summary": "Delete this specific resource.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        },
+        "\/wad\/website": {
+            "get": {
+                "tags": [
+                    "wad\/website"
+                ],
+                "summary": "Select all entries in a CLI table.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "description": "website id",
+                                            "maximum": 256,
+                                            "minimum": 0
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "description": "name of this website",
+                                            "maxLength": 63
+                                        },
+                                        "description": {
+                                            "type": "string",
+                                            "description": "description of this website",
+                                            "maxLength": 255
+                                        },
+                                        "monitor": {
+                                            "type": "string",
+                                            "description": "whether to enable monitoring this website : [enable|disable]",
+                                            "enum": [
+                                                "enable",
+                                                "disable"
+                                            ]
+                                        },
+                                        "hostname-ip": {
+                                            "type": "string",
+                                            "description": "Hostname or IP address of the website",
+                                            "maxLength": 255
+                                        },
+                                        "connect-type": {
+                                            "type": "string",
+                                            "description": "conection type : [FTP | SSH | SMB]",
+                                            "enum": [
+                                                "ftp",
+                                                "ssh",
+                                                "smb"
+                                            ]
+                                        },
+                                        "port": {
+                                            "type": "integer",
+                                            "description": "port, scale: [1-65535], only available for FTP or SSH",
+                                            "maximum": 65535,
+                                            "minimum": 1
+                                        },
+                                        "share-name": {
+                                            "type": "string",
+                                            "description": "windows share name",
+                                            "maxLength": 63
+                                        },
+                                        "web-folder": {
+                                            "type": "string",
+                                            "description": "website folder to be monitored",
+                                            "maxLength": 1023
+                                        },
+                                        "user": {
+                                            "type": "string",
+                                            "description": "user name",
+                                            "maxLength": 63
+                                        },
+                                        "password": {
+                                            "type": "string",
+                                            "format": "password",
+                                            "description": "password"
+                                        },
+                                        "alert-email": {
+                                            "type": "string",
+                                            "description": "alert email address list, seperated by commar"
+                                        },
+                                        "interval-root": {
+                                            "type": "integer",
+                                            "description": "monitor interval for pages under root directory, unit: second",
+                                            "maximum": 86400,
+                                            "minimum": 1
+                                        },
+                                        "interval-other": {
+                                            "type": "integer",
+                                            "description": "monitor interval of all pages under non root directory, unit: second",
+                                            "maximum": 86400,
+                                            "minimum": 1
+                                        },
+                                        "monitor-depth": {
+                                            "type": "integer",
+                                            "description": "max depth of web folder",
+                                            "maximum": 10,
+                                            "minimum": 1
+                                        },
+                                        "backup-max-fsize": {
+                                            "type": "integer",
+                                            "description": "maximum size of web site file to be backuped, unit: KByte",
+                                            "maximum": 1048576,
+                                            "minimum": 1
+                                        },
+                                        "backup-skip-ftype": {
+                                            "type": "string",
+                                            "description": "file suffix to be skipped, seperated by commar. For example: [avi,iso,rmvb]",
+                                            "maxLength": 511
+                                        },
+                                        "auto": {
+                                            "type": "string",
+                                            "description": "automatically execute web file changes",
+                                            "enum": [
+                                                "disable",
+                                                "restore",
+                                                "acknowledge"
+                                            ]
+                                        },
+                                        "file-filter": {
+                                            "type": "string",
+                                            "description": "file filter"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "wad\/website"
+                ],
+                "summary": "Create object(s) in this table.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "description": "website id",
+                                            "maximum": 256,
+                                            "minimum": 0
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "description": "name of this website",
+                                            "maxLength": 63
+                                        },
+                                        "description": {
+                                            "type": "string",
+                                            "description": "description of this website",
+                                            "maxLength": 255
+                                        },
+                                        "monitor": {
+                                            "type": "string",
+                                            "description": "whether to enable monitoring this website : [enable|disable]",
+                                            "enum": [
+                                                "enable",
+                                                "disable"
+                                            ]
+                                        },
+                                        "hostname-ip": {
+                                            "type": "string",
+                                            "description": "Hostname or IP address of the website",
+                                            "maxLength": 255
+                                        },
+                                        "connect-type": {
+                                            "type": "string",
+                                            "description": "conection type : [FTP | SSH | SMB]",
+                                            "enum": [
+                                                "ftp",
+                                                "ssh",
+                                                "smb"
+                                            ]
+                                        },
+                                        "port": {
+                                            "type": "integer",
+                                            "description": "port, scale: [1-65535], only available for FTP or SSH",
+                                            "maximum": 65535,
+                                            "minimum": 1
+                                        },
+                                        "share-name": {
+                                            "type": "string",
+                                            "description": "windows share name",
+                                            "maxLength": 63
+                                        },
+                                        "web-folder": {
+                                            "type": "string",
+                                            "description": "website folder to be monitored",
+                                            "maxLength": 1023
+                                        },
+                                        "user": {
+                                            "type": "string",
+                                            "description": "user name",
+                                            "maxLength": 63
+                                        },
+                                        "password": {
+                                            "type": "string",
+                                            "format": "password",
+                                            "description": "password"
+                                        },
+                                        "alert-email": {
+                                            "type": "string",
+                                            "description": "alert email address list, seperated by commar"
+                                        },
+                                        "interval-root": {
+                                            "type": "integer",
+                                            "description": "monitor interval for pages under root directory, unit: second",
+                                            "maximum": 86400,
+                                            "minimum": 1
+                                        },
+                                        "interval-other": {
+                                            "type": "integer",
+                                            "description": "monitor interval of all pages under non root directory, unit: second",
+                                            "maximum": 86400,
+                                            "minimum": 1
+                                        },
+                                        "monitor-depth": {
+                                            "type": "integer",
+                                            "description": "max depth of web folder",
+                                            "maximum": 10,
+                                            "minimum": 1
+                                        },
+                                        "backup-max-fsize": {
+                                            "type": "integer",
+                                            "description": "maximum size of web site file to be backuped, unit: KByte",
+                                            "maximum": 1048576,
+                                            "minimum": 1
+                                        },
+                                        "backup-skip-ftype": {
+                                            "type": "string",
+                                            "description": "file suffix to be skipped, seperated by commar. For example: [avi,iso,rmvb]",
+                                            "maxLength": 511
+                                        },
+                                        "auto": {
+                                            "type": "string",
+                                            "description": "automatically execute web file changes",
+                                            "enum": [
+                                                "disable",
+                                                "restore",
+                                                "acknowledge"
+                                            ]
+                                        },
+                                        "file-filter": {
+                                            "type": "string",
+                                            "description": "file filter"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "clone_mkey",
+                        "in": "query",
+                        "description": "Use *clone_mkey* to specify the ID for the new resource to be cloned. \nIf *clone_mkey* is set, *mkey* must be provided which is cloned from.\n",
+                        "required": false,
+                        "type": "string"
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "wad\/website"
+                ],
+                "summary": "Update this specific resource.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "data": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "description": "website id",
+                                            "maximum": 256,
+                                            "minimum": 0
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "description": "name of this website",
+                                            "maxLength": 63
+                                        },
+                                        "description": {
+                                            "type": "string",
+                                            "description": "description of this website",
+                                            "maxLength": 255
+                                        },
+                                        "monitor": {
+                                            "type": "string",
+                                            "description": "whether to enable monitoring this website : [enable|disable]",
+                                            "enum": [
+                                                "enable",
+                                                "disable"
+                                            ]
+                                        },
+                                        "hostname-ip": {
+                                            "type": "string",
+                                            "description": "Hostname or IP address of the website",
+                                            "maxLength": 255
+                                        },
+                                        "connect-type": {
+                                            "type": "string",
+                                            "description": "conection type : [FTP | SSH | SMB]",
+                                            "enum": [
+                                                "ftp",
+                                                "ssh",
+                                                "smb"
+                                            ]
+                                        },
+                                        "port": {
+                                            "type": "integer",
+                                            "description": "port, scale: [1-65535], only available for FTP or SSH",
+                                            "maximum": 65535,
+                                            "minimum": 1
+                                        },
+                                        "share-name": {
+                                            "type": "string",
+                                            "description": "windows share name",
+                                            "maxLength": 63
+                                        },
+                                        "web-folder": {
+                                            "type": "string",
+                                            "description": "website folder to be monitored",
+                                            "maxLength": 1023
+                                        },
+                                        "user": {
+                                            "type": "string",
+                                            "description": "user name",
+                                            "maxLength": 63
+                                        },
+                                        "password": {
+                                            "type": "string",
+                                            "format": "password",
+                                            "description": "password"
+                                        },
+                                        "alert-email": {
+                                            "type": "string",
+                                            "description": "alert email address list, seperated by commar"
+                                        },
+                                        "interval-root": {
+                                            "type": "integer",
+                                            "description": "monitor interval for pages under root directory, unit: second",
+                                            "maximum": 86400,
+                                            "minimum": 1
+                                        },
+                                        "interval-other": {
+                                            "type": "integer",
+                                            "description": "monitor interval of all pages under non root directory, unit: second",
+                                            "maximum": 86400,
+                                            "minimum": 1
+                                        },
+                                        "monitor-depth": {
+                                            "type": "integer",
+                                            "description": "max depth of web folder",
+                                            "maximum": 10,
+                                            "minimum": 1
+                                        },
+                                        "backup-max-fsize": {
+                                            "type": "integer",
+                                            "description": "maximum size of web site file to be backuped, unit: KByte",
+                                            "maximum": 1048576,
+                                            "minimum": 1
+                                        },
+                                        "backup-skip-ftype": {
+                                            "type": "string",
+                                            "description": "file suffix to be skipped, seperated by commar. For example: [avi,iso,rmvb]",
+                                            "maxLength": 511
+                                        },
+                                        "auto": {
+                                            "type": "string",
+                                            "description": "automatically execute web file changes",
+                                            "enum": [
+                                                "disable",
+                                                "restore",
+                                                "acknowledge"
+                                            ]
+                                        },
+                                        "file-filter": {
+                                            "type": "string",
+                                            "description": "file filter"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "move_flag",
+                        "in": "query",
+                        "description": "If supported, a flag can be specified.\nWhen *move_flag* is set, extra parameters (*move_mkey*, *sub_mkey*) must be provided.\n__*Note:*__ If this parameter is provided when not supported, the action will be ignored and an \u201cinvalid request\u201d error will be returned.\n",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "before",
+                            "after"
+                        ]
+                    },
+                    {
+                        "name": "sub_mkey",
+                        "in": "query",
+                        "description": "specific resource to be moved",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "move_mkey",
+                        "in": "query",
+                        "description": "specific resource to be moved before or after",
+                        "required": false,
+                        "type": "string"
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "wad\/website"
+                ],
+                "summary": "Delete this specific resource.\n Access Group: Not Specified",
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "in": "query",
+                        "required": false,
+                        "type": "string",
+                        "description": "If present, objects will be filtered on property with this name"
+                    },
+                    {
+                        "name": "vdom",
+                        "in": "query",
+                        "description": "Specify the Virtual Domain(s) from which results are returned or changes are applied to. If this parameter is not provided, the management VDOM will be used. If the admin does not have access to the VDOM, a permission error will be returned.\nThe URL parameter is one of:\nvdom=root (Single VDOM)\nvdom=vdom1,vdom2 (Multiple VDOMs)\nvdom=* (All VDOMs)\n",
+                        "required": false,
+                        "type": "array",
+                        "collectionFormat": "csv",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

@@ -1,0 +1,101 @@
+canonical_id: org.ulysses.noc.fortiweb-dos-baseline/1.0.0
+name: FortiWeb DoS Prevention Baseline
+version: 1.0.0
+description: >
+  Audit and enforce DoS prevention best-practice on FortiWeb 8.0+.
+  Covers HTTP connection flood, HTTP request flood, Layer 4 access limits,
+  Layer 4 connection flood, and Layer 3 fragment protection.
+  Creates hardened DoS prevention policy with production-safe thresholds.
+metadata:
+  org_namespace: ulysses
+  domain: noc
+  intent: configure
+  vendor: fortinet
+  shelf: noc/fortiweb
+  tags:
+  - fortiweb
+  - dos
+  - ddos
+  - flood
+  - waf
+  - baseline
+  - security
+runtime:
+  language: python
+  entry_point: main
+  source_file: org.ulysses.noc.fortiweb-dos-baseline.py
+  python_packages:
+  - pyyaml>=6.0
+  dotnet_packages: []
+  files:
+  - config/fortiweb_credentials.yaml
+  services: []
+parameters:
+  type: object
+  required:
+  - target_ip
+  - action
+  properties:
+    target_ip:
+      type: string
+      description: FortiWeb management IP address
+      format: ipv4
+    action:
+      type: string
+      enum: [audit, apply, status]
+      description: >
+        audit: Check DoS config against baseline.
+        apply: Create hardened DoS prevention rules and wire into profile.
+        status: Quick DoS posture summary.
+    profile_name:
+      type: string
+      default: Inline Standard Protection
+      description: Protection profile to audit
+    bp_prefix:
+      type: string
+      default: BP
+      description: Prefix for created objects
+    timeout:
+      type: integer
+      default: 30
+    verify_ssl:
+      type: boolean
+      default: false
+output_schema:
+  type: object
+  properties:
+    success:
+      type: boolean
+    action:
+      type: string
+    score:
+      type: string
+    findings:
+      type: array
+    created_objects:
+      type: array
+    error:
+      type: string
+credentials:
+- ref: vault://fortiweb/admin
+  type: username_password
+  required: false
+  scope: [read, write]
+- ref: local://config/fortiweb_credentials.yaml
+  type: config_file
+  required: false
+capabilities:
+  network:
+    outbound: [https:443]
+    inbound: []
+  filesystem:
+    read: [config/*.yaml]
+    write: []
+  process:
+    spawn: false
+    elevated: false
+  max_execution_time_ms: 60000
+security:
+  certified: false
+status: development
+skills_ref: Skills.md

@@ -1,0 +1,431 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "termsOfService": "http:\/\/fortinet.com\/terms\/",
+        "version": "v2",
+        "contact": {
+            "url": "http:\/\/modskristensen.net",
+            "name": "FortiOS Web Application Team",
+            "email": "fosguiqateam@fortinet.com"
+        },
+        "description": "REST API for configuring FortiWEB objects and settings",
+        "title": "FortiWEB Monitor"
+    },
+    "basePath": "\/api\/v2.0\/",
+    "host": "172.16.177.65",
+    "schemes": [
+        "https"
+    ],
+    "consumes": [
+        "application\/x-www-form-urlencoded"
+    ],
+    "produces": [
+        "application\/json"
+    ],
+    "securityDefinitions": {
+        "APIKeyHeader": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    },
+    "security": [
+        {
+            "APIKeyHeader": []
+        }
+    ],
+    "tags": [
+        {
+            "name": "server\/health.check"
+        },
+        {
+            "name": "server\/httpcontentrouting.matchlist"
+        }
+    ],
+    "paths": {
+        "\/server\/health.check": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {
+                                                "type": "string",
+                                                "description": "name"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [],
+                "tags": [
+                    "server\/health.check"
+                ]
+            }
+        },
+        "\/server\/httpcontentrouting.matchlist": {
+            "put": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "_id": {
+                                            "type": "string",
+                                            "description": " id"
+                                        },
+                                        "showmessage": {
+                                            "type": "string",
+                                            "description": "showmessage"
+                                        },
+                                        "pingResult": {
+                                            "type": "integer",
+                                            "description": "pingResult"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "mkey"
+                    },
+                    {
+                        "name": "sub_mkey",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "sub mkey"
+                    },
+                    {
+                        "name": "insert_mkey",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "insert mkey"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "match-object": {
+                                    "type": "string",
+                                    "description": "match-object"
+                                },
+                                "match-condition": {
+                                    "type": "string",
+                                    "description": "match-condition"
+                                },
+                                "match-expression": {
+                                    "type": "string",
+                                    "description": "match-expression"
+                                },
+                                "name-match-condition": {
+                                    "type": "string",
+                                    "description": "name-match-condition"
+                                },
+                                "name": {
+                                    "type": "string",
+                                    "description": "name"
+                                },
+                                "value-match-condition": {
+                                    "type": "string",
+                                    "description": "value-match-condition"
+                                },
+                                "value": {
+                                    "type": "string",
+                                    "description": "value"
+                                },
+                                "x509-subject-name": {
+                                    "type": "string",
+                                    "description": "x509-subject-name"
+                                },
+                                "ip_range": {
+                                    "type": "string",
+                                    "description": "ip range"
+                                },
+                                "country-list": {
+                                    "type": "array",
+                                    "description": "country-list",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "ztna-ems-tag": {
+                                    "type": "array",
+                                    "description": "ztna-ems-tag",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "ztna-ems-tag-combine": {
+                                    "type": "string",
+                                    "description": "ztna-ems-tag-combine"
+                                },
+                                "reverse": {
+                                    "type": "string",
+                                    "description": "reverse"
+                                },
+                                "concatenate": {
+                                    "type": "string",
+                                    "description": "concatenate"
+                                },
+                                "ip_list_file": {
+                                    "type": "string",
+                                    "format": "binary",
+                                    "description": "ip list file"
+                                },
+                                "sizeof(path": {
+                                    "type": "string",
+                                    "description": "sizeof(path"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "server\/httpcontentrouting.matchlist"
+                ]
+            },
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "_id": {
+                                            "type": "string",
+                                            "description": " id"
+                                        },
+                                        "showmessage": {
+                                            "type": "string",
+                                            "description": "showmessage"
+                                        },
+                                        "pingResult": {
+                                            "type": "integer",
+                                            "description": "pingResult"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "mkey"
+                    },
+                    {
+                        "name": "sub_mkey",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "sub mkey"
+                    },
+                    {
+                        "name": "insert_mkey",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "insert mkey"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "match-object": {
+                                    "type": "string",
+                                    "description": "match-object"
+                                },
+                                "match-condition": {
+                                    "type": "string",
+                                    "description": "match-condition"
+                                },
+                                "match-expression": {
+                                    "type": "string",
+                                    "description": "match-expression"
+                                },
+                                "name-match-condition": {
+                                    "type": "string",
+                                    "description": "name-match-condition"
+                                },
+                                "name": {
+                                    "type": "string",
+                                    "description": "name"
+                                },
+                                "value-match-condition": {
+                                    "type": "string",
+                                    "description": "value-match-condition"
+                                },
+                                "value": {
+                                    "type": "string",
+                                    "description": "value"
+                                },
+                                "x509-subject-name": {
+                                    "type": "string",
+                                    "description": "x509-subject-name"
+                                },
+                                "ip_range": {
+                                    "type": "string",
+                                    "description": "ip range"
+                                },
+                                "country-list": {
+                                    "type": "array",
+                                    "description": "country-list",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "ztna-ems-tag": {
+                                    "type": "array",
+                                    "description": "ztna-ems-tag",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "ztna-ems-tag-combine": {
+                                    "type": "string",
+                                    "description": "ztna-ems-tag-combine"
+                                },
+                                "reverse": {
+                                    "type": "string",
+                                    "description": "reverse"
+                                },
+                                "concatenate": {
+                                    "type": "string",
+                                    "description": "concatenate"
+                                },
+                                "ip_list_file": {
+                                    "type": "string",
+                                    "format": "binary",
+                                    "description": "ip list file"
+                                },
+                                "sizeof(path": {
+                                    "type": "string",
+                                    "description": "sizeof(path"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "server\/httpcontentrouting.matchlist"
+                ]
+            }
+        }
+    }
+}

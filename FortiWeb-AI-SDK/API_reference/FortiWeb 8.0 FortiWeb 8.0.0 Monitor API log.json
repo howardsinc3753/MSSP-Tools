@@ -1,0 +1,3538 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "termsOfService": "http:\/\/fortinet.com\/terms\/",
+        "version": "v2",
+        "contact": {
+            "url": "http:\/\/modskristensen.net",
+            "name": "FortiOS Web Application Team",
+            "email": "fosguiqateam@fortinet.com"
+        },
+        "description": "REST API for configuring FortiWEB objects and settings",
+        "title": "FortiWEB Monitor"
+    },
+    "basePath": "\/api\/v2.0\/",
+    "host": "172.16.177.65",
+    "schemes": [
+        "https"
+    ],
+    "consumes": [
+        "application\/x-www-form-urlencoded"
+    ],
+    "produces": [
+        "application\/json"
+    ],
+    "securityDefinitions": {
+        "APIKeyHeader": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    },
+    "security": [
+        {
+            "APIKeyHeader": []
+        }
+    ],
+    "tags": [
+        {
+            "name": "log\/logaccess.historythreat"
+        },
+        {
+            "name": "log\/logreport.reportconfig.runnow"
+        },
+        {
+            "name": "log\/logaccess.download"
+        },
+        {
+            "name": "log\/logconfig.otherlogsettings"
+        },
+        {
+            "name": "log\/logaccess.attack"
+        },
+        {
+            "name": "log\/logaccess.event"
+        },
+        {
+            "name": "log\/logaccess.traffic"
+        },
+        {
+            "name": "log\/logaccess.owasp_mapping_obj"
+        },
+        {
+            "name": "log\/logaccess.owasp_mapping_obj.owasp_api_version"
+        },
+        {
+            "name": "log\/logconfig.globallogsettings"
+        },
+        {
+            "name": "log\/logaccess.downloadfile"
+        },
+        {
+            "name": "log\/logreport.reportconfig.customlogolist"
+        },
+        {
+            "name": "log\/logaccess.logdownload"
+        },
+        {
+            "name": "log\/logreport.logaccess.filter"
+        },
+        {
+            "name": "log\/logaccess.logaccesscomment"
+        },
+        {
+            "name": "log\/logaccess.newattacklog"
+        },
+        {
+            "name": "log\/logaccess.attackdetail.signatureid"
+        },
+        {
+            "name": "log\/logpolicy.emailpolicy"
+        },
+        {
+            "name": "log\/logaccess.attackgeneratepdf"
+        },
+        {
+            "name": "log\/logreport.reportconfig.gettypes"
+        },
+        {
+            "name": "log\/logreport.logaccess.logaccessaggregatedattack"
+        },
+        {
+            "name": "log\/logreport.logaccess.logaccessaggregatedattackdetail"
+        },
+        {
+            "name": "log\/logreport.attack.logflag"
+        },
+        {
+            "name": "log\/logreport.attack.logflags"
+        },
+        {
+            "name": "log\/logreport.reportbrowse"
+        },
+        {
+            "name": "log\/logreport.logaccess.logmanagement"
+        },
+        {
+            "name": "log\/logreport.reportconfig.customlogoitem"
+        }
+    ],
+    "paths": {
+        "\/log\/logaccess.historythreat": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "history_threat",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "history threat"
+                    }
+                ],
+                "tags": [
+                    "log\/logaccess.historythreat"
+                ]
+            }
+        },
+        "\/log\/logreport.reportconfig.runnow": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "report_name": {
+                                            "type": "string",
+                                            "description": "report name"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "report",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "report"
+                    }
+                ],
+                "tags": [
+                    "log\/logreport.reportconfig.runnow"
+                ]
+            }
+        },
+        "\/log\/logaccess.download": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "logType": {
+                                            "type": "string",
+                                            "description": "logType"
+                                        },
+                                        "systemTime": {
+                                            "type": "string",
+                                            "description": "systemTime"
+                                        },
+                                        "startTime": {
+                                            "type": "string",
+                                            "description": "startTime"
+                                        },
+                                        "endTime": {
+                                            "type": "string",
+                                            "description": "endTime"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [],
+                "tags": [
+                    "log\/logaccess.download"
+                ]
+            }
+        },
+        "\/log\/logconfig.otherlogsettings": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "attacklog": {
+                                    "type": "string",
+                                    "description": "attacklog"
+                                },
+                                "trafficlog": {
+                                    "type": "string",
+                                    "description": "trafficlog"
+                                },
+                                "trafficpktlog": {
+                                    "type": "string",
+                                    "description": "trafficpktlog"
+                                },
+                                "eventlog": {
+                                    "type": "string",
+                                    "description": "eventlog"
+                                },
+                                "ignoreSslErrors": {
+                                    "type": "string",
+                                    "description": "ignoreSslErrors"
+                                },
+                                "adjust-packet": {
+                                    "type": "string",
+                                    "description": "adjust-packet"
+                                },
+                                "options_packet[cat].text": {
+                                    "type": "string",
+                                    "description": "options packet[cat].text"
+                                },
+                                "cpu": {
+                                    "type": "integer",
+                                    "description": "cpu"
+                                },
+                                "memory": {
+                                    "type": "integer",
+                                    "description": "memory"
+                                },
+                                "logdisk": {
+                                    "type": "integer",
+                                    "description": "logdisk"
+                                },
+                                "triggerpolicy": {
+                                    "type": "string",
+                                    "description": "triggerpolicy"
+                                },
+                                "sys-perf-log-interval": {
+                                    "type": "integer",
+                                    "description": "sys-perf-log-interval"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [],
+                "tags": [
+                    "log\/logconfig.otherlogsettings"
+                ]
+            },
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "_id": {
+                                            "type": "string",
+                                            "description": " id"
+                                        },
+                                        "showmessage": {
+                                            "type": "string",
+                                            "description": "showmessage"
+                                        },
+                                        "pingResult": {
+                                            "type": "integer",
+                                            "description": "pingResult"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "attacklog": {
+                                    "type": "string",
+                                    "description": "attacklog"
+                                },
+                                "ignoreSslErrors": {
+                                    "type": "string",
+                                    "description": "ignoreSslErrors"
+                                },
+                                "adjust-packet": {
+                                    "type": "string",
+                                    "description": "adjust-packet"
+                                },
+                                "buf": {
+                                    "type": "string",
+                                    "description": "buf"
+                                },
+                                "eventlog": {
+                                    "type": "string",
+                                    "description": "eventlog"
+                                },
+                                "cpu": {
+                                    "type": "integer",
+                                    "description": "cpu"
+                                },
+                                "memory": {
+                                    "type": "integer",
+                                    "description": "memory"
+                                },
+                                "logdisk": {
+                                    "type": "integer",
+                                    "description": "logdisk"
+                                },
+                                "triggerpolicy": {
+                                    "type": "string",
+                                    "description": "triggerpolicy"
+                                },
+                                "sys-perf-log-interval": {
+                                    "type": "integer",
+                                    "description": "sys-perf-log-interval"
+                                },
+                                "trafficlog": {
+                                    "type": "string",
+                                    "description": "trafficlog"
+                                },
+                                "trafficpktlog": {
+                                    "type": "string",
+                                    "description": "trafficpktlog"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "log\/logconfig.otherlogsettings"
+                ]
+            }
+        },
+        "\/log\/logaccess.attack": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "total": {
+                                            "type": "integer",
+                                            "description": "total"
+                                        },
+                                        "filter_offset": {
+                                            "type": "integer",
+                                            "description": "filter offset"
+                                        },
+                                        "payload": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "description": "id"
+                                                    },
+                                                    "length": {
+                                                        "type": "integer",
+                                                        "description": "length"
+                                                    },
+                                                    "fpos": {
+                                                        "type": "integer",
+                                                        "description": "fpos"
+                                                    },
+                                                    "flag_val": {
+                                                        "type": "integer",
+                                                        "description": "flag val"
+                                                    },
+                                                    "flag": {
+                                                        "type": "string",
+                                                        "description": "flag"
+                                                    },
+                                                    "has_comment": {
+                                                        "type": "string",
+                                                        "description": "has comment"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "offset",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "offset"
+                    },
+                    {
+                        "name": "size",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "size"
+                    },
+                    {
+                        "name": "page",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "page"
+                    },
+                    {
+                        "name": "gen_log",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "gen log"
+                    },
+                    {
+                        "name": "log",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "log"
+                    },
+                    {
+                        "name": "filter_mode",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "filter mode"
+                    },
+                    {
+                        "name": "filter",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "filter"
+                    },
+                    {
+                        "name": "filter_offset",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "filter offset"
+                    },
+                    {
+                        "name": "base_offset",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "base offset"
+                    }
+                ],
+                "tags": [
+                    "log\/logaccess.attack"
+                ]
+            }
+        },
+        "\/log\/logaccess.event": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "total": {
+                                            "type": "integer",
+                                            "description": "total"
+                                        },
+                                        "filter_offset": {
+                                            "type": "integer",
+                                            "description": "filter offset"
+                                        },
+                                        "payload": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "description": "id"
+                                                    },
+                                                    "length": {
+                                                        "type": "integer",
+                                                        "description": "length"
+                                                    },
+                                                    "fpos": {
+                                                        "type": "integer",
+                                                        "description": "fpos"
+                                                    },
+                                                    "flag_val": {
+                                                        "type": "integer",
+                                                        "description": "flag val"
+                                                    },
+                                                    "flag": {
+                                                        "type": "string",
+                                                        "description": "flag"
+                                                    },
+                                                    "has_comment": {
+                                                        "type": "string",
+                                                        "description": "has comment"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "offset",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "offset"
+                    },
+                    {
+                        "name": "size",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "size"
+                    },
+                    {
+                        "name": "page",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "page"
+                    },
+                    {
+                        "name": "gen_log",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "gen log"
+                    },
+                    {
+                        "name": "log",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "log"
+                    },
+                    {
+                        "name": "filter_mode",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "filter mode"
+                    },
+                    {
+                        "name": "filter",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "filter"
+                    },
+                    {
+                        "name": "filter_offset",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "filter offset"
+                    },
+                    {
+                        "name": "base_offset",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "base offset"
+                    }
+                ],
+                "tags": [
+                    "log\/logaccess.event"
+                ]
+            }
+        },
+        "\/log\/logaccess.traffic": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "total": {
+                                            "type": "integer",
+                                            "description": "total"
+                                        },
+                                        "filter_offset": {
+                                            "type": "integer",
+                                            "description": "filter offset"
+                                        },
+                                        "payload": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "description": "id"
+                                                    },
+                                                    "length": {
+                                                        "type": "integer",
+                                                        "description": "length"
+                                                    },
+                                                    "fpos": {
+                                                        "type": "integer",
+                                                        "description": "fpos"
+                                                    },
+                                                    "flag_val": {
+                                                        "type": "integer",
+                                                        "description": "flag val"
+                                                    },
+                                                    "flag": {
+                                                        "type": "string",
+                                                        "description": "flag"
+                                                    },
+                                                    "has_comment": {
+                                                        "type": "string",
+                                                        "description": "has comment"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "offset",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "offset"
+                    },
+                    {
+                        "name": "size",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "size"
+                    },
+                    {
+                        "name": "page",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "page"
+                    },
+                    {
+                        "name": "gen_log",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "gen log"
+                    },
+                    {
+                        "name": "log",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "log"
+                    },
+                    {
+                        "name": "filter_mode",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "filter mode"
+                    },
+                    {
+                        "name": "filter",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "filter"
+                    },
+                    {
+                        "name": "filter_offset",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "filter offset"
+                    },
+                    {
+                        "name": "base_offset",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "base offset"
+                    }
+                ],
+                "tags": [
+                    "log\/logaccess.traffic"
+                ]
+            }
+        },
+        "\/log\/logaccess.owasp_mapping_obj": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [],
+                "tags": [
+                    "log\/logaccess.owasp_mapping_obj"
+                ]
+            }
+        },
+        "\/log\/logaccess.owasp_mapping_obj.owasp_api_version": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [],
+                "tags": [
+                    "log\/logaccess.owasp_mapping_obj.owasp_api_version"
+                ]
+            }
+        },
+        "\/log\/logconfig.globallogsettings": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "description": "name"
+                                },
+                                "value": {
+                                    "type": "string",
+                                    "description": "value"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [],
+                "tags": [
+                    "log\/logconfig.globallogsettings"
+                ]
+            },
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "_id": {
+                                            "type": "string",
+                                            "description": " id"
+                                        },
+                                        "showmessage": {
+                                            "type": "string",
+                                            "description": "showmessage"
+                                        },
+                                        "pingResult": {
+                                            "type": "integer",
+                                            "description": "pingResult"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "diskstatus": {
+                                    "type": "string",
+                                    "description": "diskstatus"
+                                },
+                                "log_used_disk": {
+                                    "type": "integer",
+                                    "description": "log used disk"
+                                },
+                                "disklog_level": {
+                                    "type": "string",
+                                    "description": "disklog level"
+                                },
+                                "disk_full": {
+                                    "type": "string",
+                                    "description": "disk full"
+                                },
+                                "disk_elog": {
+                                    "type": "string",
+                                    "description": "disk elog"
+                                },
+                                "disk_tlog": {
+                                    "type": "string",
+                                    "description": "disk tlog"
+                                },
+                                "disk_alog": {
+                                    "type": "string",
+                                    "description": "disk alog"
+                                },
+                                "sysstatus": {
+                                    "type": "string",
+                                    "description": "sysstatus"
+                                },
+                                "syslogPolicy": {
+                                    "type": "string",
+                                    "description": "syslogPolicy"
+                                },
+                                "syslog_level": {
+                                    "type": "string",
+                                    "description": "syslog level"
+                                },
+                                "syslog_facility": {
+                                    "type": "string",
+                                    "description": "syslog facility"
+                                },
+                                "syslog_elog": {
+                                    "type": "string",
+                                    "description": "syslog elog"
+                                },
+                                "syslog_tlog": {
+                                    "type": "string",
+                                    "description": "syslog tlog"
+                                },
+                                "syslog_alog": {
+                                    "type": "string",
+                                    "description": "syslog alog"
+                                },
+                                "custom_field_list\" ": {
+                                    "type": "string",
+                                    "description": "custom field list\" "
+                                },
+                                "name\"  ": {
+                                    "type": "string",
+                                    "description": "name\"  "
+                                },
+                                "value\" ": {
+                                    "type": "string",
+                                    "description": "value\" "
+                                },
+                                "alertstatus": {
+                                    "type": "string",
+                                    "description": "alertstatus"
+                                },
+                                "emailPolicy": {
+                                    "type": "string",
+                                    "description": "emailPolicy"
+                                },
+                                "email_elog": {
+                                    "type": "string",
+                                    "description": "email elog"
+                                },
+                                "email_alog": {
+                                    "type": "string",
+                                    "description": "email alog"
+                                },
+                                "fortistatus": {
+                                    "type": "string",
+                                    "description": "fortistatus"
+                                },
+                                "forti_level": {
+                                    "type": "string",
+                                    "description": "forti level"
+                                },
+                                "fortiPolicy": {
+                                    "type": "string",
+                                    "description": "fortiPolicy"
+                                },
+                                "forti_elog": {
+                                    "type": "string",
+                                    "description": "forti elog"
+                                },
+                                "forti_tlog": {
+                                    "type": "string",
+                                    "description": "forti tlog"
+                                },
+                                "forti_alog": {
+                                    "type": "string",
+                                    "description": "forti alog"
+                                },
+                                "siemstatus": {
+                                    "type": "string",
+                                    "description": "siemstatus"
+                                },
+                                "siemlog_level": {
+                                    "type": "string",
+                                    "description": "siemlog level"
+                                },
+                                "siemPolicy": {
+                                    "type": "string",
+                                    "description": "siemPolicy"
+                                },
+                                "siem_elog": {
+                                    "type": "string",
+                                    "description": "siem elog"
+                                },
+                                "siem_tlog": {
+                                    "type": "string",
+                                    "description": "siem tlog"
+                                },
+                                "siem_alog": {
+                                    "type": "string",
+                                    "description": "siem alog"
+                                },
+                                "cloudstatus": {
+                                    "type": "string",
+                                    "description": "cloudstatus"
+                                },
+                                "cloud_elog": {
+                                    "type": "string",
+                                    "description": "cloud elog"
+                                },
+                                "cloud_tlog": {
+                                    "type": "string",
+                                    "description": "cloud tlog"
+                                },
+                                "cloud_alog": {
+                                    "type": "string",
+                                    "description": "cloud alog"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "log\/logconfig.globallogsettings"
+                ]
+            }
+        },
+        "\/log\/logaccess.downloadfile": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": []
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "logtype",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "logtype"
+                    },
+                    {
+                        "name": "year",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "year"
+                    },
+                    {
+                        "name": "month",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "month"
+                    },
+                    {
+                        "name": "day",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "day"
+                    },
+                    {
+                        "name": "hour",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "hour"
+                    },
+                    {
+                        "name": "minute",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "minute"
+                    },
+                    {
+                        "name": "second",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "second"
+                    },
+                    {
+                        "name": "endyear",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "endyear"
+                    },
+                    {
+                        "name": "endmonth",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "endmonth"
+                    },
+                    {
+                        "name": "endday",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "endday"
+                    },
+                    {
+                        "name": "endhour",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "endhour"
+                    },
+                    {
+                        "name": "endminute",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "endminute"
+                    },
+                    {
+                        "name": "endsecond",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "endsecond"
+                    }
+                ],
+                "tags": [
+                    "log\/logaccess.downloadfile"
+                ]
+            }
+        },
+        "\/log\/logreport.reportconfig.customlogolist": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "last_logo",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "last logo"
+                    }
+                ],
+                "tags": [
+                    "log\/logreport.reportconfig.customlogolist"
+                ]
+            }
+        },
+        "\/log\/logaccess.logdownload": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": []
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "encryption",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "encryption"
+                    },
+                    {
+                        "name": "format",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "format"
+                    },
+                    {
+                        "name": "filename",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "filename"
+                    },
+                    {
+                        "name": "password",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "password"
+                    }
+                ],
+                "tags": [
+                    "log\/logaccess.logdownload"
+                ]
+            }
+        },
+        "\/log\/logreport.logaccess.filter": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "log_type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "log type"
+                    }
+                ],
+                "tags": [
+                    "log\/logreport.logaccess.filter"
+                ]
+            },
+            "delete": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "log_type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "log type"
+                    },
+                    {
+                        "name": "name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "name"
+                    }
+                ],
+                "tags": [
+                    "log\/logreport.logaccess.filter"
+                ]
+            },
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "filter_name": {
+                                            "type": "string",
+                                            "description": "filter name"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "log_type": {
+                                    "type": "integer",
+                                    "description": "log type"
+                                },
+                                "filter_name": {
+                                    "type": "string",
+                                    "description": "filter name"
+                                },
+                                "filter": {
+                                    "type": "string",
+                                    "description": "filter"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "log\/logreport.logaccess.filter"
+                ]
+            }
+        },
+        "\/log\/logaccess.logaccesscomment": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "creator": {
+                                    "type": "string",
+                                    "description": "creator"
+                                },
+                                "editor": {
+                                    "type": "string",
+                                    "description": "editor"
+                                },
+                                "comment": {
+                                    "type": "string",
+                                    "description": "comment"
+                                },
+                                "create_time": {
+                                    "type": "string",
+                                    "description": "create time"
+                                },
+                                "edit_time": {
+                                    "type": "string",
+                                    "description": "edit time"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "msg_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "msg id"
+                    },
+                    {
+                        "name": "logfile",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "logfile"
+                    }
+                ],
+                "tags": [
+                    "log\/logaccess.logaccesscomment"
+                ]
+            },
+            "put": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "creator": {
+                                    "type": "string",
+                                    "description": "creator"
+                                },
+                                "editor": {
+                                    "type": "string",
+                                    "description": "editor"
+                                },
+                                "comment": {
+                                    "type": "string",
+                                    "description": "comment"
+                                },
+                                "create_time": {
+                                    "type": "string",
+                                    "description": "create time"
+                                },
+                                "edit_time": {
+                                    "type": "string",
+                                    "description": "edit time"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "msg_id": {
+                                    "type": "string",
+                                    "description": "msg id"
+                                },
+                                "comment": {
+                                    "type": "string",
+                                    "description": "comment"
+                                },
+                                "logfile": {
+                                    "type": "string",
+                                    "description": "logfile"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "log\/logaccess.logaccesscomment"
+                ]
+            },
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "creator": {
+                                    "type": "string",
+                                    "description": "creator"
+                                },
+                                "editor": {
+                                    "type": "string",
+                                    "description": "editor"
+                                },
+                                "comment": {
+                                    "type": "string",
+                                    "description": "comment"
+                                },
+                                "create_time": {
+                                    "type": "string",
+                                    "description": "create time"
+                                },
+                                "edit_time": {
+                                    "type": "string",
+                                    "description": "edit time"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "msg_id": {
+                                    "type": "string",
+                                    "description": "msg id"
+                                },
+                                "comment": {
+                                    "type": "string",
+                                    "description": "comment"
+                                },
+                                "logfile": {
+                                    "type": "string",
+                                    "description": "logfile"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "log\/logaccess.logaccesscomment"
+                ]
+            }
+        },
+        "\/log\/logaccess.newattacklog": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "length": {
+                                                "type": "integer",
+                                                "description": "length"
+                                            },
+                                            "fpos": {
+                                                "type": "integer",
+                                                "description": "fpos"
+                                            },
+                                            "logfile": {
+                                                "type": "string",
+                                                "description": "logfile"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "msg_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "msg id"
+                    },
+                    {
+                        "name": "size",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "size"
+                    }
+                ],
+                "tags": [
+                    "log\/logaccess.newattacklog"
+                ]
+            }
+        },
+        "\/log\/logaccess.attackdetail.signatureid": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "signature_id": {
+                                    "type": "string",
+                                    "description": "signature id"
+                                },
+                                "desc": {
+                                    "type": "string",
+                                    "description": "desc"
+                                },
+                                "meet_target": {
+                                    "type": "string",
+                                    "description": "meet target"
+                                },
+                                "attack_example": {
+                                    "type": "string",
+                                    "description": "attack example"
+                                },
+                                "attack_reference": {
+                                    "type": "string",
+                                    "description": "attack reference"
+                                },
+                                "protocol": {
+                                    "type": "integer",
+                                    "description": "protocol"
+                                },
+                                "attack_example2": {
+                                    "type": "string",
+                                    "description": "attack example2"
+                                },
+                                "is_default": {
+                                    "type": "integer",
+                                    "description": "is default"
+                                },
+                                "no_score_mode": {
+                                    "type": "integer",
+                                    "description": "no score mode"
+                                },
+                                "score_mode": {
+                                    "type": "integer",
+                                    "description": "score mode"
+                                },
+                                "sig_score": {
+                                    "type": "integer",
+                                    "description": "sig score"
+                                },
+                                "default_score": {
+                                    "type": "integer",
+                                    "description": "default score"
+                                },
+                                "override": {
+                                    "type": "integer",
+                                    "description": "override"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "sig_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "sig id"
+                    },
+                    {
+                        "name": "sig_name",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "sig name"
+                    }
+                ],
+                "tags": [
+                    "log\/logaccess.attackdetail.signatureid"
+                ]
+            },
+            "put": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "status": {
+                                    "type": "integer",
+                                    "description": "status"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "sig_name": {
+                                    "type": "string",
+                                    "description": "sig name"
+                                },
+                                "signature_id": {
+                                    "type": "string",
+                                    "description": "signature id"
+                                },
+                                "override": {
+                                    "type": "integer",
+                                    "description": "override"
+                                },
+                                "sig_score": {
+                                    "type": "integer",
+                                    "description": "sig score"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "log\/logaccess.attackdetail.signatureid"
+                ]
+            },
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "status": {
+                                    "type": "integer",
+                                    "description": "status"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "sig_name": {
+                                    "type": "string",
+                                    "description": "sig name"
+                                },
+                                "signature_id": {
+                                    "type": "string",
+                                    "description": "signature id"
+                                },
+                                "override": {
+                                    "type": "integer",
+                                    "description": "override"
+                                },
+                                "sig_score": {
+                                    "type": "integer",
+                                    "description": "sig score"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "log\/logaccess.attackdetail.signatureid"
+                ]
+            }
+        },
+        "\/log\/logpolicy.emailpolicy": {
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "_id": {
+                                            "type": "string",
+                                            "description": " id"
+                                        },
+                                        "showmessage": {
+                                            "type": "string",
+                                            "description": "showmessage"
+                                        },
+                                        "pingResult": {
+                                            "type": "integer",
+                                            "description": "pingResult"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "description": "name"
+                                },
+                                "smtp-auth": {
+                                    "type": "string",
+                                    "description": "smtp-auth"
+                                },
+                                "smtp-server": {
+                                    "type": "string",
+                                    "description": "smtp-server"
+                                },
+                                "smtp-username": {
+                                    "type": "string",
+                                    "description": "smtp-username"
+                                },
+                                "smtp-password": {
+                                    "type": "string",
+                                    "description": "smtp-password"
+                                },
+                                "mailfrom": {
+                                    "type": "string",
+                                    "description": "mailfrom"
+                                },
+                                "mailto1": {
+                                    "type": "string",
+                                    "description": "mailto1"
+                                },
+                                "mailto2": {
+                                    "type": "string",
+                                    "description": "mailto2"
+                                },
+                                "mailto3": {
+                                    "type": "string",
+                                    "description": "mailto3"
+                                },
+                                "severity": {
+                                    "type": "string",
+                                    "description": "severity"
+                                },
+                                "send-email-based-on-interval-time": {
+                                    "type": "string",
+                                    "description": "send-email-based-on-interval-time"
+                                },
+                                "interval": {
+                                    "type": "integer",
+                                    "description": "interval"
+                                },
+                                "smtp-port": {
+                                    "type": "integer",
+                                    "description": "smtp-port"
+                                },
+                                "connection-security": {
+                                    "type": "string",
+                                    "description": "connection-security"
+                                },
+                                "attach-compression": {
+                                    "type": "string",
+                                    "description": "attach-compression"
+                                },
+                                "company-name": {
+                                    "type": "string",
+                                    "description": "company-name"
+                                },
+                                "company_logo": {
+                                    "type": "string",
+                                    "format": "binary",
+                                    "description": "company logo"
+                                },
+                                "action": {
+                                    "type": "integer",
+                                    "description": "action"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "log\/logpolicy.emailpolicy"
+                ]
+            }
+        },
+        "\/log\/logaccess.attackgeneratepdf": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": []
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "items",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "items"
+                    },
+                    {
+                        "name": "buf",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "buf"
+                    }
+                ],
+                "tags": [
+                    "log\/logaccess.attackgeneratepdf"
+                ]
+            }
+        },
+        "\/log\/logreport.reportconfig.gettypes": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "name": {
+                                                "type": "string",
+                                                "description": "name"
+                                            },
+                                            "sub": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "name": {
+                                                            "type": "string",
+                                                            "description": "name"
+                                                        },
+                                                        "help": {
+                                                            "type": "string",
+                                                            "description": "help"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [],
+                "tags": [
+                    "log\/logreport.reportconfig.gettypes"
+                ]
+            }
+        },
+        "\/log\/logreport.logaccess.logaccessaggregatedattack": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "_id": {
+                                                        "type": "string",
+                                                        "description": " id"
+                                                    },
+                                                    "date": {
+                                                        "type": "string",
+                                                        "description": "date"
+                                                    },
+                                                    "count": {
+                                                        "type": "integer",
+                                                        "description": "count"
+                                                    },
+                                                    "details": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "type": "object",
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer",
+                                                                    "description": "id"
+                                                                },
+                                                                "type_label": {
+                                                                    "type": "string",
+                                                                    "description": "type label"
+                                                                },
+                                                                "type_id": {
+                                                                    "type": "integer",
+                                                                    "description": "type id"
+                                                                },
+                                                                "datetime": {
+                                                                    "type": "string",
+                                                                    "description": "datetime"
+                                                                },
+                                                                "count": {
+                                                                    "type": "integer",
+                                                                    "description": "count"
+                                                                },
+                                                                "signature": {
+                                                                    "type": "string",
+                                                                    "description": "signature"
+                                                                },
+                                                                "is_scoring": {
+                                                                    "type": "integer",
+                                                                    "description": "is scoring"
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "next": {
+                                            "type": "integer",
+                                            "description": "next"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "days",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "days"
+                    },
+                    {
+                        "name": "startline",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "startline"
+                    },
+                    {
+                        "name": "direction",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "direction"
+                    },
+                    {
+                        "name": "first_date",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "first date"
+                    },
+                    {
+                        "name": "last_date",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "last date"
+                    }
+                ],
+                "tags": [
+                    "log\/logreport.logaccess.logaccessaggregatedattack"
+                ]
+            }
+        },
+        "\/log\/logreport.logaccess.logaccessaggregatedattackdetail": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "time": {
+                                    "type": "string",
+                                    "description": "time"
+                                },
+                                "_id": {
+                                    "type": "integer",
+                                    "description": " id"
+                                },
+                                "msg_id": {
+                                    "type": "integer",
+                                    "description": "msg id"
+                                },
+                                "policy": {
+                                    "type": "string",
+                                    "description": "policy"
+                                },
+                                "score": {
+                                    "type": "integer",
+                                    "description": "score"
+                                },
+                                "score_scope": {
+                                    "type": "string",
+                                    "description": "score scope"
+                                },
+                                "score_threshold": {
+                                    "type": "integer",
+                                    "description": "score threshold"
+                                },
+                                "score_sum": {
+                                    "type": "integer",
+                                    "description": "score sum"
+                                },
+                                "entry_sequence": {
+                                    "type": "string",
+                                    "description": "entry sequence"
+                                },
+                                "log_file_name": {
+                                    "type": "string",
+                                    "description": "log file name"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "date",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "date"
+                    },
+                    {
+                        "name": "signature",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "signature"
+                    },
+                    {
+                        "name": "type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "type"
+                    },
+                    {
+                        "name": "viewline",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "viewline"
+                    },
+                    {
+                        "name": "msg_id",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "msg id"
+                    },
+                    {
+                        "name": "is_scoring",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "is scoring"
+                    }
+                ],
+                "tags": [
+                    "log\/logreport.logaccess.logaccessaggregatedattackdetail"
+                ]
+            }
+        },
+        "\/log\/logreport.attack.logflag": {
+            "put": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "status": {
+                                            "type": "integer",
+                                            "description": "status"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "msg_id": {
+                                    "type": "integer",
+                                    "description": "msg id"
+                                },
+                                "flag": {
+                                    "type": "integer",
+                                    "description": "flag"
+                                },
+                                "value": {
+                                    "type": "integer",
+                                    "description": "value"
+                                },
+                                "logfile": {
+                                    "type": "string",
+                                    "description": "logfile"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "log\/logreport.attack.logflag"
+                ]
+            }
+        },
+        "\/log\/logreport.attack.logflags": {
+            "put": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": []
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "msg_id": {
+                                    "type": "integer",
+                                    "description": "msg id"
+                                },
+                                "flag": {
+                                    "type": "integer",
+                                    "description": "flag"
+                                },
+                                "value": {
+                                    "type": "integer",
+                                    "description": "value"
+                                },
+                                "logfile": {
+                                    "type": "string",
+                                    "description": "logfile"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "log\/logreport.attack.logflags"
+                ]
+            }
+        },
+        "\/log\/logreport.reportbrowse": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": []
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "view",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "view"
+                    },
+                    {
+                        "name": "wd",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "wd"
+                    },
+                    {
+                        "name": "im",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "im"
+                    },
+                    {
+                        "name": "file",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "file"
+                    }
+                ],
+                "tags": [
+                    "log\/logreport.reportbrowse"
+                ]
+            },
+            "delete": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "affected": {
+                                            "type": "integer",
+                                            "description": "affected"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "mkey"
+                    }
+                ],
+                "tags": [
+                    "log\/logreport.reportbrowse"
+                ]
+            },
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "affected": {
+                                            "type": "integer",
+                                            "description": "affected"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "mkey",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "mkey"
+                    }
+                ],
+                "tags": [
+                    "log\/logreport.reportbrowse"
+                ]
+            }
+        },
+        "\/log\/logreport.logaccess.logmanagement": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful"
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "type",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "type"
+                    },
+                    {
+                        "name": "sn",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "sn"
+                    },
+                    {
+                        "name": "startline",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "startline"
+                    },
+                    {
+                        "name": "viewlines",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "viewlines"
+                    }
+                ],
+                "tags": [
+                    "log\/logreport.logaccess.logmanagement"
+                ]
+            },
+            "delete": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "affected": {
+                                            "type": "integer",
+                                            "description": "affected"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "filename",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "filename"
+                    }
+                ],
+                "tags": [
+                    "log\/logreport.logaccess.logmanagement"
+                ]
+            }
+        },
+        "\/log\/logreport.reportconfig.customlogoitem": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": []
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "path",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "path"
+                    }
+                ],
+                "tags": [
+                    "log\/logreport.reportconfig.customlogoitem"
+                ]
+            },
+            "delete": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "affected": {
+                                            "type": "integer",
+                                            "description": "affected"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "filename",
+                        "type": "string",
+                        "required": false,
+                        "in": "query",
+                        "description": "filename"
+                    }
+                ],
+                "tags": [
+                    "log\/logreport.reportconfig.customlogoitem"
+                ]
+            },
+            "post": {
+                "responses": {
+                    "200": {
+                        "description": "OK: Request returns successful",
+                        "schema": {
+                            "properties": {
+                                "results": {
+                                    "type": "object",
+                                    "description": "results",
+                                    "properties": {
+                                        "_id": {
+                                            "type": "string",
+                                            "description": " id"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request: Request cannot be processed by the API"
+                    },
+                    "401": {
+                        "description": "Not Authorized: Request without successful login session"
+                    },
+                    "403": {
+                        "description": "Forbidden: Request is missing CSRF token or administrator is missing access profile permissions."
+                    },
+                    "404": {
+                        "description": "Resource Not Found: Unable to find the specified resource."
+                    },
+                    "405": {
+                        "description": "Method Not Allowed: Specified HTTP method is not allowed for this resource. "
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large: Request cannot be processed due to large entity "
+                    },
+                    "424": {
+                        "description": "Failed Dependency: Fail dependency can be duplicate resource, missing required parameter, missing required attribute, invalid attribute value"
+                    },
+                    "429": {
+                        "description": "Access temporarily blocked: Maximum failed authentications reached. The offended source is temporarily blocked for certain amount of time."
+                    },
+                    "500": {
+                        "description": "Internal Server Error: Internal error when processing the request "
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Possible parameters to go in the body for the request",
+                        "required": true,
+                        "schema": {
+                            "properties": {
+                                "upfile": {
+                                    "type": "string",
+                                    "format": "binary",
+                                    "description": "upfile"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "tags": [
+                    "log\/logreport.reportconfig.customlogoitem"
+                ]
+            }
+        }
+    }
+}
